@@ -5,6 +5,6 @@ const config = {
   pixelArt: true,
   width: 1920,
   height: 1080,
-  scene: [Accueil, Jeu, Credits, Victoire, PartieTerminee],
+  scene: [Accueil, Jeu, Credits, Victoire, PartieTerminee, Tutoriel],
 };
 const game = new Phaser.Game(config);

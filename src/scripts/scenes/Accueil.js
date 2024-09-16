@@ -20,11 +20,16 @@ class Accueil extends Phaser.Scene {
       "credits",
       "./assets/images/ui/Small_Buttons/Info_Square_Button.png"
     );
+
+    this.load.image(
+      "audio",
+      "./assets/images/ui/Small_Buttons/Audio_Square_Button.png"
+    );
   }
 
   create() {
     // HUD
-    const hudContainer = this.add.container(0, 0);
+    const hudContainer = this.add.container(0, 0).setDepth(1);
 
     // Background
 
@@ -38,6 +43,7 @@ class Accueil extends Phaser.Scene {
     const logo = this.add
       .image(0, 0, "logo")
       .setPosition(config.width / 2, 200);
+    hudContainer.add(logo);
 
     /* J'ajouterais le texte plus tard avec un font que je trouverais
 
@@ -50,27 +56,36 @@ class Accueil extends Phaser.Scene {
 
     // Boutons
 
-    let playBtn = this.add.image(config.width / 2, config.height / 2, "play");
+    let playBtn = this.add
+      .image(config.width / 2, config.height / 2, "play")
+      .setScale(0.5);
 
-    let controlsBtn = this.add.image(
-      config.width / 2,
-      config.height / 2,
-      "controls"
-    );
+    hudContainer.add(playBtn);
 
-    let creditsBtn = this.add.image(
-      config.width / 2,
-      config.height / 2,
-      "credits"
-    );
+    let controlsBtn = this.add
+      .image(config.width / 2, config.height / 2 + 120, "controls")
+      .setScale(0.5);
 
-    hudContainer.add(playBtn, controlsBtn, creditsBtn);
+    hudContainer.add(controlsBtn);
+
+    let creditsBtn = this.add
+      .image(config.width / 2 - 50, config.height / 2 + 250, "credits")
+      .setScale(0.2);
+
+    hudContainer.add(creditsBtn);
+
+    let audioBtn = this.add
+      .image(config.width / 2 + 50, config.height / 2 + 250, "audio")
+      .setScale(0.2);
+
+    hudContainer.add(audioBtn);
 
     // Interactifs
 
     playBtn.setInteractive();
     controlsBtn.setInteractive();
     creditsBtn.setInteractive();
+    audioBtn.setInteractive();
 
     playBtn.on("pointerdown", () => {
       this.scene.start("jeu");
