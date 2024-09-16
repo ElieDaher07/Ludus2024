@@ -24,7 +24,7 @@ class Accueil extends Phaser.Scene {
 
   create() {
     // HUD
-    this.hudContainer = this.add.container(0, 0);
+    const hudContainer = this.add.container(0, 0);
 
     // Background
 
@@ -37,9 +37,7 @@ class Accueil extends Phaser.Scene {
     // Logo
     const logo = this.add
       .image(0, 0, "logo")
-      .setPosition(config.width / 2, 200)
-      .setScale(0.9);
-    hudContainer.add(logo);
+      .setPosition(config.width / 2, 200);
 
     /* J'ajouterais le texte plus tard avec un font que je trouverais
 
@@ -52,20 +50,19 @@ class Accueil extends Phaser.Scene {
 
     // Boutons
 
-    let playBtn = this.add
-      .image(config.width / 2, config.height / 2, "play")
-      .setDepth(1)
-      .setScale(1);
+    let playBtn = this.add.image(config.width / 2, config.height / 2, "play");
 
-    let controlsBtn = this.add
-      .image(config.width / 2, config.height / 2, "controls")
-      .setDepth(1)
-      .setScale(1);
+    let controlsBtn = this.add.image(
+      config.width / 2,
+      config.height / 2,
+      "controls"
+    );
 
-    let creditsBtn = this.add
-      .image(config.width / 2, config.height / 2, "credits")
-      .setDepth(1)
-      .setScale(1);
+    let creditsBtn = this.add.image(
+      config.width / 2,
+      config.height / 2,
+      "credits"
+    );
 
     hudContainer.add(playBtn, controlsBtn, creditsBtn);
 
