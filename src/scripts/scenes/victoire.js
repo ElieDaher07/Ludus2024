@@ -1,6 +1,8 @@
 class Victoire extends Phaser.Scene {
   constructor() {
-    super({ key: "victoire" });
+    super({
+      key: "victoire"
+    });
   }
 
   preload() {
