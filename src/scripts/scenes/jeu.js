@@ -1,6 +1,8 @@
 class Jeu extends Phaser.Scene {
   constructor() {
-    super({ key: "jeu" });
+    super({
+      key: "jeu"
+    });
   }
 
   preload() {
@@ -28,7 +30,7 @@ class Jeu extends Phaser.Scene {
 
     let quitBtn = this.add
       .image(config.width / 2, config.height / 2, "quit")
-      .setScale(0.5);
+      .setScale(0.3);
 
     hudContainer.add(quitBtn);
 

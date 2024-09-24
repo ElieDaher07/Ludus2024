@@ -1,6 +1,8 @@
 class Tutoriel extends Phaser.Scene {
   constructor() {
-    super({ key: "tutoriel" });
+    super({
+      key: "tutoriel"
+    });
   }
 
   preload() {
@@ -31,7 +33,7 @@ class Tutoriel extends Phaser.Scene {
 
     let returnBtn = this.add
       .image(config.width / 2, config.height / 2, "return")
-      .setScale(0.5);
+      .setScale(0.3);
 
     hudContainer.add(returnBtn);
 

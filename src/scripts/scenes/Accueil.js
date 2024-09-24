@@ -1,6 +1,8 @@
 class Accueil extends Phaser.Scene {
   constructor() {
-    super({ key: "accueil" });
+    super({
+      key: "accueil"
+    });
   }
 
   preload() {
@@ -42,7 +44,7 @@ class Accueil extends Phaser.Scene {
     // Logo
     const logo = this.add
       .image(0, 0, "logo")
-      .setPosition(config.width / 2, 200);
+      .setPosition(config.width / 2, 150).setScale(0.7);
     hudContainer.add(logo);
 
     /* J'ajouterais le texte plus tard avec un font que je trouverais
@@ -58,25 +60,25 @@ class Accueil extends Phaser.Scene {
 
     let playBtn = this.add
       .image(config.width / 2, config.height / 2, "play")
-      .setScale(0.5);
+      .setScale(0.3);
 
     hudContainer.add(playBtn);
 
     let controlsBtn = this.add
-      .image(config.width / 2, config.height / 2 + 120, "controls")
-      .setScale(0.5);
+      .image(config.width / 2, config.height / 2 + 80, "controls")
+      .setScale(0.3);
 
     hudContainer.add(controlsBtn);
 
     let creditsBtn = this.add
-      .image(config.width / 2 - 50, config.height / 2 + 250, "credits")
-      .setScale(0.2);
+      .image(config.width / 2 - 50, config.height / 2 + 150, "credits")
+      .setScale(0.15);
 
     hudContainer.add(creditsBtn);
 
     let audioBtn = this.add
-      .image(config.width / 2 + 50, config.height / 2 + 250, "audio")
-      .setScale(0.2);
+      .image(config.width / 2 + 50, config.height / 2 + 150, "audio")
+      .setScale(0.15);
 
     hudContainer.add(audioBtn);
 
