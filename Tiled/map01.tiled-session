@@ -3,10 +3,37 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "rocky_world.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "": {
+            "scaleInEditor": 1
+        },
+        "rocky_world.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 579.9999999999999,
+                "y": 337.33333333333337
+            }
+        },
+        "rocky_world.tmx#background1": {
+            "scaleInDock": 1
+        },
+        "rocky_world.tmx#background2": {
+            "scaleInDock": 1
+        },
+        "rocky_world.tmx#background3": {
+            "scaleInDock": 1
+        },
+        "rocky_world.tmx#main_lev_build": {
+            "scaleInDock": 1
+        },
+        "rocky_world.tmx#other_lev_build": {
+            "scaleInDock": 1
+        }
     },
     "last.imagePath": "C:/Users/V/Documents/GitHub/Ludus2024/assets/images/backgrounds/Rocky_Level",
     "map.height": 45,
@@ -15,10 +42,12 @@
     "map.tileWidth": 16,
     "map.width": 80,
     "openFiles": [
+        "rocky_world.tmx"
     ],
     "project": "map01.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "rocky_world.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
