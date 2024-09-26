@@ -1,0 +1,60 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map_rocky.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 2,
+            "scaleInEditor": 1
+        },
+        "map_rocky.tmx": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 266.5,
+                "y": 204.5
+            }
+        },
+        "map_rocky.tmx#background1": {
+            "scaleInDock": 1
+        },
+        "map_rocky.tmx#background2": {
+            "scaleInDock": 1
+        },
+        "map_rocky.tmx#background3": {
+            "scaleInDock": 1
+        },
+        "map_rocky.tmx#main_lev_build": {
+            "scaleInDock": 1
+        },
+        "map_rocky.tmx#other_lev_build": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/V/Documents/GitHub/Ludus2024/assets/images/backgrounds/Rocky_Level",
+    "last.imagePath": "C:/Users/V/Documents/GitHub/Ludus2024/Tiled",
+    "map.height": 45,
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 80,
+    "openFiles": [
+        "map_rocky.tmx"
+    ],
+    "project": "ludus.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "map_rocky.tmx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    }
+}
