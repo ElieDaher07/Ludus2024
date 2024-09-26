@@ -13,11 +13,11 @@
             "scaleInEditor": 1
         },
         "map_rocky.tmx": {
-            "scale": 1,
-            "selectedLayer": 1,
+            "scale": 0.75,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 266.5,
-                "y": 204.5
+                "x": 747.3333333333333,
+                "y": 303.33333333333337
             }
         },
         "map_rocky.tmx#background1": {
@@ -30,7 +30,7 @@
             "scaleInDock": 1
         },
         "map_rocky.tmx#main_lev_build": {
-            "scaleInDock": 1
+            "scaleInDock": 0.5
         },
         "map_rocky.tmx#other_lev_build": {
             "scaleInDock": 1

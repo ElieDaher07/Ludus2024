@@ -8,9 +8,9 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
+      debug: true, // Je laisse le debug pour vous
       gravity: {
-        y: 1000
+        y: 1000 // La gravité
       }
     }
   }

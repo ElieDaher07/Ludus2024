@@ -17,6 +17,8 @@ class Jeu extends Phaser.Scene {
       "./assets/images/backgrounds/Rocky_Level/carte_rocky.json"
     );
 
+    // Preload les 5 images de tilesets utiliser
+
     this.load.image(
       "background1_tile",
       "./assets/images/backgrounds/Rocky_Level/background1.png"
@@ -44,6 +46,8 @@ class Jeu extends Phaser.Scene {
   }
 
   create() {
+
+    // Jumpcount
 
     this.jumpCount = 0;
     this.jumpKeyReleased = true;
@@ -94,7 +98,8 @@ class Jeu extends Phaser.Scene {
       "background_other"
     );
 
-    // Calques background non collision
+    // Calques background non collision, ajout en ordre de bas a haut dans l'application Tiled
+
     const background_sky = maCarte.createLayer("background_sky", [background1], 0, 0);
 
     const background_sky_front = maCarte.createLayer(
@@ -104,15 +109,12 @@ class Jeu extends Phaser.Scene {
       0
     );
 
-
-
     const background_behind04 = maCarte.createLayer(
       "background_behind04",
       [background3, main_lev_build],
       0,
       0
     );
-
 
     const background_behind03 = maCarte.createLayer(
       "background_behind03",
@@ -127,7 +129,6 @@ class Jeu extends Phaser.Scene {
       0,
       0
     );
-
 
     const background_behind01 = maCarte.createLayer(
       "background_behind01",
@@ -144,8 +145,6 @@ class Jeu extends Phaser.Scene {
       0,
       0
     );
-
-
 
     // Calques avec collision
 
@@ -192,10 +191,11 @@ class Jeu extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
-
   }
 
   update() {
+
+    // La gravité a été ajouté dans le config
 
     // Mouvement avec A et D
 
@@ -207,8 +207,7 @@ class Jeu extends Phaser.Scene {
       this.player.body.setVelocityX(0);
     }
 
-
-    // Double saut
+    // Double saut avec SPACE
 
     if (this.keys.jump.isUp) {
       this.jumpKeyReleased = true; // La touche est relâchée
@@ -225,7 +224,6 @@ class Jeu extends Phaser.Scene {
     if (this.player.body.onFloor()) {
       this.jumpCount = 0;
     }
-
 
     // Contraintes de deplacement
 
@@ -245,8 +243,4 @@ class Jeu extends Phaser.Scene {
     }
 
   }
-
-
-
-
 }
