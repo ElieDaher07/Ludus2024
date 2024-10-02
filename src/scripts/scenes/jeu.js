@@ -249,9 +249,7 @@ class Jeu extends Phaser.Scene {
     this.physics.add.collider(this.player, collisionLayer01);
     this.physics.add.collider(this.player, collisionLayer02);
 
-
     // Rescale de la map
-
 
     background_sky.setScale(2);
     background_sky_front.setScale(2);
@@ -264,17 +262,13 @@ class Jeu extends Phaser.Scene {
     collisionLayer01.setScale(2);
     collisionLayer02.setScale(2);
 
-
     // Camera
-
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 150);
     //  this.cameras.main.centerOn(1, 1);
     // this.cameras.main.setPosition(0, 0);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-
-
 
     // Animations 
 
@@ -292,8 +286,6 @@ class Jeu extends Phaser.Scene {
 
       }
     });
-
-
 
     this.player.on("animationcomplete", (animation) => {
       if (animation.key === "fall") {
@@ -365,11 +357,9 @@ class Jeu extends Phaser.Scene {
 
   handleAnimations() {
 
-
     if (this.isAttacking) {
       return;
     }
-
 
     // Animation Saut
 
