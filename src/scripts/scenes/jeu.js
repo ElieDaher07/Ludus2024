@@ -25,10 +25,6 @@ class Jeu extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
-    this.load.spritesheet("player_attacks_in_jump", "./assets/images/characters/player_spritesheet/attack_in_jump_sheet.png", {
-      frameWidth: 64,
-      frameHeight: 64
-    });
     this.load.spritesheet("player_attacks", "./assets/images/characters/player_spritesheet/attacks_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
@@ -37,14 +33,17 @@ class Jeu extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
+
+    /*
     this.load.spritesheet("player_throw_attack", "./assets/images/characters/player_spritesheet/throw_attack_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
-    });
+    }); À ajouter plus tard avec les projectiles etc... */
+
     /* this.load.spritesheet("player_throw_dagger", "./assets/images/characters/player_spritesheet/throw_dagger_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
-    }); */
+    }); À voir plus tard */
 
     this.load.spritesheet("player_slide", "./assets/images/characters/player_spritesheet/slide_sheet.png", {
       frameWidth: 64,
@@ -57,6 +56,7 @@ class Jeu extends Phaser.Scene {
 
     this.isFalling = false;
     this.isJumping = false;
+    this.isSliding = false;
 
     this.anims.create({
       key: "idle",
@@ -102,39 +102,7 @@ class Jeu extends Phaser.Scene {
       key: "attack",
       frames: this.anims.generateFrameNumbers("player_attacks", {
         start: 0,
-        end: 5 // 26
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "throw_attack",
-      frames: this.anims.generateFrameNumbers("player_throw_attack", {
-        start: 0,
-        end: 6
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    /* this.anims.create({
-       key: "dagger_throw",
-       frames: this.anims.generateFrameNumbers("player_throw_dagger", {
-         start: 0,
-         end: 0
-       }),
-       frameRate: 10,
-       repeat: 0
-     });
- 
-     */
-
-    this.anims.create({
-      key: "jump_attack",
-      frames: this.anims.generateFrameNumbers("player_attacks_in_jump", {
-        start: 0,
-        end: 6
+        end: 6 // 26
       }),
       frameRate: 10,
       repeat: 0
@@ -143,7 +111,7 @@ class Jeu extends Phaser.Scene {
     this.anims.create({
       key: "slide",
       frames: this.anims.generateFrameNumbers("player_slide", {
-        start: 0,
+        start: 2,
         end: 4
       }),
       frameRate: 10,
@@ -192,7 +160,6 @@ class Jeu extends Phaser.Scene {
     });
 
 
-
     // Tileset
 
     const background1 = maCarte.addTilesetImage("background1", "background1_tile");
@@ -217,16 +184,14 @@ class Jeu extends Phaser.Scene {
     const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0);
     const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
 
-
     // Joueur
-
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
     this.player.body.setBounce(0).setSize(20, 41).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2);
 
 
-    // Monde
+    // Monde (* 2 parce que le scale de la map et le player est aussi multiplié par 2)
 
     const mapWidth = maCarte.widthInPixels * 2;
     const mapHeight = maCarte.heightInPixels * 2;
@@ -235,14 +200,12 @@ class Jeu extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
 
-
     collisionLayer01.setCollisionByProperty({
       collision: true
     });
     collisionLayer02.setCollisionByProperty({
       collision: true
     });
-
 
     // Collision
 
@@ -266,13 +229,12 @@ class Jeu extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 150);
-    //  this.cameras.main.centerOn(1, 1);
+    // this.cameras.main.centerOn(1, 1);
     // this.cameras.main.setPosition(0, 0);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // Animations 
 
-    this.isThrowAttack = false;
+
 
     this.input.on('pointerdown', () => {
       if (!this.isAttacking) {
@@ -303,13 +265,14 @@ class Jeu extends Phaser.Scene {
       jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
+      slide: Phaser.Input.Keyboard.KeyCodes.SHIFT
     });
 
   }
 
   update() {
 
-    console.log(`Camera Position: ${this.cameras.main.scrollX}, ${this.cameras.main.scrollY}`);
+
 
     this.handleMovement();
     this.handleAnimations();
@@ -325,7 +288,7 @@ class Jeu extends Phaser.Scene {
       this.player.body.setVelocityX(-280);
       if (!this.player.flipX) {
         this.player.flipX = true;
-
+        // this.player.setPosition(this.player.body.position.x, this.player.body.position.y); - Je sais pas comment régler le problème du flip qui change la position du joueur :(
         this.player.setOffset(34, 20);
       }
     } else if (this.keys.right.isDown) {
@@ -353,9 +316,33 @@ class Jeu extends Phaser.Scene {
     if (this.player.body.onFloor()) {
       this.jumpCount = 0;
     }
+
+    // Slide
+
+    if (this.keys.slide.isDown) {
+      this.isSliding = true;
+      if (this.player.flipX) {
+        this.player.setVelocityX(-400);
+      } else {
+        this.player.setVelocityX(400);
+      }
+      //this.player.setOffset(10, 40);
+      // this.player.setSize(64, 32);
+    } else {
+
+      if (this.isSliding) {
+        this.isSliding = false;
+        this.player.setVelocityX(0);
+        // this.player.setSize(20, 41);
+        // this.player.setOffset(10, 20);
+      }
+
+    }
   }
 
   handleAnimations() {
+
+    // Animation attaque
 
     if (this.isAttacking) {
       return;
@@ -379,5 +366,14 @@ class Jeu extends Phaser.Scene {
         this.player.anims.play("idle", true);
       }
     }
+
+
+    // Animation Slide
+    if (this.isSliding) {
+      this.player.anims.play("slide", true);
+      return;
+    }
+
+
   }
 }
