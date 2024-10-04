@@ -56,7 +56,7 @@ class Jeu extends Phaser.Scene {
 
     this.isFalling = false;
     this.isJumping = false;
-    this.isSliding = false;
+    // this.isSliding = false;
 
     this.anims.create({
       key: "idle",
@@ -91,7 +91,7 @@ class Jeu extends Phaser.Scene {
     this.anims.create({
       key: "fall",
       frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-        start: 21,
+        start: 20,
         end: 23
       }),
       frameRate: 10,
@@ -102,21 +102,35 @@ class Jeu extends Phaser.Scene {
       key: "attack",
       frames: this.anims.generateFrameNumbers("player_attacks", {
         start: 0,
-        end: 6 // 26
+        end: 6 // 26 combo pour le futur
+      }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    /* À revoir
+    
+    this.anims.create({
+      key: "beginslide",
+      frames: this.anims.generateFrameNumbers("player_slide", {
+        start: 0,
+        end: 2
       }),
       frameRate: 10,
       repeat: 0
     });
 
     this.anims.create({
-      key: "slide",
+      key: "endslide",
       frames: this.anims.generateFrameNumbers("player_slide", {
-        start: 2,
+        start: 3,
         end: 4
       }),
       frameRate: 10,
       repeat: 0
     });
+
+    */ 
 
     this.anims.create({
       key: "hit_death",
@@ -317,7 +331,7 @@ class Jeu extends Phaser.Scene {
       this.jumpCount = 0;
     }
 
-    // Slide
+    /* Slide a voir si j'arrive dans le futur 
 
     if (this.keys.slide.isDown) {
       this.isSliding = true;
@@ -338,6 +352,8 @@ class Jeu extends Phaser.Scene {
       }
 
     }
+
+    */
   }
 
   handleAnimations() {
@@ -347,6 +363,12 @@ class Jeu extends Phaser.Scene {
     if (this.isAttacking) {
       return;
     }
+   /* Animation Slide a revoir
+   if (this.isSliding ) {
+    this.player.anims.play("slide", true);
+    return;
+  }
+    */
 
     // Animation Saut
 
@@ -368,11 +390,7 @@ class Jeu extends Phaser.Scene {
     }
 
 
-    // Animation Slide
-    if (this.isSliding) {
-      this.player.anims.play("slide", true);
-      return;
-    }
+ 
 
 
   }
