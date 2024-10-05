@@ -130,7 +130,7 @@ class Jeu extends Phaser.Scene {
       repeat: 0
     });
 
-    */ 
+    */
 
     this.anims.create({
       key: "hit_death",
@@ -201,7 +201,7 @@ class Jeu extends Phaser.Scene {
     // Joueur
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
-    this.player.body.setBounce(0).setSize(20, 41).setOffset(10, 20).setCollideWorldBounds(true);
+    this.player.body.setBounce(0).setSize(8, 41).setOffset(18, 20).setCollideWorldBounds(true);
     this.player.setScale(2);
 
 
@@ -302,18 +302,19 @@ class Jeu extends Phaser.Scene {
       this.player.body.setVelocityX(-280);
       if (!this.player.flipX) {
         this.player.flipX = true;
-        // this.player.setPosition(this.player.body.position.x, this.player.body.position.y); - Je sais pas comment régler le problème du flip qui change la position du joueur :(
-        this.player.setOffset(34, 20);
+        this.player.setPosition(this.player.body.position.x, this.player.body.position.y + 30);
+        this.player.setSize(8, 41).setOffset(38, 20)
       }
     } else if (this.keys.right.isDown) {
       this.player.body.setVelocityX(280);
       if (this.player.flipX) {
         this.player.flipX = false;
-
-        this.player.setOffset(10, 20);
+        this.player.setPosition(this.player.body.position.x + 25, this.player.body.position.y + 30);
+        this.player.setSize(8, 41).setOffset(18, 20)
       }
     } else {
       this.player.body.setVelocityX(0);
+
     }
 
     // Double saut avec SPACE
@@ -363,7 +364,7 @@ class Jeu extends Phaser.Scene {
     if (this.isAttacking) {
       return;
     }
-   /* Animation Slide a revoir
+    /* Animation Slide a revoir
    if (this.isSliding ) {
     this.player.anims.play("slide", true);
     return;
@@ -390,7 +391,7 @@ class Jeu extends Phaser.Scene {
     }
 
 
- 
+
 
 
   }
