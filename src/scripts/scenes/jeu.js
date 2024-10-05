@@ -201,7 +201,7 @@ class Jeu extends Phaser.Scene {
     // Joueur
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
-    this.player.body.setBounce(0).setSize(8, 41).setOffset(18, 20).setCollideWorldBounds(true);
+    this.player.body.setBounce(0).setSize(8, 38).setOffset(18, 24).setCollideWorldBounds(true);
     this.player.setScale(2);
 
 
@@ -303,14 +303,14 @@ class Jeu extends Phaser.Scene {
       if (!this.player.flipX) {
         this.player.flipX = true;
         this.player.setPosition(this.player.body.position.x, this.player.body.position.y + 30);
-        this.player.setSize(8, 41).setOffset(38, 20)
+        this.player.setSize(8, 38).setOffset(38, 24)
       }
     } else if (this.keys.right.isDown) {
       this.player.body.setVelocityX(280);
       if (this.player.flipX) {
         this.player.flipX = false;
         this.player.setPosition(this.player.body.position.x + 25, this.player.body.position.y + 30);
-        this.player.setSize(8, 41).setOffset(18, 20)
+        this.player.setSize(8, 38).setOffset(18, 24)
       }
     } else {
       this.player.body.setVelocityX(0);
