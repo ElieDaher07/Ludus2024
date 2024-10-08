@@ -51,7 +51,12 @@ class Jeu extends Phaser.Scene {
       frameHeight: 64
     });
 
-    // Preload oiseau
+    // Preload oiseau spritesheet
+
+    this.load.spritesheet("bird", "./assets/images/backgrounds/bird.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
 
 
   }
@@ -158,6 +163,16 @@ class Jeu extends Phaser.Scene {
       repeat: 0
     });
 
+    this.anims.create({
+      key: "bird_bg",
+      frames: this.anims.generateFrameNames("bird", {
+        start: 9,
+        end: 11
+      }),
+      frameRate: 8,
+      repeat: -1
+    })
+
 
     // ---------------- CRÉATION DU TILEMAP ----------------
 
@@ -220,6 +235,23 @@ class Jeu extends Phaser.Scene {
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2);
+
+
+    // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
+
+    this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
+
+    this.bird.setScale(2);
+
+    this.tweens.add({
+      targets: this.bird,
+      x: config.width * 2,
+      duration: 20000,
+      repeat: 1
+    })
+
+    this.bird.anims.play("bird_bg", true);
+
 
 
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
@@ -317,6 +349,7 @@ class Jeu extends Phaser.Scene {
 
     this.handleMovement();
     this.handleAnimations();
+
 
     // this.handleDeath(); - A ajouter plus tard quand on ajoutera les ennemies, les attaques, les hits etc..
 
