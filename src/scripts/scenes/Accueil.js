@@ -45,6 +45,17 @@ class Accueil extends Phaser.Scene {
     const logo = this.add
       .image(0, 0, "logo")
       .setPosition(config.width / 2, 150).setScale(0.7);
+
+    this.tweens.add({
+      targets: logo,
+      scale: 0.76,
+      duration: 900,
+      ease: 'Quad.easeInOut',
+      repeat: -1,
+      yoyo: true
+
+    })
+
     hudContainer.add(logo);
 
     /* J'ajouterais le texte plus tard avec un font que je trouverais
