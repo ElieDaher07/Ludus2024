@@ -49,6 +49,10 @@ class Jeu extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
+
+    // Preload oiseau
+
+
   }
 
   create() {
@@ -254,7 +258,7 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.setDeadzone(200, 150);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-
+    // Input
 
 
     this.input.on('pointerdown', () => {
@@ -310,7 +314,7 @@ class Jeu extends Phaser.Scene {
       if (!this.player.flipX) {
         this.player.setSize(20, 40).setOffset(30, 20)
         this.player.flipX = true;
-        // this.player.setPosition(this.player.body.position.x, this.player.body.position.y + 30);
+        this.player.setPosition(this.player.body.position.x, this.player.body.position.y + 30);
 
       }
     } else if (this.keys.right.isDown) {
@@ -318,7 +322,7 @@ class Jeu extends Phaser.Scene {
       if (this.player.flipX) {
         this.player.setSize(20, 40).setOffset(10, 20)
         this.player.flipX = false;
-        // this.player.setPosition(this.player.body.position.x + 25, this.player.body.position.y + 30); 
+        this.player.setPosition(this.player.body.position.x + 45, this.player.body.position.y + 30);
 
       }
     } else {
