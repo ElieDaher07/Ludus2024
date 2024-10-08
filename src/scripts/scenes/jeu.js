@@ -6,6 +6,7 @@ class Jeu extends Phaser.Scene {
   }
 
   preload() {
+
     // Preload le(s) bouton(s)
     this.load.image("quit", "./assets/images/ui/Large_Buttons/Exit_Button.png");
 
@@ -56,11 +57,22 @@ class Jeu extends Phaser.Scene {
   }
 
   create() {
-    // Animations
+
+    // ---------------- CRÉATION DES VARIABLES POUR LE MOUVEMENT ----------------
+
+    // Sauter et tomber
 
     this.isFalling = false;
     this.isJumping = false;
+
     // this.isSliding = false;
+
+    // Jumpcount
+
+    this.jumpCount = 0;
+    this.jumpKeyReleased = true;
+
+    // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
     this.anims.create({
       key: "idle",
@@ -147,21 +159,18 @@ class Jeu extends Phaser.Scene {
     });
 
 
-    // Tilemap
+    // ---------------- CRÉATION DU TILEMAP ----------------
+
     const maCarte = this.make.tilemap({
       key: "carte_json"
     });
 
-    // Jumpcount
 
-    this.jumpCount = 0;
-    this.jumpKeyReleased = true;
-
-    // HUD
+    // ---------------- HUD ----------------
 
     const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(1);
 
-    // Boutons
+    // Bouton(s) + ajout dans le hud
 
     let quitBtn = this.add.image(
       (config.width / 2),
@@ -171,14 +180,15 @@ class Jeu extends Phaser.Scene {
 
     hudContainer.add(quitBtn);
 
-    // Interactifs
+    // Interactions avec le(s) bouton(s)
+
     quitBtn.setInteractive();
     quitBtn.on("pointerdown", () => {
       this.scene.start("accueil");
     });
 
 
-    // Tileset
+    // ---------------- CRÉATION DES TILESETS ----------------
 
     const background1 = maCarte.addTilesetImage("background1", "background1_tile");
     const background2 = maCarte.addTilesetImage("background2", "background2_tile");
@@ -186,7 +196,9 @@ class Jeu extends Phaser.Scene {
     const main_lev_build = maCarte.addTilesetImage("main_lev_build", "background_main");
     const other_lev_build = maCarte.addTilesetImage("other_lev_build", "background_other");
 
-    // Calques background non collision, ajout en ordre de bas a haut dans l'application Tiled
+    // ---------------- CRÉATION CALQUES BACKGROUND  ----------------
+
+    // (Non collision)
 
     const background_sky = maCarte.createLayer("background_sky", [background1], 0, 0);
     const background_sky_front = maCarte.createLayer("background_sky_front", [background2, other_lev_build], 0, 0);
@@ -197,29 +209,34 @@ class Jeu extends Phaser.Scene {
     const background_front = maCarte.createLayer("background_front", [main_lev_build], 0, 0);
     const background_vegetation = maCarte.createLayer("background_vegetation", [main_lev_build], 0, 0);
 
-    // Calques avec collision
+    // (Avec collision)
 
     const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0);
     const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
+    const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0); // Pour blesser le joueur
 
-    // Calques
-    const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0);
-
-    // Joueur
+    // ---------------- CRÉATION DU JOUEUR ----------------
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2);
 
 
-    // Monde (* 2 parce que le scale de la map et le player est aussi multiplié par 2)
+    //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
+
+    // Monde 
+    // (multiplié par 2 parce que le scale de la map et le player est aussi multiplié par 2)
 
     const mapWidth = maCarte.widthInPixels * 2;
     const mapHeight = maCarte.heightInPixels * 2;
 
-    // World setbound
+    // Setbound
 
     this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
+
+    // ---------------- LA COLLISION ---------------- 
+
+    // Rendre les collisions calques selectionés en true
 
     collisionLayer01.setCollisionByProperty({
       collision: true
@@ -232,13 +249,16 @@ class Jeu extends Phaser.Scene {
       collision: true
     })
 
-    // Collision
+    // Collision du joueur avec les calques
 
     this.physics.add.collider(this.player, collisionLayer01);
     this.physics.add.collider(this.player, collisionLayer02);
     this.physics.add.collider(this.player, collisionDanger);
 
-    // Rescale de la map
+
+    // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
+
+    // (Alternative pour ne pas faire un zoom avec la caméra et que tout marche correctement)
 
     background_sky.setScale(2);
     background_sky_front.setScale(2);
@@ -252,21 +272,19 @@ class Jeu extends Phaser.Scene {
     collisionLayer02.setScale(2);
     collisionDanger.setScale(2);
 
-    // Camera
+    // ---------------- CAMÉRA ---------------- 
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 150);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // Input
-
+    // ---------------- INPUT ANIMATION ---------------- 
 
     this.input.on('pointerdown', () => {
       if (!this.isAttacking) {
+
         this.player.anims.play("attack", true);
         this.isAttacking = true;
-
-
         this.player.on("animationcomplete-attack", () => {
           this.isAttacking = false;
         })
@@ -278,13 +296,13 @@ class Jeu extends Phaser.Scene {
       if (animation.key === "fall") {
         this.isFalling = true;
       }
+
       if (animation.key === "jump") {
         this.isJumping = true;
       }
     });
 
-    // Touches
-
+    // ---------------- TOUCHES ---------------- 
 
     this.keys = this.input.keyboard.addKeys({
       jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
@@ -296,8 +314,6 @@ class Jeu extends Phaser.Scene {
   }
 
   update() {
-
-
 
     this.handleMovement();
     this.handleAnimations();
@@ -327,7 +343,6 @@ class Jeu extends Phaser.Scene {
       }
     } else {
       this.player.body.setVelocityX(0);
-
     }
 
     // Double saut avec SPACE
@@ -403,9 +418,6 @@ class Jeu extends Phaser.Scene {
       }
     }
 
-
-
-
-
   }
+
 }
