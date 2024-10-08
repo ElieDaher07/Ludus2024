@@ -198,6 +198,9 @@ class Jeu extends Phaser.Scene {
     const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0);
     const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
 
+    // Calques
+    const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0);
+
     // Joueur
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
@@ -221,10 +224,15 @@ class Jeu extends Phaser.Scene {
       collision: true
     });
 
+    collisionDanger.setCollisionByProperty({
+      collision: true
+    })
+
     // Collision
 
     this.physics.add.collider(this.player, collisionLayer01);
     this.physics.add.collider(this.player, collisionLayer02);
+    this.physics.add.collider(this.player, collisionDanger);
 
     // Rescale de la map
 
@@ -238,13 +246,12 @@ class Jeu extends Phaser.Scene {
     background_vegetation.setScale(2);
     collisionLayer01.setScale(2);
     collisionLayer02.setScale(2);
+    collisionDanger.setScale(2);
 
     // Camera
 
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 150);
-    // this.cameras.main.centerOn(1, 1);
-    // this.cameras.main.setPosition(0, 0);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
 
