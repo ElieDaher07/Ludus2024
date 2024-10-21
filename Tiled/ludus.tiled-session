@@ -14,10 +14,10 @@
         },
         "map_rocky.tmx": {
             "scale": 0.75,
-            "selectedLayer": 8,
+            "selectedLayer": 10,
             "viewCenter": {
-                "x": 666.6666666666666,
-                "y": 207.33333333333337
+                "x": 43.999999999999886,
+                "y": 45.33333333333337
             }
         },
         "map_rocky.tmx#background1": {
