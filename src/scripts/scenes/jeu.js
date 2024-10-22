@@ -63,7 +63,7 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
-    // ---------------- CRÉATION DES VARIABLES POUR LE MOUVEMENT ----------------
+    // ---------------- CRÉATION DES VARIABLES POUR LE JOUEUR ----------------
 
     // Sauter et tomber
 
@@ -76,6 +76,10 @@ class Jeu extends Phaser.Scene {
 
     this.jumpCount = 0;
     this.jumpKeyReleased = true;
+
+    // Attaque
+
+    this.isAttacking = false;
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
