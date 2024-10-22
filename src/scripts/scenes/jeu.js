@@ -58,6 +58,10 @@ class Jeu extends Phaser.Scene {
       frameHeight: 32
     });
 
+    // Preload les items
+
+    this.load.image("heart01" , "./assets/images/items/heart01.png")
+
 
   }
 
@@ -187,7 +191,7 @@ class Jeu extends Phaser.Scene {
 
     // ---------------- HUD ----------------
 
-    const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(1);
+    const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(2);
 
     // Bouton(s) + ajout dans le hud
 
@@ -230,7 +234,7 @@ class Jeu extends Phaser.Scene {
 
     // (Avec collision)
 
-    const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0);
+    const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0).setDepth(1);
     const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
     const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0); // Pour blesser le joueur
 
@@ -238,24 +242,20 @@ class Jeu extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
-    this.player.setScale(2);
+    this.player.setScale(2).setDepth(1);
 
+       // ---------------- ITEMS ---------------- 
 
-    // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
+       this.heart01 = this.physics.add.image(650, config.height / 2 + - 30, "heart01");
+       this.heart01.body.allowGravity = false;
 
-    this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
+       this.heart01.setScale(2);
 
-    this.bird.setScale(2);
-
-    this.tweens.add({
-      targets: this.bird,
-      x: config.width * 2,
-      duration: 20000,
-      repeat: 1
-    })
-
-    this.bird.anims.play("bird_bg", true);
-
+       this.physics.add.overlap(this.player, this.heart01, () => {
+        this.heart01.setActive(false);
+        this.heart01.setVisible(false);
+        this.heart01.destroy();
+       });
 
 
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
@@ -347,6 +347,38 @@ class Jeu extends Phaser.Scene {
       slide: Phaser.Input.Keyboard.KeyCodes.SHIFT
     });
 
+
+      // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
+
+      this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
+      this.bird.setDepth(0).setTint(0x808080);
+      this.bird.anims.play("bird_bg", true);
+      
+  
+      this.moveBird(this.bird);
+      
+  
+
+  }
+
+  
+  moveBird(bird) {
+    
+    bird.x = 0;
+    bird.scale = Phaser.Math.Between(1.7 , 2);
+    bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
+
+    this.tweens.add({
+      targets: bird,
+      x: config.width * 2,
+      duration: 10000,
+      
+      onComplete: () => {
+        console.log("Animation terminée");
+       
+        this.moveBird(bird);
+      }
+    });
   }
 
   update() {
