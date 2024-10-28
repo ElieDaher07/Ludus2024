@@ -46,11 +46,6 @@ class Jeu extends Phaser.Scene {
       frameHeight: 64
     }); À voir plus tard */
 
-    this.load.spritesheet("player_slide", "./assets/images/characters/player_spritesheet/slide_sheet.png", {
-      frameWidth: 64,
-      frameHeight: 64
-    });
-
     // Preload oiseau spritesheet
 
     this.load.spritesheet("bird", "./assets/images/backgrounds/bird.png", {
@@ -73,8 +68,6 @@ class Jeu extends Phaser.Scene {
 
     this.isFalling = false;
     this.isJumping = false;
-
-    // this.isSliding = false;
 
     // Jumpcount
 
@@ -136,30 +129,6 @@ class Jeu extends Phaser.Scene {
       frameRate: 10,
       repeat: 0
     });
-
-    /* À revoir
-    
-    this.anims.create({
-      key: "beginslide",
-      frames: this.anims.generateFrameNumbers("player_slide", {
-        start: 0,
-        end: 2
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "endslide",
-      frames: this.anims.generateFrameNumbers("player_slide", {
-        start: 3,
-        end: 4
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    */
 
     this.anims.create({
       key: "hit_death",
@@ -314,64 +283,41 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.setDeadzone(200, 150);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
 
-    // ---------------- INPUT ANIMATION ---------------- 
-
-    this.input.on('pointerdown', () => {
-      if (!this.isAttacking) {
-
-        this.player.anims.play("attack", true);
-        this.isAttacking = true;
-        this.player.on("animationcomplete-attack", () => {
-          this.isAttacking = false;
-        })
-
-      }
-    });
-
-    this.player.on("animationcomplete", (animation) => {
-      if (animation.key === "fall") {
-        this.isFalling = true;
-      }
-
-      if (animation.key === "jump") {
-        this.isJumping = true;
-      }
-    });
-
     // ---------------- TOUCHES ---------------- 
 
     this.keys = this.input.keyboard.addKeys({
       jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
-      slide: Phaser.Input.Keyboard.KeyCodes.SHIFT
     });
 
 
-    // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
+    // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
 
-    this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
-    this.bird.setDepth(0).setTint(0x808080);
-    this.bird.anims.play("bird_bg", true);
+    this.birds = [];
 
-
-    this.moveBird(this.bird);
-
-
+    for (let i = 0; i < 3; i++) {
+      let bird = this.add.sprite(0, Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200), "bird");
+      bird.setDepth(0).setTint(0x808080);
+      bird.anims.play("bird_bg", true);
+      this.birds.push(bird);
+      this.moveBird(bird);
+    }
 
   }
 
-
   moveBird(bird) {
 
-    bird.x = 0;
-    bird.scale = Phaser.Math.Between(1.7, 2);
+    bird.x = -bird.width;
+    bird.scale = Phaser.Math.Between(1, 2);
     bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
+
 
     this.tweens.add({
       targets: bird,
       x: config.width * 2,
-      duration: 10000,
+      duration: Phaser.Math.Between(12000, 17000),
+      delay: Phaser.Math.Between(9000, 12000),
 
       onComplete: () => {
         console.log("Animation terminée");
@@ -429,44 +375,37 @@ class Jeu extends Phaser.Scene {
       this.jumpCount = 0;
     }
 
-    /* Slide a voir si j'arrive dans le futur 
-
-    if (this.keys.slide.isDown) {
-      this.isSliding = true;
-      if (this.player.flipX) {
-        this.player.setVelocityX(-400);
-      } else {
-        this.player.setVelocityX(400);
-      }
-      //this.player.setOffset(10, 40);
-      // this.player.setSize(64, 32);
-    } else {
-
-      if (this.isSliding) {
-        this.isSliding = false;
-        this.player.setVelocityX(0);
-        // this.player.setSize(20, 41);
-        // this.player.setOffset(10, 20);
-      }
-
-    }
-
-    */
   }
 
   handleAnimations() {
 
     // Animation attaque
 
+    this.input.on('pointerdown', () => {
+      if (!this.isAttacking) {
+
+        this.player.anims.play("attack", true);
+        this.isAttacking = true;
+        this.player.on("animationcomplete-attack", () => {
+          this.isAttacking = false;
+        })
+
+      }
+    });
+
+    this.player.on("animationcomplete", (animation) => {
+      if (animation.key === "fall") {
+        this.isFalling = true;
+      }
+
+      if (animation.key === "jump") {
+        this.isJumping = true;
+      }
+    });
+
     if (this.isAttacking) {
       return;
     }
-    /* Animation Slide a revoir
-   if (this.isSliding ) {
-    this.player.anims.play("slide", true);
-    return;
-  }
-    */
 
     // Animation Saut
 
