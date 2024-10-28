@@ -57,6 +57,32 @@ class Jeu extends Phaser.Scene {
 
     this.load.image("heart01", "./assets/images/items/heart01.png")
 
+    // Preload les ennemis
+
+    this.load.spritesheet("enemy01", "./assets/images/characters/enemy/enemy01_sheet.png", {
+      frameWidth: 64,
+      frameHeight: 64
+    });
+
+    this.load.spritesheet("enemy02", "./assets/images/characters/enemy/enemy02_sheet.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    this.load.spritesheet("enemy03", "./assets/images/characters/enemy/enemy03_sheet.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+
+    this.load.spritesheet("enemy04", "./assets/images/characters/enemy/enemy04_sheet.png", {
+      frameWidth: 64,
+      frameHeight: 64
+    });
+
+    this.load.spritesheet("enemy05", "./assets/images/characters/enemy/enemy05_sheet.png", {
+      frameWidth: 64,
+      frameHeight: 64
+    });
 
   }
 
@@ -84,7 +110,7 @@ class Jeu extends Phaser.Scene {
 
     // Ennemis
 
-
+    this.enemy02Life = 4;
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
@@ -158,13 +184,61 @@ class Jeu extends Phaser.Scene {
       repeat: -1
     })
 
+    this.anims.create({
+      key: "enemy02_idle",
+      frames: this.anims.generateFrameNames("enemy02", {
+        start: 0,
+        end: 4
+      }),
+      frameRate: 8,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: "enemy02_walk",
+      frames: this.anims.generateFrameNames("enemy02", {
+        start: 5,
+        end: 8
+      }),
+      frameRate: 8,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: "enemy02_attack",
+      frames: this.anims.generateFrameNames("enemy02", {
+        start: 10,
+        end: 13
+      }),
+      frameRate: 8,
+      repeat: 0
+    })
+
+    this.anims.create({
+      key: "enemy02_hit",
+      frames: this.anims.generateFrameNames("enemy02", {
+        start: 15,
+        end: 18
+      }),
+      frameRate: 8,
+      repeat: -1
+    })
+
+    this.anims.create({
+      key: "enemy02_death",
+      frames: this.anims.generateFrameNames("enemy02", {
+        start: 20,
+        end: 24
+      }),
+      frameRate: 8,
+      repeat: 0
+    })
 
     // ---------------- CRÉATION DU TILEMAP ----------------
 
     const maCarte = this.make.tilemap({
       key: "carte_json"
     });
-
 
     // ---------------- HUD ----------------
 
@@ -186,7 +260,6 @@ class Jeu extends Phaser.Scene {
     quitBtn.on("pointerdown", () => {
       this.scene.start("accueil");
     });
-
 
     // ---------------- CRÉATION DES TILESETS ----------------
 
@@ -221,6 +294,12 @@ class Jeu extends Phaser.Scene {
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2).setDepth(1);
 
+    // ---------------- CRÉATION DE ENEMY02 ----------------
+
+    this.enemy02 = this.physics.add.sprite(config.width / 2 - 500, config.height / 2, "enemy02_idle");
+    this.enemy02.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
+    this.enemy02.setScale(2).setDepth(1);
+
     // ---------------- ITEMS ---------------- 
 
     this.heart01 = this.physics.add.image(650, config.height / 2 + -30, "heart01");
@@ -233,7 +312,6 @@ class Jeu extends Phaser.Scene {
       this.heart01.setVisible(false);
       this.heart01.destroy();
     });
-
 
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
 
@@ -268,6 +346,10 @@ class Jeu extends Phaser.Scene {
     this.physics.add.collider(this.player, collisionLayer02);
     this.physics.add.collider(this.player, collisionDanger);
 
+    // Collision des ennemis avec les calques
+
+    this.physics.add.collider(this.enemy02, collisionLayer01);
+    this.physics.add.collider(this.enemy02, collisionLayer02);
 
     // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
 
@@ -299,7 +381,6 @@ class Jeu extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
-
     // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
 
     this.birds = [];
@@ -320,7 +401,6 @@ class Jeu extends Phaser.Scene {
     bird.scale = Phaser.Math.Between(1, 2);
     bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
 
-
     this.tweens.add({
       targets: bird,
       x: config.width * 2,
@@ -339,8 +419,6 @@ class Jeu extends Phaser.Scene {
 
     this.handleMovement();
     this.handleAnimations();
-
-
     // this.handleDeath(); - A ajouter plus tard quand on ajoutera les ennemies, les attaques, les hits etc..
 
   }
