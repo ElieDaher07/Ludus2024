@@ -35,16 +35,16 @@ class Jeu extends Phaser.Scene {
       frameHeight: 64
     });
 
-    /*
+
     this.load.spritesheet("player_throw_attack", "./assets/images/characters/player_spritesheet/throw_attack_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
-    }); À ajouter plus tard avec les projectiles etc... */
+    });
 
-    /* this.load.spritesheet("player_throw_dagger", "./assets/images/characters/player_spritesheet/throw_dagger_sheet.png", {
+    this.load.spritesheet("player_throw_dagger", "./assets/images/characters/player_spritesheet/throw_dagger_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
-    }); À voir plus tard */
+    });
 
     // Preload oiseau spritesheet
 
@@ -77,6 +77,14 @@ class Jeu extends Phaser.Scene {
     // Attaque
 
     this.isAttacking = false;
+
+    // Joueur
+
+    this.playerLife = 8;
+
+    // Ennemis
+
+
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
