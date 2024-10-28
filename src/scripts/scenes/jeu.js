@@ -60,7 +60,7 @@ class Jeu extends Phaser.Scene {
 
     // Preload les items
 
-    this.load.image("heart01" , "./assets/images/items/heart01.png")
+    this.load.image("heart01", "./assets/images/items/heart01.png")
 
 
   }
@@ -244,18 +244,18 @@ class Jeu extends Phaser.Scene {
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2).setDepth(1);
 
-       // ---------------- ITEMS ---------------- 
+    // ---------------- ITEMS ---------------- 
 
-       this.heart01 = this.physics.add.image(650, config.height / 2 + - 30, "heart01");
-       this.heart01.body.allowGravity = false;
+    this.heart01 = this.physics.add.image(650, config.height / 2 + -30, "heart01");
+    this.heart01.body.allowGravity = false;
 
-       this.heart01.setScale(2);
+    this.heart01.setScale(2);
 
-       this.physics.add.overlap(this.player, this.heart01, () => {
-        this.heart01.setActive(false);
-        this.heart01.setVisible(false);
-        this.heart01.destroy();
-       });
+    this.physics.add.overlap(this.player, this.heart01, () => {
+      this.heart01.setActive(false);
+      this.heart01.setVisible(false);
+      this.heart01.destroy();
+    });
 
 
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
@@ -348,34 +348,34 @@ class Jeu extends Phaser.Scene {
     });
 
 
-      // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
+    // ---------------- CRÉATION OISEAU QUI VOLE DANS LE BACKGROUND ----------------
 
-      this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
-      this.bird.setDepth(0).setTint(0x808080);
-      this.bird.anims.play("bird_bg", true);
-      
-  
-      this.moveBird(this.bird);
-      
-  
+    this.bird = this.add.sprite(0, config.height / 2 - 200, "bird");
+    this.bird.setDepth(0).setTint(0x808080);
+    this.bird.anims.play("bird_bg", true);
+
+
+    this.moveBird(this.bird);
+
+
 
   }
 
-  
+
   moveBird(bird) {
-    
+
     bird.x = 0;
-    bird.scale = Phaser.Math.Between(1.7 , 2);
+    bird.scale = Phaser.Math.Between(1.7, 2);
     bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
 
     this.tweens.add({
       targets: bird,
       x: config.width * 2,
       duration: 10000,
-      
+
       onComplete: () => {
         console.log("Animation terminée");
-       
+
         this.moveBird(bird);
       }
     });
