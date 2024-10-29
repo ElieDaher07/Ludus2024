@@ -225,7 +225,7 @@ class Jeu extends Phaser.Scene {
         start: 0,
         end: 4
       }),
-      frameRate: 8,
+      frameRate: 6,
       repeat: -1
     })
 
@@ -356,64 +356,90 @@ class Jeu extends Phaser.Scene {
 
     this.dagger = this.physics.add.group({
       defaultKey: "dagger",
-      maxSize: 10
-    })
+      maxSize: 1
+    });
+
+    // Variable to track if the dagger has hit an enemy
+    let daggerHitEnemy = false;
+
+    // Flag to track if the dagger is currently thrown
+    let daggerThrown = false;
 
     this.input.on("pointerdown", (pointer) => {
       if (pointer.rightButtonDown()) {
-        if (this.player.alpha !== 1) return;
-        const dagger = this.dagger.get(this.player.x, this.player.y);
-        dagger.anims.play("dagger_projectile", true);
+        // Prevent throwing if the dagger is already thrown
+        // if (this.player.alpha !== 1 || daggerThrown) return;
+
+        const dagger = this.dagger.get(this.player.x + 25, this.player.y + 20);
         if (dagger) {
-          dagger.setActive(true);
-          dagger.setVisible(true);
+          dagger.anims.play("dagger_projectile", true);
           dagger.setScale(2).setSize(15, 5);
           dagger.body.allowGravity = false;
 
 
+          daggerHitEnemy = false; // Reset hit flag
+          daggerThrown = true; // Set dagger as thrown
+
+          // Timer to destroy the dagger after 5 seconds
           this.time.delayedCall(5000, () => {
-            let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
-            explosion.setScale(2).setDepth(1);
-            explosion.play("dagger_hit");
-            this.time.delayedCall(50, () => {
-              explosion.on("animationcomplete", () => {
-                explosion.destroy();
+            if (!daggerHitEnemy) { // Only execute if it hasn't hit an enemy
+              let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
+              explosion.setScale(2).setDepth(1);
+              explosion.play("dagger_hit");
+              this.time.delayedCall(50, () => {
+                explosion.on("animationcomplete", () => {
+                  explosion.destroy();
+                });
+                dagger.destroy();
+                daggerThrown = false; // Reset thrown flag after destruction
               });
-              dagger.destroy();
-            });
+            } else {
+              daggerThrown = false; // Reset if it hit an enemy
+            }
           });
           if (this.player.flipX) {
-            dagger.setVelocity(-300, 0);
+            this.time.delayedCall(150, () => {
+              dagger.setFlipY(true);
+              dagger.setActive(true);
+              dagger.setVisible(true);
+              dagger.setVelocity(-300, 0);
+              dagger.setAngle(180);
+            });
           } else {
-            dagger.setVelocity(300, 0);
+            this.time.delayedCall(150, () => {
+              dagger.setActive(true);
+              dagger.setVisible(true);
+              dagger.setVelocity(300, 0);
+            });
           }
         }
       }
     });
 
     this.physics.add.overlap(this.enemy02, this.dagger, (enemy, dagger) => {
-      this.enemy02Life -= 1;
-      dagger.setActive(false);
-      dagger.setVisible(false);
-      dagger.destroy();
+      if (!daggerHitEnemy) { // Check if the dagger has already hit an enemy
+        this.enemy02Life -= 1;
+        daggerHitEnemy = true; // Set the flag to true to indicate it hit an enemy
+        dagger.setActive(false);
+        dagger.setVisible(false);
+        dagger.destroy(); // Destroy the dagger immediately
+        daggerThrown = false; // Reset thrown flag when hitting enemy
 
-      let explosionEnemy = this.add.sprite(enemy.x - 20, enemy.y, "dagger_hit");
-      explosionEnemy.setScale(2).setDepth(1);
-      explosionEnemy.play("dagger_hit");
-      explosionEnemy.on("animationcomplete", () => {
-        explosionEnemy.destroy();
-      });
-
-
-      if (this.enemy02Life <= 0) {
-        this.enemy02.body.checkCollision.none = true;
-        this.enemy02.body.enable = false;
-        // this.enemyFiring.remove();
-        // this.enemyMoving.stop();
-        this.enemy02.play("enemy02_death");
-        this.enemy02.on("animationcomplete", () => {
-          this.enemy02.destroy();
+        let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
+        explosionEnemy.setScale(2).setDepth(1);
+        explosionEnemy.play("dagger_hit");
+        explosionEnemy.on("animationcomplete", () => {
+          explosionEnemy.destroy();
         });
+
+        if (this.enemy02Life <= 0) {
+          this.enemy02.body.checkCollision.none = true;
+          this.enemy02.body.enable = false;
+          this.enemy02.play("enemy02_death");
+          this.enemy02.on("animationcomplete", () => {
+            this.enemy02.destroy();
+          });
+        }
       }
     });
 
@@ -593,15 +619,6 @@ class Jeu extends Phaser.Scene {
       }
     });
 
-    this.player.on("animationcomplete", (animation) => {
-      if (animation.key === "fall") {
-        this.isFalling = true;
-      }
-      if (animation.key === "jump") {
-        this.isJumping = true;
-      }
-    });
-
     if (this.isAttacking) {
       return;
     }
@@ -609,11 +626,11 @@ class Jeu extends Phaser.Scene {
     // Animation throw attack right click
 
     this.input.on('pointerdown', () => {
-      if (this.input.activePointer.rightButtonDown() && !this.isThrowAttacking && !this.isAttacking) {
+      if (this.input.activePointer.rightButtonDown() && !this.isThrowAttacking && (!this.isAttacking || !daggerThrown)) {
         this.player.anims.play("throw_attack", true);
         this.isThrowAttacking = true;
         this.player.on("animationcomplete-throw_attack", () => {
-          this.isThrowAttacking = false;
+          this.isThrowAttacking = false
         })
       }
     });
@@ -622,9 +639,7 @@ class Jeu extends Phaser.Scene {
       return;
     }
 
-
-
-    // Animation 
+    // // Animation Saut & Fall
 
     this.player.on("animationcomplete", (animation) => {
       if (animation.key === "fall") {
@@ -634,11 +649,6 @@ class Jeu extends Phaser.Scene {
         this.isJumping = true;
       }
     });
-    if (this.isAttacking) {
-      return;
-    }
-
-    // Animation Saut
 
     if (!this.player.body.blocked.down) {
       if (this.player.body.velocity.y < 0 && !this.isJumping) {
