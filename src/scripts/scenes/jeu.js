@@ -91,7 +91,7 @@ class Jeu extends Phaser.Scene {
 
     this.input.mouse.disableContextMenu();
 
-    // ---------------- CRÉATION DES VARIABLES POUR LE JOUEUR ----------------
+    // ---------------- CRÉATION DES VARIABLES GLOBALES ----------------
 
     // Sauter et tomber
 
@@ -107,15 +107,27 @@ class Jeu extends Phaser.Scene {
 
     this.isAttacking = false;
     this.isThrowAttacking = false;
+    this.isAttackingOrThrowing = false;
 
-    // Joueur
+    // Combo 
+
+    this.comboCount = 0;
+    this.comboDelay = 300;
+    this.lastClickTime = 0;
+
+    // Vie joueur
 
     this.playerLife = 8;
 
-    // Ennemis
+    // Vie ennemis
 
     this.enemy02Life = 3;
     this.enemy04Life = 5;
+
+    // Dagger
+
+    let daggerHitEnemy = false;
+    let daggerThrown = false;
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
@@ -160,10 +172,40 @@ class Jeu extends Phaser.Scene {
     });
 
     this.anims.create({
-      key: "attack",
+      key: "attack_1",
       frames: this.anims.generateFrameNumbers("player_attacks", {
         start: 0,
-        end: 6 // max: frame 26, combo pour le futur
+        end: 6
+      }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "attack_2",
+      frames: this.anims.generateFrameNumbers("player_attacks", {
+        start: 7,
+        end: 11
+      }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "attack_3",
+      frames: this.anims.generateFrameNumbers("player_attacks", {
+        start: 12,
+        end: 18
+      }),
+      frameRate: 10,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "attack_4",
+      frames: this.anims.generateFrameNumbers("player_attacks", {
+        start: 19,
+        end: 26
       }),
       frameRate: 10,
       repeat: 0
@@ -352,37 +394,29 @@ class Jeu extends Phaser.Scene {
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2).setDepth(1);
 
-    // ---------------- CRÉATION DES BALLES ----------------
+    // ---------------- CRÉATION DES BALLES "Dagger" ----------------
 
     this.dagger = this.physics.add.group({
       defaultKey: "dagger",
       maxSize: 1
     });
 
-    // Variable to track if the dagger has hit an enemy
-    let daggerHitEnemy = false;
-
-    // Flag to track if the dagger is currently thrown
-    let daggerThrown = false;
-
     this.input.on("pointerdown", (pointer) => {
       if (pointer.rightButtonDown()) {
-        // Prevent throwing if the dagger is already thrown
-        // if (this.player.alpha !== 1 || daggerThrown) return;
 
-        const dagger = this.dagger.get(this.player.x + 25, this.player.y + 20);
+        if (this.player.alpha !== 1 || daggerThrown) return;
+
+        const dagger = this.dagger.get(this.player.x + 30, this.player.y + 20);
         if (dagger) {
           dagger.anims.play("dagger_projectile", true);
           dagger.setScale(2).setSize(15, 5);
           dagger.body.allowGravity = false;
 
+          daggerHitEnemy = false;
+          daggerThrown = true;
 
-          daggerHitEnemy = false; // Reset hit flag
-          daggerThrown = true; // Set dagger as thrown
-
-          // Timer to destroy the dagger after 5 seconds
           this.time.delayedCall(5000, () => {
-            if (!daggerHitEnemy) { // Only execute if it hasn't hit an enemy
+            if (!daggerHitEnemy) {
               let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
               explosion.setScale(2).setDepth(1);
               explosion.play("dagger_hit");
@@ -391,25 +425,19 @@ class Jeu extends Phaser.Scene {
                   explosion.destroy();
                 });
                 dagger.destroy();
-                daggerThrown = false; // Reset thrown flag after destruction
+                daggerThrown = false;
               });
             } else {
-              daggerThrown = false; // Reset if it hit an enemy
+              daggerThrown = false;
             }
           });
           if (this.player.flipX) {
-            this.time.delayedCall(150, () => {
-              dagger.setFlipY(true);
-              dagger.setActive(true);
-              dagger.setVisible(true);
-              dagger.setVelocity(-300, 0);
-              dagger.setAngle(180);
+            this.time.delayedCall(50, () => {
+              dagger.setVelocity(-400, 0).setFlipY(true).setActive(true).setVisible(true).setAngle(180);
             });
           } else {
-            this.time.delayedCall(150, () => {
-              dagger.setActive(true);
-              dagger.setVisible(true);
-              dagger.setVelocity(300, 0);
+            this.time.delayedCall(50, () => {
+              dagger.setVelocity(400, 0).setActive(true).setVisible(true);
             });
           }
         }
@@ -417,13 +445,13 @@ class Jeu extends Phaser.Scene {
     });
 
     this.physics.add.overlap(this.enemy02, this.dagger, (enemy, dagger) => {
-      if (!daggerHitEnemy) { // Check if the dagger has already hit an enemy
+      if (!daggerHitEnemy) {
         this.enemy02Life -= 1;
-        daggerHitEnemy = true; // Set the flag to true to indicate it hit an enemy
+        daggerHitEnemy = true;
         dagger.setActive(false);
         dagger.setVisible(false);
-        dagger.destroy(); // Destroy the dagger immediately
-        daggerThrown = false; // Reset thrown flag when hitting enemy
+        dagger.destroy();
+        daggerThrown = true;
 
         let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
         explosionEnemy.setScale(2).setDepth(1);
@@ -607,39 +635,38 @@ class Jeu extends Phaser.Scene {
   }
 
   handleAnimations() {
+    const currentTime = this.time.now;
 
-    // Animation left click attack
-    this.input.on('pointerdown', () => {
-      if (this.input.activePointer.leftButtonDown() && !this.isAttacking && !this.isThrowAttacking) {
-        this.player.anims.play("attack", true);
-        this.isAttacking = true;
-        this.player.on("animationcomplete-attack", () => {
-          this.isAttacking = false;
-        })
+    this.input.on('pointerdown', (pointer) => {
+      if (this.isAttackingOrThrowing) {
+        return;
+      }
+
+      if (this.input.activePointer.leftButtonDown()) {
+        if (currentTime - this.lastClickTime > this.comboDelay) {
+          this.comboCount = 0;
+        }
+
+        this.lastClickTime = currentTime;
+        this.comboCount++;
+        this.performComboAttack(this.comboCount);
       }
     });
 
-    if (this.isAttacking) {
-      return;
-    }
-
-    // Animation throw attack right click
-
     this.input.on('pointerdown', () => {
-      if (this.input.activePointer.rightButtonDown() && !this.isThrowAttacking && (!this.isAttacking || !daggerThrown)) {
+      if (this.input.activePointer.rightButtonDown()) {
         this.player.anims.play("throw_attack", true);
-        this.isThrowAttacking = true;
+        this.isAttackingOrThrowing = true;
         this.player.on("animationcomplete-throw_attack", () => {
-          this.isThrowAttacking = false
-        })
+          this.isAttackingOrThrowing = false;
+          this.resetCombo();
+        });
       }
     });
 
-    if (this.isThrowAttacking) {
+    if (this.isAttackingOrThrowing) {
       return;
     }
-
-    // // Animation Saut & Fall
 
     this.player.on("animationcomplete", (animation) => {
       if (animation.key === "fall") {
@@ -666,6 +693,37 @@ class Jeu extends Phaser.Scene {
         this.player.anims.play("idle", true);
       }
     }
+  }
+
+  performComboAttack(comboCount) {
+    let attackKey;
+
+    if (comboCount > 4) {
+      this.comboCount = 1;
+      attackKey = "attack_1";
+    } else {
+      attackKey = `attack_${comboCount}`;
+    }
+
+    this.player.anims.play(attackKey, true);
+    this.isAttackingOrThrowing = true;
+
+    this.player.on("animationcomplete", () => {
+      this.isAttackingOrThrowing = false;
+      if (this.comboCount < 4) {
+        this.resetCombo();
+      }
+    });
+  }
+
+  resetCombo() {
+    if (this.comboResetTimer) {
+      this.time.removeEvent(this.comboResetTimer);
+    }
+
+    this.comboResetTimer = this.time.delayedCall(3000, () => {
+      this.comboCount = 0;
+    });
   }
 
 }
