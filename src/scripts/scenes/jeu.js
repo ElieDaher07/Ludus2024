@@ -487,7 +487,7 @@ class Jeu extends Phaser.Scene {
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
 
     // Monde 
-    // (multiplié par 2 parce que le scale de la map et le player est aussi multiplié par 2)
+    // (multiplié par 2 parce que le scale de les layers de la carte et le player sont aussi multipliés par 2)
 
     const mapWidth = maCarte.widthInPixels * 2;
     const mapHeight = maCarte.heightInPixels * 2;
