@@ -362,8 +362,11 @@ class Jeu extends Phaser.Scene {
     // (Non collision)
 
     const background_sky = maCarte.createLayer("background_sky", [background1], 0, 0);
+    background_sky.setScrollFactor(0.1);
     const background_sky_front = maCarte.createLayer("background_sky_front", [background2, other_lev_build], 0, 0);
+    background_sky_front.setScrollFactor(0.3);
     const background_behind04 = maCarte.createLayer("background_behind04", [background3, main_lev_build], 0, 0);
+    background_sky_front.setScrollFactor(0.6);
     const background_behind03 = maCarte.createLayer("background_behind03", [main_lev_build], 0, 0);
     const background_behind02 = maCarte.createLayer("background_behind02", [main_lev_build], 0, 0);
     const background_behind01 = maCarte.createLayer("background_behind01", [main_lev_build, other_lev_build], 0, 0);
@@ -461,7 +464,7 @@ class Jeu extends Phaser.Scene {
         });
 
         if (this.enemy02Life <= 0) {
-          this.enemy02.body.checkCollision.none = true;
+          // this.enemy02.body.checkCollision.none = true;
           this.enemy02.body.enable = false;
           this.enemy02.play("enemy02_death");
           this.enemy02.on("animationcomplete", () => {
@@ -551,11 +554,6 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 150);
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-
-    // ---------------- Parallax initial ---------------- 
-
-    this.lastCameraX = this.cameras.main.scrollX;
-    this.lastCameraY = this.cameras.main.scrollY;
 
     // ---------------- TOUCHES ---------------- 
 
