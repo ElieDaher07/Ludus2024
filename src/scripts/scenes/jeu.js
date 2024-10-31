@@ -668,6 +668,8 @@ class Jeu extends Phaser.Scene {
       return;
     }
 
+    // Animation saut, walk et idle
+
     this.player.on("animationcomplete", (animation) => {
       if (animation.key === "fall") {
         this.isFalling = true;
