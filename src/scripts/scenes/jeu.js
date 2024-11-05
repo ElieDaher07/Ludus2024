@@ -36,7 +36,6 @@ class Jeu extends Phaser.Scene {
       frameHeight: 64
     });
 
-
     this.load.spritesheet("player_throw_attack", "./assets/images/characters/player_spritesheet/throw_attack_sheet.png", {
       frameWidth: 64,
       frameHeight: 64
@@ -89,272 +88,8 @@ class Jeu extends Phaser.Scene {
     // Preload l'élément hud du joueur
 
     this.load.image("hud", "./assets/images/ui/Gui.png");
+    this.load.image("health", "./assets/images/ui/health_sheet.png")
 
-  }
-
-  create() {
-
-    this.input.mouse.disableContextMenu();
-
-    // ---------------- CRÉATION DES VARIABLES GLOBALES ----------------
-
-    // Sauter et tomber
-
-    this.isFalling = false;
-    this.isJumping = false;
-
-    // Jumpcount
-
-    this.jumpCount = 0;
-    this.jumpKeyReleased = true;
-
-    // Attaque
-
-    this.isAttackingOrThrowing = false;
-
-    // Combo 
-
-    this.comboCount = 0;
-    this.comboDelay = 300;
-    this.lastClickTime = 0;
-
-    // Vie joueur
-
-    this.playerLife = 8;
-
-    // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
-
-    this.createAnimation();
-
-    // ---------------- CRÉATION DU TILEMAP ----------------
-
-    const maCarte = this.make.tilemap({
-      key: "carte_json"
-    });
-
-    // ---------------- HUD ----------------
-
-    const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(2);
-
-    // Bouton(s) + ajout dans le hud
-
-    let quitBtn = this.add.image(
-      (config.width / 2),
-      (config.height / 2 - 300),
-      "quit"
-    ).setScale(0.3).setScrollFactor(0);
-
-    hudContainer.add(quitBtn);
-
-    // Ajout des élements hud du joueur
-
-    this.avatarHud = this.add.image(config.width / 2, config.height / 2, "hud");
-    this.healthHud = this.add.image(config.width / 2, config.height / 2, "hud");
-    this.daggerHud = this.add.image(config.width / 2, config.height / 2, "hud");
-
-    this.healthHud.setCrop(5, 35, 40, 15)
-    this.healthHud.setOrigin(0, 0);
-    this.healthHud.setScale(5);
-    this.healthHud.setPosition(50, -120)
-
-    this.avatarHud.setCrop(5, 5, 55, 30)
-    this.avatarHud.setOrigin(0, 0);
-    this.avatarHud.setScale(5);
-    this.avatarHud.setPosition(-30, -35)
-
-    this.daggerHud.setCrop(5, 70, 25, 80);
-    this.daggerHud.setOrigin(0, 0);
-    this.daggerHud.setScale(5);
-    this.daggerHud.setPosition(-20, -270)
-
-    hudContainer.add(this.healthHud);
-    hudContainer.add(this.avatarHud);
-    hudContainer.add(this.daggerHud);
-
-    // Interactions avec le(s) bouton(s)
-
-    quitBtn.setInteractive();
-    quitBtn.on("pointerdown", () => {
-      this.scene.start("accueil");
-    });
-
-    // ---------------- CRÉATION DES TILESETS ----------------
-
-    const background1 = maCarte.addTilesetImage("background1", "background1_tile");
-    const background2 = maCarte.addTilesetImage("background2", "background2_tile");
-    const background3 = maCarte.addTilesetImage("background3", "background3_tile");
-    const main_lev_build = maCarte.addTilesetImage("main_lev_build", "background_main");
-    const other_lev_build = maCarte.addTilesetImage("other_lev_build", "background_other");
-
-    // ---------------- CRÉATION CALQUES BACKGROUND  ----------------
-
-    // (Non collision)
-
-    const background_sky = maCarte.createLayer("background_sky", [background1], 0, 0);
-    const background_sky_front = maCarte.createLayer("background_sky_front", [background2, other_lev_build], 0, 0);
-    const background_behind04 = maCarte.createLayer("background_behind04", [background3, main_lev_build], 0, 0);
-    const background_behind03 = maCarte.createLayer("background_behind03", [main_lev_build], 0, 0);
-    const background_behind02 = maCarte.createLayer("background_behind02", [main_lev_build], 0, 0);
-    const background_behind01 = maCarte.createLayer("background_behind01", [main_lev_build, other_lev_build], 0, 0);
-    const background_front = maCarte.createLayer("background_front", [main_lev_build], 0, 0);
-    const background_vegetation = maCarte.createLayer("background_vegetation", [main_lev_build], 0, 0);
-
-    this.backgroundParallax = [background_sky, background_sky_front, background_behind04];
-
-    // (Avec collision)
-
-    const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0).setDepth(1);
-    const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
-    const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0); // Pour blesser le joueur
-
-    // ---------------- CRÉATION DES ENNEMIS ----------------
-
-    this.enemy01 = this.physics.add.sprite(1000, config.height / 2 - 70, "enemy01_idle");
-    this.enemy01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
-    this.enemy01.setScale(2).setDepth(1);
-    this.enemy01.anims.play("enemy01_idle", true);
-
-    this.enemy02 = this.physics.add.sprite(800, config.height / 2 - 50, "enemy02_idle");
-    this.enemy02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy02.setScale(3).setDepth(1);
-    this.enemy02.anims.play("enemy02_idle", true);
-
-    this.enemy03 = this.physics.add.sprite(1200, config.height / 2 - 50, "enemy03_idle");
-    this.enemy03.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy03.setScale(3).setDepth(1);
-    this.enemy03.anims.play("enemy03_idle", true);
-
-    this.enemy04 = this.physics.add.sprite(config.width / 2 - 500, config.height / 2, "enemy04_idle");
-    this.enemy04.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
-    this.enemy04.setScale(2).setDepth(1);
-    this.enemy04.anims.play("enemy04_idle", true);
-
-    this.enemy05 = this.physics.add.sprite(config.width / 2 - 400, config.height / 2 + 55, "enemy05_idle");
-    this.enemy05.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
-    this.enemy05.setScale(2).setDepth(1);
-    this.enemy05.anims.play("enemy05_idle", true);
-
-    // Vie ennemis
-
-    this.enemy01Life = 3;
-    this.enemy02Life = 5;
-    this.enemy03Life = 6;
-    this.enemy04Life = 5;
-    this.enemy05Life = 4;
-
-    this.enemies = [this.enemy01, this.enemy02, this.enemy03, this.enemy04, this.enemy05];
-
-    // ---------------- CRÉATION DU JOUEUR ----------------
-
-    this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
-    this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
-    this.player.setScale(2).setDepth(1);
-
-    // ---------------- CRÉATION DES BALLES "Dagger" ----------------
-
-    this.createDagger()
-
-    // ---------------- ITEMS ---------------- 
-
-    this.heart01 = this.physics.add.image(650, config.height / 2 - 30, "heart01");
-    this.heart01.body.allowGravity = false;
-
-    this.heart01.setScale(2);
-
-    this.physics.add.overlap(this.player, this.heart01, () => {
-      this.heart01.setActive(false);
-      this.heart01.setVisible(false);
-      this.heart01.destroy();
-    });
-
-    //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
-
-    // Monde 
-    // (multiplié par 2 parce que le scale de les layers de la carte et le player sont aussi multipliés par 2)
-
-    const mapWidth = maCarte.widthInPixels * 2;
-    const mapHeight = maCarte.heightInPixels * 2;
-
-    // Setbound
-
-    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
-
-    // ---------------- LA COLLISION ---------------- 
-
-    // Rendre les collisions calques selectionés en true
-
-    collisionLayer01.setCollisionByProperty({
-      collision: true
-    });
-    collisionLayer02.setCollisionByProperty({
-      collision: true
-    });
-
-    collisionDanger.setCollisionByProperty({
-      collision: true
-    })
-
-    // Collision du joueur avec les calques
-
-    this.physics.add.collider(this.player, collisionLayer01);
-    this.physics.add.collider(this.player, collisionLayer02);
-    this.physics.add.collider(this.player, collisionDanger);
-
-    // Collision des ennemis avec les calques
-
-    this.physics.add.collider(this.enemies, collisionLayer01);
-    this.physics.add.collider(this.enemies, collisionLayer02);
-
-    // Collision dagger
-
-    this.physics.add.collider(this.dagger, collisionLayer01);
-    this.physics.add.collider(this.dagger, collisionLayer02);
-    this.physics.add.collider(this.dagger, collisionDanger);
-
-    // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
-
-    // (Alternative pour ne pas faire un zoom avec la caméra et que tout marche correctement)
-
-    background_sky.setScale(2);
-    background_sky_front.setScale(2);
-    background_behind04.setScale(2);
-    background_behind03.setScale(2);
-    background_behind02.setScale(2);
-    background_behind01.setScale(2);
-    background_front.setScale(2);
-    background_vegetation.setScale(2);
-    collisionLayer01.setScale(2);
-    collisionLayer02.setScale(2);
-    collisionDanger.setScale(2);
-
-    // ---------------- CAMÉRA ---------------- 
-
-    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-    this.cameras.main.setDeadzone(200, 150);
-    this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-
-    // ---------------- TOUCHES ---------------- 
-
-    this.keys = this.input.keyboard.addKeys({
-      jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-    });
-
-    // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
-
-    this.birds = [];
-
-    for (let i = 0; i < 3; i++) {
-      let bird = this.add.sprite(0, Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200), "bird");
-      bird.setDepth(0).setTint(0x808080);
-      bird.anims.play("bird_bg", true);
-      this.birds.push(bird);
-      this.moveBird(bird);
-    }
-
-    this.swordHitBox = this.add.rectangle(0, 0, 32, 64, 0xffffff, 0.5)
-    this.physics.add.existing(this.swordHitBox);
   }
 
   createAnimation() {
@@ -469,10 +204,20 @@ class Jeu extends Phaser.Scene {
     });
 
     this.anims.create({
-      key: "hit_death",
+      key: "player_hit",
+      frames: this.anims.generateFrameNumbers("player_hit_death", {
+        start: 5,
+        end: 7
+      }),
+      frameRate: 10,
+      repeat: 6
+    });
+
+    this.anims.create({
+      key: "player_death",
       frames: this.anims.generateFrameNumbers("player_hit_death", {
         start: 0,
-        end: 7
+        end: 4
       }),
       frameRate: 10,
       repeat: 0
@@ -629,7 +374,110 @@ class Jeu extends Phaser.Scene {
     })
   }
 
-  createDagger() {
+  handleEnemyLife() {
+    if (this.enemy01Life <= 0) {
+      this.enemy01.body.enable = false;
+      this.enemy01.anims.play("enemy01_death");
+      this.enemy01.on("animationcomplete", () => {
+        this.enemy01.destroy();
+      });
+    }
+
+    if (this.enemy02Life <= 0) {
+      this.enemy02.body.enable = false;
+      this.enemy02.anims.play("enemy02_death");
+      this.enemy02.on("animationcomplete", () => {
+        this.enemy02.destroy();
+      });
+    }
+
+    if (this.enemy03Life <= 0) {
+      this.enemy03.body.enable = false;
+      this.enemy03.anims.play("enemy03_death");
+      this.enemy03.on("animationcomplete", () => {
+        this.enemy03.destroy();
+      });
+    }
+
+    if (this.enemy04Life <= 0) {
+      this.enemy04.body.enable = false;
+      this.enemy04.anims.play("enemy04_death");
+      this.enemy04.on("animationcomplete", () => {
+        this.enemy04.destroy();
+      });
+    }
+
+    if (this.enemy05Life <= 0) {
+      this.enemy05.body.enable = false;
+      this.enemy05.anims.play("enemy05_death");
+      this.enemy05.on("animationcomplete", () => {
+        this.enemy05.destroy();
+      });
+    }
+  }
+
+  handlePlayerLife() {
+
+    this.playerLife = 8;
+    this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
+
+    this.physics.add.overlap(this.player, this.enemies, () => {
+      if (this.player.alpha != 1) return;
+      if (this.player.alpha === 1) {
+
+        this.playerLife--;
+        this.playerIsHit = true;
+
+
+        let flashTween = this.tweens.add({
+          targets: this.player,
+          alpha: {
+            from: 0.33,
+            to: 0.66
+          },
+          ease: "Linear",
+          duration: 100,
+          repeat: 10,
+          yoyo: true,
+          onComplete: () => {
+
+            this.player.setAlpha(1);
+          }
+        });
+
+      }
+
+      this.physics.add.overlap(this.player, this.heart01, () => {
+        this.playerLife++;
+        this.heart01.setActive(false);
+        this.heart01.setVisible(false);
+        this.heart01.destroy();
+      });
+
+      if (this.playerLife === 8) {
+        this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
+      } else if (this.playerLife === 7) {
+        this.healthHud.setCrop(238, 0, 35, 10).setPosition(-1100, 70);
+      } else if (this.playerLife === 6) {
+        this.healthHud.setCrop(205, 0, 32, 10).setPosition(-930, 70);
+      } else if (this.playerLife === 5) {
+        this.healthHud.setCrop(170, 0, 32, 10).setPosition(-760, 70);
+      } else if (this.playerLife === 4) {
+        this.healthHud.setCrop(134, 0, 35, 10).setPosition(-590, 70); // -170
+      } else if (this.playerLife === 3) {
+        this.healthHud.setCrop(96, 0, 40, 10).setPosition(-420, 70);
+      } else if (this.playerLife === 2) {
+        this.healthHud.setCrop(58, 0, 42, 10).setPosition(-250, 70);
+      } else if (this.playerLife === 1) {
+        this.healthHud.setCrop(20, 0, 48, 10).setPosition(-80, 70);
+      } else if (this.playerLife === 0) {
+        this.healthHud.setCrop(0, 0, 32, 10).setPosition(90, 70);
+        this.playerIsDead = true;
+      }
+    });
+  }
+
+  handleDagger() {
     // Dagger
     let daggerHitEnemy = false;
     let daggerThrown = false;
@@ -641,6 +489,7 @@ class Jeu extends Phaser.Scene {
 
     this.input.on("pointerdown", (pointer) => {
       if (pointer.rightButtonDown()) {
+        if (this.playerIsDead) return;
         if (this.player.alpha !== 1 || daggerThrown) return;
         const dagger = this.dagger.get(this.player.x + 30, this.player.y + 20);
         if (dagger) {
@@ -665,12 +514,16 @@ class Jeu extends Phaser.Scene {
               daggerThrown = false;
             }
           });
+
           if (this.player.flipX) {
             this.time.delayedCall(50, () => {
+              if (!dagger || !dagger.scene) return;
               dagger.setVelocity(-400, 0).setFlipY(true).setActive(true).setVisible(true).setAngle(180);
             });
           } else {
             this.time.delayedCall(50, () => {
+              if (!dagger || !dagger.scene) return;
+              console.log(dagger);
               dagger.setVelocity(400, 0).setActive(true).setVisible(true);
             });
           }
@@ -708,54 +561,18 @@ class Jeu extends Phaser.Scene {
           // Hit effect
           let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
           explosionEnemy.setScale(2).setDepth(1);
-          explosionEnemy.play("dagger_hit");
+          explosionEnemy.anims.play("dagger_hit");
           explosionEnemy.on("animationcomplete", () => {
             explosionEnemy.destroy();
           });
 
           // Enemy life
-          if (this.enemy01Life <= 0) {
-            this.enemy01.body.enable = false;
-            this.enemy01.play("enemy01_death");
-            this.enemy01.on("animationcomplete", () => {
-              this.enemy01.destroy();
-            });
-          }
+          this.handleEnemyLife();
 
-          if (this.enemy02Life <= 0) {
-            this.enemy02.body.enable = false;
-            this.enemy02.play("enemy02_death");
-            this.enemy02.on("animationcomplete", () => {
-              this.enemy02.destroy();
-            });
-          }
-
-          if (this.enemy03Life <= 0) {
-            this.enemy03.body.enable = false;
-            this.enemy03.play("enemy03_death");
-            this.enemy03.on("animationcomplete", () => {
-              this.enemy03.destroy();
-            });
-          }
-
-          if (this.enemy04Life <= 0) {
-            this.enemy04.body.enable = false;
-            this.enemy04.play("enemy04_death");
-            this.enemy04.on("animationcomplete", () => {
-              this.enemy04.destroy();
-            });
-          }
-
-          if (this.enemy05Life <= 0) {
-            this.enemy05.body.enable = false;
-            this.enemy05.play("enemy05_death");
-            this.enemy05.on("animationcomplete", () => {
-              this.enemy05.destroy();
-            });
-          }
         }
       });
     });
+
   }
 
   moveBird(bird) {
@@ -774,12 +591,331 @@ class Jeu extends Phaser.Scene {
     });
   }
 
+  create() {
+
+    this.input.mouse.disableContextMenu();
+
+    // ---------------- CRÉATION DES VARIABLES GLOBALES ----------------
+
+    // Sauter et tomber
+
+    this.isFalling = false;
+    this.isJumping = false;
+
+    // Jumpcount
+
+    this.jumpCount = 0;
+    this.jumpKeyReleased = true;
+
+    // Attaque
+
+    this.isAttackingOrThrowing = false;
+
+    // Combo 
+
+    this.comboCount = 0;
+    this.comboDelay = 300;
+    this.lastClickTime = 0;
+
+    // Vie joueur
+
+    this.playerLife = 8;
+    this.playerIsHit = false;
+    this.playerIsDead = false;
+
+    // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
+
+    this.createAnimation();
+
+    // ---------------- CRÉATION DU TILEMAP ----------------
+
+    const maCarte = this.make.tilemap({
+      key: "carte_json"
+    });
+
+    // ---------------- HUD ----------------
+
+    const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(2);
+
+    // Bouton(s) + ajout dans le hud
+
+    let quitBtn = this.add.image(
+      (config.width / 2),
+      (config.height / 2 - 300),
+      "quit"
+    ).setScale(0.3).setScrollFactor(0);
+
+    hudContainer.add(quitBtn);
+
+    // Ajout des élements hud du joueur
+
+    this.avatarHud = this.add.image(config.width / 2, config.height / 2, "hud");
+    this.healthHud = this.add.image(config.width / 2, config.height / 2, "health");
+    this.daggerHud = this.add.image(config.width / 2, config.height / 2, "hud");
+
+
+    this.healthHud.setOrigin(0, 0);
+    this.healthHud.setScale(5);
+
+    this.avatarHud.setCrop(5, 5, 55, 30)
+    this.avatarHud.setOrigin(0, 0);
+    this.avatarHud.setScale(5);
+    this.avatarHud.setPosition(-30, -35)
+
+    this.daggerHud.setCrop(5, 70, 25, 80);
+    this.daggerHud.setOrigin(0, 0);
+    this.daggerHud.setScale(5);
+    this.daggerHud.setPosition(-20, -270)
+
+    hudContainer.add(this.healthHud);
+    hudContainer.add(this.avatarHud);
+    hudContainer.add(this.daggerHud);
+
+    // Interactions avec le(s) bouton(s)
+
+    quitBtn.setInteractive();
+    quitBtn.on("pointerdown", () => {
+      this.scene.start("accueil");
+    });
+
+    // ---------------- CRÉATION DES TILESETS ----------------
+
+    const background1 = maCarte.addTilesetImage("background1", "background1_tile");
+    const background2 = maCarte.addTilesetImage("background2", "background2_tile");
+    const background3 = maCarte.addTilesetImage("background3", "background3_tile");
+    const main_lev_build = maCarte.addTilesetImage("main_lev_build", "background_main");
+    const other_lev_build = maCarte.addTilesetImage("other_lev_build", "background_other");
+
+    // ---------------- CRÉATION CALQUES BACKGROUND  ----------------
+
+    // (Non collision)
+
+    const background_sky = maCarte.createLayer("background_sky", [background1], 0, 0);
+    const background_sky_front = maCarte.createLayer("background_sky_front", [background2, other_lev_build], 0, 0);
+    const background_behind04 = maCarte.createLayer("background_behind04", [background3, main_lev_build], 0, 0);
+    const background_behind03 = maCarte.createLayer("background_behind03", [main_lev_build], 0, 0);
+    const background_behind02 = maCarte.createLayer("background_behind02", [main_lev_build], 0, 0);
+    const background_behind01 = maCarte.createLayer("background_behind01", [main_lev_build, other_lev_build], 0, 0);
+    const background_front = maCarte.createLayer("background_front", [main_lev_build], 0, 0);
+    const background_vegetation = maCarte.createLayer("background_vegetation", [main_lev_build], 0, 0);
+
+    this.backgroundParallax = [background_sky, background_sky_front, background_behind04];
+
+    // (Avec collision)
+
+    const collisionLayer01 = maCarte.createLayer("background_main", [main_lev_build], 0, 0).setDepth(1);
+    const collisionLayer02 = maCarte.createLayer("background_bridge", [main_lev_build], 0, 0);
+    const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0); // Pour blesser le joueur
+
+    // ---------------- CRÉATION DES ENNEMIS ----------------
+
+    this.enemy01 = this.physics.add.sprite(1000, config.height / 2 - 70, "enemy01_idle");
+    this.enemy01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
+    this.enemy01.setScale(2).setDepth(1);
+    this.enemy01.anims.play("enemy01_idle", true);
+
+    this.enemy02 = this.physics.add.sprite(800, config.height / 2 - 50, "enemy02_idle");
+    this.enemy02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.enemy02.setScale(3).setDepth(1);
+    this.enemy02.anims.play("enemy02_idle", true);
+
+    this.enemy03 = this.physics.add.sprite(1200, config.height / 2 - 50, "enemy03_idle");
+    this.enemy03.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.enemy03.setScale(3).setDepth(1);
+    this.enemy03.anims.play("enemy03_idle", true);
+
+    this.enemy04 = this.physics.add.sprite(config.width / 2 - 500, config.height / 2, "enemy04_idle");
+    this.enemy04.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
+    this.enemy04.setScale(2).setDepth(1);
+    this.enemy04.anims.play("enemy04_idle", true);
+
+    this.enemy05 = this.physics.add.sprite(config.width / 2 - 400, config.height / 2 + 55, "enemy05_idle");
+    this.enemy05.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
+    this.enemy05.setScale(2).setDepth(1);
+    this.enemy05.anims.play("enemy05_idle", true);
+
+    // Vie ennemis
+
+    this.enemy01Life = 3;
+    this.enemy02Life = 5;
+    this.enemy03Life = 6;
+    this.enemy04Life = 5;
+    this.enemy05Life = 4;
+
+    this.enemies = [this.enemy01, this.enemy02, this.enemy03, this.enemy04, this.enemy05];
+
+    // ------------------------------ CRÉATION DU JOUEUR -------------------------------
+
+    this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
+    this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
+    this.player.setScale(2).setDepth(1);
+
+    // ------------------------------ PLAYER SWORD HITBOX ------------------------------
+
+    this.swordHitBox = this.add.rectangle(0, 0, 32, 64, 0xffffff, 0.5)
+    this.physics.add.existing(this.swordHitBox);
+
+    this.input.on('pointerdown', (pointer) => {
+      if (this.isAttackingOrThrowing) {
+        return;
+      }
+
+      // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
+
+      if (this.input.activePointer.leftButtonDown()) {
+        if (this.playerIsDead) return;
+        this.isAttackingOrThrowing = true;
+        this.player.anims.play("attack_2", true)
+        this.player.on("animationcomplete-attack_2", () => {
+          this.isAttackingOrThrowing = false;
+          // this.resetCombo();
+        });
+        // if (currentTime - this.lastClickTime > this.comboDelay) {
+        // this.comboCount = 0;
+        // }
+        // this.lastClickTime = currentTime;
+        // this.comboCount++;
+        // this.performComboAttack(this.comboCount);
+      }
+    });
+
+    this.input.on('pointerdown', () => {
+      if (this.input.activePointer.rightButtonDown()) {
+        if (this.playerIsDead) return;
+        this.player.anims.play("throw_attack", true);
+        this.isAttackingOrThrowing = true;
+        this.player.on("animationcomplete-throw_attack", () => {
+          this.isAttackingOrThrowing = false;
+          // this.resetCombo();
+        });
+      }
+    });
+
+    // ----------------------- PLAYER ON ANIMATION COMPLETE  ------------------------
+
+    this.player.on("animationcomplete", (animation) => {
+      if (animation.key === "fall") {
+        this.isFalling = true;
+      }
+      if (animation.key === "jump") {
+        this.isJumping = true;
+      }
+      if (animation.key === "player_hit") {
+        this.playerIsHit = false;
+      }
+      if (animation.key === "player_death") {
+        this.player.anims.stop();
+        this.player.setFrame(4);
+      }
+    });
+
+    this.handlePlayerLife();
+
+    // ---------------- CRÉATION DES BALLES "Dagger" ET SON OVERLAP AVEC LES ENNEMIS ----------------
+
+    this.handleDagger()
+
+    // ---------------- ITEMS ---------------- 
+
+    this.heart01 = this.physics.add.image(650, config.height / 2 - 30, "heart01");
+    this.heart01.body.allowGravity = false;
+
+    this.heart01.setScale(2);
+
+    //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
+
+    // Monde 
+    // (multiplié par 2 parce que le scale de les layers de la carte et le player sont aussi multipliés par 2)
+
+    const mapWidth = maCarte.widthInPixels * 2;
+    const mapHeight = maCarte.heightInPixels * 2;
+
+    // Setbound
+
+    this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
+
+    // ---------------- LA COLLISION ---------------- 
+
+    // Rendre les collisions calques selectionés en true
+
+    collisionLayer01.setCollisionByProperty({
+      collision: true
+    });
+    collisionLayer02.setCollisionByProperty({
+      collision: true
+    });
+
+    collisionDanger.setCollisionByProperty({
+      collision: true
+    })
+
+    // Collision du joueur avec les calques
+
+    this.physics.add.collider(this.player, collisionLayer01);
+    this.physics.add.collider(this.player, collisionLayer02);
+    this.physics.add.collider(this.player, collisionDanger);
+
+    // Collision des ennemis avec les calques
+
+    this.physics.add.collider(this.enemies, collisionLayer01);
+    this.physics.add.collider(this.enemies, collisionLayer02);
+
+    // Collision dagger
+
+    this.physics.add.collider(this.dagger, collisionLayer01);
+    this.physics.add.collider(this.dagger, collisionLayer02);
+    this.physics.add.collider(this.dagger, collisionDanger);
+
+    // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
+
+    // (Alternative pour ne pas faire un zoom avec la caméra et que tout marche correctement)
+
+    background_sky.setScale(2);
+    background_sky_front.setScale(2);
+    background_behind04.setScale(2);
+    background_behind03.setScale(2);
+    background_behind02.setScale(2);
+    background_behind01.setScale(2);
+    background_front.setScale(2);
+    background_vegetation.setScale(2);
+    collisionLayer01.setScale(2);
+    collisionLayer02.setScale(2);
+    collisionDanger.setScale(2);
+
+    // ---------------- CAMÉRA ---------------- 
+
+    this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+    this.cameras.main.setDeadzone(200, 150);
+    this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+
+    // ---------------- TOUCHES ---------------- 
+
+    this.keys = this.input.keyboard.addKeys({
+      jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+
+    // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
+
+    this.birds = [];
+
+    for (let i = 0; i < 3; i++) {
+      let bird = this.add.sprite(0, Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200), "bird");
+      bird.setDepth(0).setTint(0x808080);
+      bird.anims.play("bird_bg", true);
+      this.birds.push(bird);
+      this.moveBird(bird);
+    }
+
+  }
+
   update() {
     this.handleParallax();
     this.handleMovement();
     this.handleAnimations();
-    this.handlePlayerLife();
     // this.handleDeath(); - A ajouter plus tard
+
   }
 
   handleParallax() {
@@ -794,19 +930,17 @@ class Jeu extends Phaser.Scene {
           speed = 0.2;
           break;
         case 2: // background_behind04
-          speed = 0.3;
+          speed = -0.1;
           break;
       }
       layer.x = cameraX * speed;
     });
   }
 
-  handlePlayerLife() {
-
-  }
-
   handleMovement() {
     // Mouvement avec A et D
+    if (this.playerIsDead) return;
+
     if (this.keys.left.isDown) {
       this.player.body.setVelocityX(-280);
       if (!this.player.flipX) {
@@ -842,54 +976,22 @@ class Jeu extends Phaser.Scene {
   handleAnimations() {
     // const currentTime = this.time.now;
 
-    this.input.on('pointerdown', (pointer) => {
-      if (this.isAttackingOrThrowing) {
-        return;
-      }
+    if (this.isAttackingOrThrowing) return;
 
-      if (this.input.activePointer.leftButtonDown()) {
-        this.isAttackingOrThrowing = true;
-        this.player.anims.play("attack_2", true)
-        this.player.on("animationcomplete-attack_2", () => {
-          this.isAttackingOrThrowing = false;
-          // this.resetCombo();
-        });
-        // if (currentTime - this.lastClickTime > this.comboDelay) {
-        // this.comboCount = 0;
-        // }
-        // this.lastClickTime = currentTime;
-        // this.comboCount++;
-        // this.performComboAttack(this.comboCount);
-      }
-    });
+    // Animation hit, saut, walk, idle, death
 
-    this.input.on('pointerdown', () => {
-      if (this.input.activePointer.rightButtonDown()) {
-        this.player.anims.play("throw_attack", true);
-        this.isAttackingOrThrowing = true;
-        this.player.on("animationcomplete-throw_attack", () => {
-          this.isAttackingOrThrowing = false;
-          // this.resetCombo();
-        });
-      }
-    });
+    if (this.playerIsDead) {
+      this.player.anims.play("player_death");
+      // this.player.on("animationcomplete-player_death", () => {
+      //  this.player.setFrame(4);
+      // });
+      this.player.body.setVelocity(0, 0);
+      this.player.body.allowGravity = false;
 
-    if (this.isAttackingOrThrowing) {
-      return;
-    }
 
-    // Animation saut, walk et idle
-
-    this.player.on("animationcomplete", (animation) => {
-      if (animation.key === "fall") {
-        this.isFalling = true;
-      }
-      if (animation.key === "jump") {
-        this.isJumping = true;
-      }
-    });
-
-    if (!this.player.body.blocked.down) {
+    } else if (this.playerIsHit) {
+      this.player.anims.play("player_hit", true);
+    } else if (!this.player.body.blocked.down) {
       if (this.player.body.velocity.y < 0 && !this.isJumping) {
         this.player.anims.play("jump", true);
         this.isFalling = false;
@@ -905,6 +1007,7 @@ class Jeu extends Phaser.Scene {
         this.player.anims.play("idle", true);
       }
     }
+
   }
 
   /* performComboAttack(comboCount) {
