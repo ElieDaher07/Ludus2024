@@ -642,7 +642,11 @@ class Jeu extends Phaser.Scene {
 
     this.physics.add.collider(this.player, collisionLayer01);
     this.physics.add.collider(this.player, collisionLayer02);
-    this.physics.add.collider(this.player, collisionDanger);
+    this.physics.add.collider(this.player, collisionDanger, () => {
+      console.log("HIIIITT")
+    }, (player, tile) => {
+      return tile && tile.properties && tile.properties.collision === true;
+    });
 
     // Collision des ennemis avec les calques
 
