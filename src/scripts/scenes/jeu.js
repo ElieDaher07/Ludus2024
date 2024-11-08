@@ -210,7 +210,7 @@ class Jeu extends Phaser.Scene {
         end: 7
       }),
       frameRate: 10,
-      repeat: 6
+      repeat: 0
     });
 
     this.anims.create({
@@ -374,224 +374,8 @@ class Jeu extends Phaser.Scene {
     })
   }
 
-  handleEnemyLife() {
-    if (this.enemy01Life <= 0) {
-      this.enemy01.body.enable = false;
-      this.enemy01.anims.play("enemy01_death");
-      this.enemy01.on("animationcomplete", () => {
-        this.enemy01.destroy();
-      });
-    }
-
-    if (this.enemy02Life <= 0) {
-      this.enemy02.body.enable = false;
-      this.enemy02.anims.play("enemy02_death");
-      this.enemy02.on("animationcomplete", () => {
-        this.enemy02.destroy();
-      });
-    }
-
-    if (this.enemy03Life <= 0) {
-      this.enemy03.body.enable = false;
-      this.enemy03.anims.play("enemy03_death");
-      this.enemy03.on("animationcomplete", () => {
-        this.enemy03.destroy();
-      });
-    }
-
-    if (this.enemy04Life <= 0) {
-      this.enemy04.body.enable = false;
-      this.enemy04.anims.play("enemy04_death");
-      this.enemy04.on("animationcomplete", () => {
-        this.enemy04.destroy();
-      });
-    }
-
-    if (this.enemy05Life <= 0) {
-      this.enemy05.body.enable = false;
-      this.enemy05.anims.play("enemy05_death");
-      this.enemy05.on("animationcomplete", () => {
-        this.enemy05.destroy();
-      });
-    }
-  }
-
-  handlePlayerLife() {
-
-    this.playerLife = 8;
-    this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
-
-    this.physics.add.overlap(this.player, this.enemies, () => {
-      if (this.player.alpha != 1) return;
-      if (this.player.alpha === 1) {
-
-        this.playerLife--;
-        this.playerIsHit = true;
-
-
-        let flashTween = this.tweens.add({
-          targets: this.player,
-          alpha: {
-            from: 0.33,
-            to: 0.66
-          },
-          ease: "Linear",
-          duration: 100,
-          repeat: 10,
-          yoyo: true,
-          onComplete: () => {
-
-            this.player.setAlpha(1);
-          }
-        });
-
-      }
-
-      this.physics.add.overlap(this.player, this.heart01, () => {
-        this.playerLife++;
-        this.heart01.setActive(false);
-        this.heart01.setVisible(false);
-        this.heart01.destroy();
-      });
-
-      if (this.playerLife === 8) {
-        this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
-      } else if (this.playerLife === 7) {
-        this.healthHud.setCrop(238, 0, 35, 10).setPosition(-1100, 70);
-      } else if (this.playerLife === 6) {
-        this.healthHud.setCrop(205, 0, 32, 10).setPosition(-930, 70);
-      } else if (this.playerLife === 5) {
-        this.healthHud.setCrop(170, 0, 32, 10).setPosition(-760, 70);
-      } else if (this.playerLife === 4) {
-        this.healthHud.setCrop(134, 0, 35, 10).setPosition(-590, 70); // -170
-      } else if (this.playerLife === 3) {
-        this.healthHud.setCrop(96, 0, 40, 10).setPosition(-420, 70);
-      } else if (this.playerLife === 2) {
-        this.healthHud.setCrop(58, 0, 42, 10).setPosition(-250, 70);
-      } else if (this.playerLife === 1) {
-        this.healthHud.setCrop(20, 0, 48, 10).setPosition(-80, 70);
-      } else if (this.playerLife === 0) {
-        this.healthHud.setCrop(0, 0, 32, 10).setPosition(90, 70);
-        this.playerIsDead = true;
-      }
-    });
-  }
-
-  handleDagger() {
-    // Dagger
-    let daggerHitEnemy = false;
-    let daggerThrown = false;
-
-    this.dagger = this.physics.add.group({
-      defaultKey: "dagger",
-      maxSize: 1
-    });
-
-    this.input.on("pointerdown", (pointer) => {
-      if (pointer.rightButtonDown()) {
-        if (this.playerIsDead) return;
-        if (this.player.alpha !== 1 || daggerThrown) return;
-        const dagger = this.dagger.get(this.player.x + 30, this.player.y + 20);
-        if (dagger) {
-          dagger.anims.play("dagger_projectile", true);
-          dagger.setScale(2).setSize(15, 5);
-          dagger.body.allowGravity = false;
-          daggerHitEnemy = false;
-          daggerThrown = true;
-          this.time.delayedCall(5000, () => {
-            if (!daggerHitEnemy) {
-              let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
-              explosion.setScale(2).setDepth(1);
-              explosion.play("dagger_hit");
-              this.time.delayedCall(50, () => {
-                explosion.on("animationcomplete", () => {
-                  explosion.destroy();
-                });
-                dagger.destroy();
-                daggerThrown = false;
-              });
-            } else {
-              daggerThrown = false;
-            }
-          });
-
-          if (this.player.flipX) {
-            this.time.delayedCall(50, () => {
-              if (!dagger || !dagger.scene) return;
-              dagger.setVelocity(-400, 0).setFlipY(true).setActive(true).setVisible(true).setAngle(180);
-            });
-          } else {
-            this.time.delayedCall(50, () => {
-              if (!dagger || !dagger.scene) return;
-              console.log(dagger);
-              dagger.setVelocity(400, 0).setActive(true).setVisible(true);
-            });
-          }
-        }
-      }
-    });
-
-    this.enemies.forEach((enemy, index) => {
-      this.physics.add.overlap(enemy, this.dagger, (enemy, dagger) => {
-        if (!daggerHitEnemy) {
-          switch (enemy) {
-            case this.enemy01:
-              this.enemy01Life--;
-              break;
-            case this.enemy02:
-              this.enemy02Life--;
-              break;
-            case this.enemy03:
-              this.enemy03Life--;
-              break;
-            case this.enemy04:
-              this.enemy04Life--;
-              break;
-            case this.enemy05:
-              this.enemy05Life--;
-              break;
-          }
-
-          daggerHitEnemy = true;
-          dagger.setActive(false);
-          dagger.setVisible(false);
-          dagger.destroy();
-          daggerThrown = true;
-
-          // Hit effect
-          let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
-          explosionEnemy.setScale(2).setDepth(1);
-          explosionEnemy.anims.play("dagger_hit");
-          explosionEnemy.on("animationcomplete", () => {
-            explosionEnemy.destroy();
-          });
-
-          // Enemy life
-          this.handleEnemyLife();
-
-        }
-      });
-    });
-
-  }
-
-  moveBird(bird) {
-
-    bird.x = -bird.width;
-    bird.scale = Phaser.Math.Between(1, 2);
-    bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
-    this.tweens.add({
-      targets: bird,
-      x: config.width * 2,
-      duration: Phaser.Math.Between(12000, 17000),
-      delay: Phaser.Math.Between(9000, 20000),
-      onComplete: () => {
-        this.moveBird(bird);
-      }
-    });
-  }
-
   create() {
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     this.input.mouse.disableContextMenu();
 
@@ -675,7 +459,11 @@ class Jeu extends Phaser.Scene {
 
     quitBtn.setInteractive();
     quitBtn.on("pointerdown", () => {
-      this.scene.start("accueil");
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+      this.time.delayedCall(1000, () => {
+        this.scene.start("accueil");
+      });
     });
 
     // ---------------- CRÉATION DES TILESETS ----------------
@@ -755,15 +543,16 @@ class Jeu extends Phaser.Scene {
     this.swordHitBox = this.add.rectangle(0, 0, 32, 64, 0xffffff, 0.5)
     this.physics.add.existing(this.swordHitBox);
 
+
+    // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
+
     this.input.on('pointerdown', (pointer) => {
       if (this.isAttackingOrThrowing) {
         return;
       }
 
-      // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
-
       if (this.input.activePointer.leftButtonDown()) {
-        if (this.playerIsDead) return;
+        if (this.playerIsDead || this.player.alpha != 1) return;
         this.isAttackingOrThrowing = true;
         this.player.anims.play("attack_2", true)
         this.player.on("animationcomplete-attack_2", () => {
@@ -781,7 +570,7 @@ class Jeu extends Phaser.Scene {
 
     this.input.on('pointerdown', () => {
       if (this.input.activePointer.rightButtonDown()) {
-        if (this.playerIsDead) return;
+        if (this.playerIsDead || this.player.alpha != 1) return;
         this.player.anims.play("throw_attack", true);
         this.isAttackingOrThrowing = true;
         this.player.on("animationcomplete-throw_attack", () => {
@@ -911,11 +700,255 @@ class Jeu extends Phaser.Scene {
   }
 
   update() {
-    this.handleParallax();
-    this.handleMovement();
-    this.handleAnimations();
-    // this.handleDeath(); - A ajouter plus tard
+    if (!this.playerIsDead) {
+      this.handleParallax();
+      this.handleMovement();
+      this.handleAnimations();
+    }
+  }
 
+  handleEnemyLife() {
+    if (this.enemy01Life <= 0) {
+      this.enemy01.body.enable = false;
+      this.enemy01.anims.play("enemy01_death");
+      this.enemy01.on("animationcomplete", () => {
+        this.enemy01.destroy();
+      });
+    }
+
+    if (this.enemy02Life <= 0) {
+      this.enemy02.body.enable = false;
+      this.enemy02.anims.play("enemy02_death");
+      this.enemy02.on("animationcomplete", () => {
+        this.enemy02.destroy();
+      });
+    }
+
+    if (this.enemy03Life <= 0) {
+      this.enemy03.body.enable = false;
+      this.enemy03.anims.play("enemy03_death");
+      this.enemy03.on("animationcomplete", () => {
+        this.enemy03.destroy();
+      });
+    }
+
+    if (this.enemy04Life <= 0) {
+      this.enemy04.body.enable = false;
+      this.enemy04.anims.play("enemy04_death");
+      this.enemy04.on("animationcomplete", () => {
+        this.enemy04.destroy();
+      });
+    }
+
+    if (this.enemy05Life <= 0) {
+      this.enemy05.body.enable = false;
+      this.enemy05.anims.play("enemy05_death");
+      this.enemy05.on("animationcomplete", () => {
+        this.enemy05.destroy();
+      });
+    }
+  }
+
+  handlePlayerLife() {
+
+    this.playerLife = 8;
+    this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
+
+    this.physics.add.overlap(this.player, this.enemies, () => {
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      if (this.player.alpha === 1) {
+
+        this.playerLife--;
+        this.playerIsHit = true;
+
+        let flashTween = this.tweens.add({
+          targets: this.player,
+          alpha: {
+            from: 0.33,
+            to: 0.66
+          },
+          ease: "Linear",
+          duration: 100,
+          repeat: 10,
+          yoyo: true,
+          onComplete: () => {
+            if (!this.playerIsDead) {
+              this.player.setAlpha(1);
+            }
+          }
+        });
+      }
+
+      this.physics.add.overlap(this.player, this.heart01, () => {
+        this.playerLife++;
+        this.heart01.setActive(false);
+        this.heart01.setVisible(false);
+        this.heart01.destroy();
+        this.handleHud();
+      });
+      this.handleHud();
+    });
+  }
+
+  handleHud() {
+    if (this.playerLife === 8) {
+      this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
+    } else if (this.playerLife === 7) {
+      this.healthHud.setCrop(238, 0, 35, 10).setPosition(-1100, 70);
+    } else if (this.playerLife === 6) {
+      this.healthHud.setCrop(205, 0, 32, 10).setPosition(-930, 70);
+    } else if (this.playerLife === 5) {
+      this.healthHud.setCrop(170, 0, 32, 10).setPosition(-760, 70);
+    } else if (this.playerLife === 4) {
+      this.healthHud.setCrop(134, 0, 35, 10).setPosition(-590, 70); // -170
+    } else if (this.playerLife === 3) {
+      this.healthHud.setCrop(96, 0, 40, 10).setPosition(-420, 70);
+    } else if (this.playerLife === 2) {
+      this.healthHud.setCrop(58, 0, 42, 10).setPosition(-250, 70);
+    } else if (this.playerLife === 1) {
+      this.healthHud.setCrop(20, 0, 48, 10).setPosition(-80, 70);
+    } else if (this.playerLife === 0 && !this.playerIsDead) {
+      this.healthHud.setCrop(0, 0, 32, 10).setPosition(90, 70);
+      this.handleDeath();
+    }
+  }
+
+  handleDeath() {
+    this.playerIsDead = true;
+    this.player.body.enable = false;
+    this.player.anims.play("player_death", true);
+
+    this.player.once("animationcomplete-player_death", () => {
+      this.player.anims.stop();
+      this.player.setFrame(4);
+      this.tweens.add({
+        targets: this,
+        duration: 1000,
+        ease: 'Power2',
+        onComplete: () => {
+          this.time.delayedCall(800, () => {
+            this.cameras.main.fade(1500, 0, 0, 0, false, (camera, progress) => {
+              if (progress === 1) {
+                this.scene.start("gameover");
+              }
+            });
+          });
+        }
+      });
+    });
+
+    this.enemies.forEach(enemy => {
+      enemy.body.enable = false;
+    });
+
+    this.player.setAlpha(0.7);
+    this.tweens.killTweensOf(this.player);
+  }
+
+  handleDagger() {
+    // Dagger
+    let daggerHitEnemy = false;
+    let daggerThrown = false;
+
+    this.dagger = this.physics.add.group({
+      defaultKey: "dagger",
+      maxSize: 1
+    });
+
+    this.input.on("pointerdown", (pointer) => {
+      if (pointer.rightButtonDown()) {
+        if (this.player.alpha !== 1 || daggerThrown || this.playerIsDead) return;
+        const dagger = this.dagger.get(this.player.x + 30, this.player.y + 20);
+        if (dagger) {
+          dagger.anims.play("dagger_projectile", true);
+          dagger.setScale(2).setSize(15, 5);
+          dagger.body.allowGravity = false;
+          daggerHitEnemy = false;
+          daggerThrown = true;
+          this.time.delayedCall(5000, () => {
+            if (!daggerHitEnemy) {
+              let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
+              explosion.setScale(2).setDepth(1);
+              explosion.play("dagger_hit");
+              this.time.delayedCall(50, () => {
+                explosion.on("animationcomplete", () => {
+                  explosion.destroy();
+                });
+                dagger.destroy();
+                daggerThrown = false;
+              });
+            } else {
+              daggerThrown = false;
+            }
+          });
+          if (this.player.flipX) {
+            this.time.delayedCall(50, () => {
+              if (!dagger || !dagger.scene) return;
+              dagger.setVelocity(-400, 0).setFlipY(true).setActive(true).setVisible(true).setAngle(180);
+            });
+          } else {
+            this.time.delayedCall(50, () => {
+              if (!dagger || !dagger.scene) return;
+              console.log(dagger);
+              dagger.setVelocity(400, 0).setActive(true).setVisible(true);
+            });
+          }
+        }
+      }
+    });
+
+    this.enemies.forEach((enemy, index) => {
+      this.physics.add.overlap(enemy, this.dagger, (enemy, dagger) => {
+        if (!daggerHitEnemy) {
+          switch (enemy) {
+            case this.enemy01:
+              this.enemy01Life--;
+              break;
+            case this.enemy02:
+              this.enemy02Life--;
+              break;
+            case this.enemy03:
+              this.enemy03Life--;
+              break;
+            case this.enemy04:
+              this.enemy04Life--;
+              break;
+            case this.enemy05:
+              this.enemy05Life--;
+              break;
+          }
+          daggerHitEnemy = true;
+          dagger.setActive(false);
+          dagger.setVisible(false);
+          dagger.destroy();
+          daggerThrown = true;
+          // Hit effect
+          let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
+          explosionEnemy.setScale(2).setDepth(1);
+          explosionEnemy.anims.play("dagger_hit");
+          explosionEnemy.on("animationcomplete", () => {
+            explosionEnemy.destroy();
+          });
+          // Enemy life
+          this.handleEnemyLife();
+        }
+      });
+    });
+  }
+
+  moveBird(bird) {
+    bird.x = -bird.width;
+    bird.scale = Phaser.Math.Between(1, 2);
+    bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
+    this.tweens.add({
+      targets: bird,
+      x: config.width * 2,
+      duration: Phaser.Math.Between(12000, 17000),
+      delay: Phaser.Math.Between(9000, 20000),
+      onComplete: () => {
+        this.moveBird(bird);
+      }
+    });
   }
 
   handleParallax() {
@@ -924,16 +957,16 @@ class Jeu extends Phaser.Scene {
       let speed;
       switch (index) {
         case 0: // background_sky
-          speed = 0.1;
+          speed = 0.05;
           break;
         case 1: // background_sky_front
-          speed = 0.2;
+          speed = 0.1;
           break;
         case 2: // background_behind04
-          speed = -0.1;
+          speed = -0.01;
           break;
       }
-      layer.x = cameraX * speed;
+      layer.setX(cameraX * speed);
     });
   }
 
@@ -980,16 +1013,7 @@ class Jeu extends Phaser.Scene {
 
     // Animation hit, saut, walk, idle, death
 
-    if (this.playerIsDead) {
-      this.player.anims.play("player_death");
-      // this.player.on("animationcomplete-player_death", () => {
-      //  this.player.setFrame(4);
-      // });
-      this.player.body.setVelocity(0, 0);
-      this.player.body.allowGravity = false;
-
-
-    } else if (this.playerIsHit) {
+    if (this.playerIsHit) {
       this.player.anims.play("player_hit", true);
     } else if (!this.player.body.blocked.down) {
       if (this.player.body.velocity.y < 0 && !this.isJumping) {
@@ -1043,6 +1067,5 @@ class Jeu extends Phaser.Scene {
     });
   }
   */
-
 
 }

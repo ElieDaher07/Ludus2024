@@ -30,6 +30,8 @@ class Accueil extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
@@ -101,15 +103,29 @@ class Accueil extends Phaser.Scene {
     audioBtn.setInteractive();
 
     playBtn.on("pointerdown", () => {
-      this.scene.start("jeu");
+
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+
+      this.time.delayedCall(1000, () => {
+        this.scene.start("jeu");
+      });
     });
 
     controlsBtn.on("pointerdown", () => {
-      this.scene.start("tutoriel");
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+      this.time.delayedCall(1000, () => {
+        this.scene.start("tutoriel");
+      });
     });
 
     creditsBtn.on("pointerdown", () => {
-      this.scene.start("credits");
+      this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+      this.time.delayedCall(1000, () => {
+        this.scene.start("credits");
+      });
     });
   }
 

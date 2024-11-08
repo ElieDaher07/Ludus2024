@@ -13,11 +13,11 @@
             "scaleInEditor": 1
         },
         "map_rocky.tmx": {
-            "scale": 0.75,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 623.9999999999999,
-                "y": 136
+                "x": 578,
+                "y": 631
             }
         },
         "map_rocky.tmx#background1": {

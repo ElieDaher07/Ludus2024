@@ -18,6 +18,7 @@ class Credits extends Phaser.Scene {
   }
 
   create() {
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 

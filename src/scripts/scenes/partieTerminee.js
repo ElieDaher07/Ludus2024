@@ -1,6 +1,8 @@
 class PartieTerminee extends Phaser.Scene {
   constructor() {
-    super({ key: "gameover" });
+    super({
+      key: "gameover"
+    });
   }
 
   preload() {
@@ -21,6 +23,9 @@ class PartieTerminee extends Phaser.Scene {
   }
 
   create() {
+
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
@@ -37,13 +42,13 @@ class PartieTerminee extends Phaser.Scene {
     // Les boutons seront à placer et à resize correctement quand je pourrais voir avec un preview
 
     let menuBtn = this.add
-      .image(config.width / 2, config.height / 2, "menu")
+      .image(config.width / 2 + 100, config.height / 2, "menu")
       .setScale(0.5);
 
     hudContainer.add(menuBtn);
 
     let restartBtn = this.add
-      .image(config.width / 2, config.height / 2, "recommencer")
+      .image(config.width / 2 - 100, config.height / 2, "recommencer")
       .setScale(0.5);
 
     hudContainer.add(restartBtn);
