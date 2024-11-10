@@ -643,7 +643,9 @@ class Jeu extends Phaser.Scene {
     this.physics.add.collider(this.player, collisionLayer01);
     this.physics.add.collider(this.player, collisionLayer02);
     this.physics.add.collider(this.player, collisionDanger, () => {
-      console.log("HIIIITT")
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      this.handlePlayerIsHit();
+      this.handleHud();
     }, (player, tile) => {
       return tile && tile.properties && tile.properties.collision === true;
     });
@@ -753,35 +755,44 @@ class Jeu extends Phaser.Scene {
     }
   }
 
+  handlePlayerIsHit() {
+
+    if (this.player.alpha === 1) {
+
+      this.playerLife--;
+      this.playerIsHit = true;
+
+      let flashTween = this.tweens.add({
+        targets: this.player,
+        alpha: {
+          from: 0.33,
+          to: 0.66
+        },
+        ease: "Linear",
+        duration: 100,
+        repeat: 10,
+        yoyo: true,
+        onComplete: () => {
+          if (!this.playerIsDead) {
+            this.player.setAlpha(1);
+          }
+        }
+      });
+    }
+
+  }
+
   handlePlayerLife() {
+
 
     this.playerLife = 8;
     this.healthHud.setCrop(270, 0, 40, 10).setPosition(-1270, 70);
 
     this.physics.add.overlap(this.player, this.enemies, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      if (this.player.alpha === 1) {
 
-        this.playerLife--;
-        this.playerIsHit = true;
-
-        let flashTween = this.tweens.add({
-          targets: this.player,
-          alpha: {
-            from: 0.33,
-            to: 0.66
-          },
-          ease: "Linear",
-          duration: 100,
-          repeat: 10,
-          yoyo: true,
-          onComplete: () => {
-            if (!this.playerIsDead) {
-              this.player.setAlpha(1);
-            }
-          }
-        });
-      }
+      this.handlePlayerIsHit();
+      console.log(this.playerLife)
 
       this.physics.add.overlap(this.player, this.heart01, () => {
         this.playerLife++;
