@@ -68,4 +68,6 @@ class PartieTerminee extends Phaser.Scene {
   }
 
   update() {}
+
+
 }

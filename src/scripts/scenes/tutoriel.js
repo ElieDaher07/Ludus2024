@@ -12,12 +12,15 @@ class Tutoriel extends Phaser.Scene {
     );
 
     this.load.image(
-      "return",
-      "./assets/images/ui/Large_Buttons/Back_Button.png"
+      "x",
+      "./assets/images/ui/Small_Buttons/X_Square_Button.png"
     );
+
+    this.load.image("controles", "./assets/images/ui/controles.png");
   }
 
   create() {
+    //this.cameras.main.fadeIn(1000, 0, 0, 0);
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
@@ -29,20 +32,52 @@ class Tutoriel extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY);
     img.setScale(scale);
 
+    // Image contrôles
+
+    let imgControle = this.add.image(config.width / 2, config.height / 2, "controles");
+    imgControle.setScale(0.5);
+
     // Boutons
 
-    let returnBtn = this.add
-      .image(config.width / 2, config.height / 2, "return")
-      .setScale(0.3);
+    let xBtn = this.add
+      .image(config.width / 2 + 265, config.height / 2 - 295, "x")
+      .setScale(0.2);
 
-    hudContainer.add(returnBtn);
+    hudContainer.add(xBtn);
 
     // Interactifs
 
-    returnBtn.setInteractive();
+    xBtn.setInteractive();
+    this.addHoverEffectSmall(xBtn);
 
-    returnBtn.on("pointerdown", () => {
+    xBtn.on("pointerdown", () => {
+      //this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+      //this.time.delayedCall(1000, () => {
       this.scene.start("accueil");
+    });
+    //});
+  }
+
+  addHoverEffectSmall(button) {
+    button.setInteractive();
+    button.on('pointerover', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.21,
+        scaleY: 0.21,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+    button.on('pointerout', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
     });
   }
 
