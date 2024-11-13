@@ -4,7 +4,7 @@ const config = {
   pixelArt: true,
   width: 1280,
   height: 720,
-  scene: [Accueil, Jeu, Credits, Victoire, PartieTerminee, Tutoriel],
+  scene: [Accueil, Jeu, Credits, Victoire, PartieTerminee, Tutoriel, Pause],
   physics: {
     default: "arcade",
     arcade: {
@@ -17,3 +17,6 @@ const config = {
   }
 };
 const game = new Phaser.Game(config);
+
+game.registry.set('isMuted', 0);
+game.registry.set('leftFromAccueil', false);

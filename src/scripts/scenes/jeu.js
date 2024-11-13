@@ -171,7 +171,7 @@ class Jeu extends Phaser.Scene {
       key: "enemy01_attack_left",
       frames: this.anims.generateFrameNames("enemy01", {
         start: 8,
-        end: 0 // IDK TO CHANGE
+        end: 0 // À CHANGER, NE FAIT RIEN EN CE MOMENT
       }),
       frameRate: 8,
       repeat: 0
@@ -291,8 +291,6 @@ class Jeu extends Phaser.Scene {
       repeat: -1
     })
 
-
-
     // ENEMY 05 - SCORPION
     this.anims.create({
       key: "enemy05_idle",
@@ -310,7 +308,67 @@ class Jeu extends Phaser.Scene {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
     this.input.mouse.disableContextMenu();
 
+    this.bgMusic = this.sound.add("jeuBg", {
+      loop: true
+    });
+
+    this.game.registry.set("bgMusic", this.bgMusic);
+    let isMuted = this.game.registry.get("isMuted");
+
+    if (!isMuted) {
+      this.bgMusic.play();
+      this.bgMusic.setVolume(0.1);
+    }
+
+    this.hoverSound = this.sound.add("buttonHoverSfx");
+    this.confirmSound = this.sound.add("buttonConfirmSfx");
+    this.pauseSound = this.sound.add("pauseSfx");
+
+
+    this.pauseSound.setVolume(0.4);
+
+    this.hitSound01 = this.sound.add("hitSound01");
+    this.hitSound02 = this.sound.add("hitSound02");
+    this.hitSound03 = this.sound.add("hitSound03");
+    this.hitSound04 = this.sound.add("hitSound04");
+    this.hitSound05 = this.sound.add("hitSound05");
+    this.hitSound06 = this.sound.add("hitSound06");
+
+    this.enemyDeathSound = this.sound.add("enemyDeathSound");
+
+    this.attackSound = this.sound.add("attackSound");
+    this.jumpSound = this.sound.add("jumpSound");
+    this.landingSound = this.sound.add("landingSound");
+    this.walkingSound = this.sound.add("walkingSound", {
+      loop: true,
+      rate: 2.5,
+      detune: -1200,
+    });
+
+    this.playerDeathSound = this.sound.add("playerDeathSound");
+    this.itemPickupSound = this.sound.add("itemPickupSound");
+
     // ---------------- CRÉATION DES VARIABLES GLOBALES ----------------
+
+
+    this.isPaused = false;
+
+    this.input.keyboard.on("keydown-ESC", () => {
+      if (!this.isPaused) {
+        this.pauseSound.play();
+        this.scene.launch("pause");
+        this.bgMusic.pause();
+        this.scene.pause();
+        this.isPaused = true;
+      } else {
+        this.unpauseSound.play();
+        this.scene.stop("pause");
+        this.bgMusic.resume();
+        this.scene.resume();
+        this.isPaused = false;
+      }
+    });
+
 
     // Sauter et tomber
 
@@ -339,6 +397,9 @@ class Jeu extends Phaser.Scene {
     this.maxPlayerLife = 8;
     this.playerIsHit = false;
     this.playerIsDead = false;
+    this.playerHasLanded = false;
+    this.isWalking = false;
+    this.diamondCount = 0;
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
@@ -353,16 +414,6 @@ class Jeu extends Phaser.Scene {
     // ---------------- HUD ----------------
 
     const hudContainer = this.add.container(0, 0).setScrollFactor(0).setDepth(2);
-
-    // Bouton(s) + ajout dans le hud
-
-    let quitBtn = this.add.image(
-      (config.width / 2),
-      (config.height / 2 - 300),
-      "quit"
-    ).setScale(0.3).setScrollFactor(0);
-
-    hudContainer.add(quitBtn);
 
     // Ajout des élements hud du joueur
 
@@ -386,17 +437,6 @@ class Jeu extends Phaser.Scene {
     hudContainer.add(this.healthHud);
     hudContainer.add(this.avatarHud);
     hudContainer.add(this.daggerHud);
-
-    // Interactions avec le(s) bouton(s)
-
-    quitBtn.setInteractive();
-    quitBtn.on("pointerdown", () => {
-      this.cameras.main.fadeOut(1000, 0, 0, 0);
-
-      this.time.delayedCall(1000, () => {
-        this.scene.start("accueil");
-      });
-    });
 
     // ---------------- CRÉATION DES TILESETS ----------------
 
@@ -428,48 +468,6 @@ class Jeu extends Phaser.Scene {
     const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build], 0, 0); // Pour blesser le joueur
 
     // ---------------- CRÉATION DES ENNEMIS ----------------
-
-    const spawnPoints = [{
-        x: 2032,
-        y: 744
-      },
-      {
-        x: 1907,
-        y: 296
-      },
-      {
-        x: 698,
-        y: 744
-      },
-      {
-        x: 351,
-        y: 744
-      },
-      {
-        x: 1190,
-        y: 936
-      },
-      {
-        x: 231,
-        y: 1192
-      },
-      {
-        x: 250,
-        y: 1352
-      },
-      {
-        x: 1387,
-        y: 1352
-      },
-      {
-        x: 2337,
-        y: 1160
-      },
-      {
-        x: 712,
-        y: 29
-      }
-    ];
 
     this.createEnemy01();
 
@@ -507,6 +505,7 @@ class Jeu extends Phaser.Scene {
         this.isAttacking = true;
         this.isAttackingOrThrowing = true;
         this.player.anims.play("attack_1", true);
+        this.attackSound.play();
 
         // Hitbox delay
         this.time.delayedCall(150, () => {
@@ -640,7 +639,6 @@ class Jeu extends Phaser.Scene {
       jump: Phaser.Input.Keyboard.KeyCodes.SPACE,
       left: Phaser.Input.Keyboard.KeyCodes.A,
       right: Phaser.Input.Keyboard.KeyCodes.D,
-      pause: Phaser.Input.Keyboard.KeyCodes.ESC
     });
 
     // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
@@ -696,6 +694,8 @@ class Jeu extends Phaser.Scene {
       this.handleHealthPickup();
       this.handleHud();
     });
+
+
   }
 
   createHoverAnimation(item) {
@@ -834,7 +834,7 @@ class Jeu extends Phaser.Scene {
     }
 
     this.hitbox = this.add.zone(
-      this.player.x + (this.player.flipX ? -26 : 18),
+      this.player.x + (this.player.flipX ? -18 : 18),
       this.player.y + 20, 42, 50
     );
     this.physics.add.existing(this.hitbox);
@@ -851,6 +851,7 @@ class Jeu extends Phaser.Scene {
             case this.enemy01:
               if (this.enemy01Life > 0) {
                 this.enemy01Life--;
+
               }
               break;
             case this.enemy02:
@@ -858,6 +859,7 @@ class Jeu extends Phaser.Scene {
                 this.enemy02Life--;
                 this.enemy02isHit = true;
                 this.enemy02.play("enemy02_hit", true);
+                this.hitSound03.play();
               }
               break;
             case this.enemy02_b:
@@ -865,6 +867,7 @@ class Jeu extends Phaser.Scene {
                 this.enemy02_bLife--;
                 this.enemy02_bisHit = true;
                 this.enemy02_b.play("enemy02_hit", true);
+                this.hitSound03.play();
               }
               break;
             case this.enemy03:
@@ -872,6 +875,7 @@ class Jeu extends Phaser.Scene {
                 this.enemy03Life--;
                 this.enemy03isHit = true;
                 this.enemy03.play("enemy03_hit", true);
+                this.hitSound04.play();
               }
               break;
             case this.enemy04:
@@ -892,29 +896,34 @@ class Jeu extends Phaser.Scene {
   }
 
   createEnemyHitbox(enemy) {
-    this.time.delayedCall(300, () => {
-      const hitbox = this.add.zone(
-        enemy.x + (enemy.flipX ? 25 : -25),
-        enemy.y,
-        50,
-        50
-      );
-      this.physics.add.existing(hitbox);
-      hitbox.body.setAllowGravity(false);
-      hitbox.body.setImmovable(true);
+    // Only create the hitbox if one doesn't already exist
+    if (this.enemy02.hitbox) return;
 
-      this.physics.add.overlap(hitbox, this.player, () => {
-        if (this.player.alpha != 1 || this.playerIsDead) return;
-        this.handlePlayerIsHit();
-        this.handleHud();
-        this.handleHealthPickup();
-        console.log(this.playerLife);
-        hitbox.destroy();
-      });
+    this.enemy02.hitbox = this.add.zone(
+      enemy.x + (enemy.flipX ? 25 : -25),
+      enemy.y,
+      50,
+      50
+    );
+    this.physics.add.existing(this.enemy02.hitbox);
+    this.enemy02.hitbox.body.setAllowGravity(false);
+    this.enemy02.hitbox.body.setImmovable(true);
 
-      this.time.delayedCall(500, () => {
-        hitbox.destroy();
-      });
+    this.physics.add.overlap(this.enemy02.hitbox, this.player, () => {
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      this.handlePlayerIsHit();
+      this.handleHud();
+      this.handleHealthPickup();
+      console.log(this.playerLife);
+      this.enemy02.hitbox.destroy(); // Destroy hitbox after player is hit
+      this.enemy02.hitbox = null; // Reset hitbox reference
+    });
+
+    this.time.delayedCall(500, () => {
+      if (this.enemy02.hitbox) {
+        this.enemy02.hitbox.destroy(); // Destroy hitbox after a delay
+        this.enemy02.hitbox = null;
+      }
     });
   }
 
@@ -934,18 +943,30 @@ class Jeu extends Phaser.Scene {
   handleEnemy02Behavior() {
     if (this.enemy02Life <= 0 || !this.enemy02) return;
 
-    // Add max chase distance
-    const maxChaseDistance = 500; // Adjust as needed
+    const maxChaseDistance = 500;
 
     if (this.enemy02isHit) {
       this.enemy02.setVelocityX(0);
+
+      // Destroy hitbox immediately if hit during attack
+      if (this.enemy02.hitbox) {
+        this.enemy02.hitbox.destroy();
+        this.enemy02.hitbox = null;
+      }
+
       if (!this.enemy02.hitCooldown) {
-        this.enemy02.hitCooldown = 500;
-        this.time.delayedCall(this.enemy02.hitCooldown, () => {
+        this.enemy02.hitCooldown = this.time.delayedCall(500, () => {
           this.enemy02isHit = false;
           this.enemy02.hitCooldown = null;
+          this.enemy02.isPatrolling = true;
+          this.enemy02.canAttack = true;
+          this.enemy02.attackCooldown = 0;
+          if (!this.enemy02.anims.isPlaying) {
+            this.enemy02.anims.play("enemy02_idle", true);
+          }
         });
       }
+      this.enemy02.isAttacking = false; // Reset attacking state if hit during attack
       return;
     }
 
@@ -956,7 +977,6 @@ class Jeu extends Phaser.Scene {
       this.player.y
     );
 
-    // Calculate distance from original spot
     const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
       this.enemy02.x,
       this.enemy02.y,
@@ -968,14 +988,16 @@ class Jeu extends Phaser.Scene {
     const patrolRightLimit = this.enemy02.initialX + 100;
     const chaseSpeedMultiplier = 2;
 
-    // If chased too far from original spot, return to patrol
+    if (this.enemy02.isAttacking || this.enemy02.postAttackCooldown) {
+      this.enemy02.setVelocityX(0);
+      return;
+    }
+
     if (distanceFromOriginalSpot > maxChaseDistance) {
-      // Reset patrol to current location
       this.enemy02.initialX = this.enemy02.x;
       this.enemy02.patrolLeftLimit = this.enemy02.initialX - 100;
       this.enemy02.patrolRightLimit = this.enemy02.initialX + 100;
 
-      // Force return to patrol behavior
       this.enemy02.isPatrolling = true;
       this.enemy02.direction = (this.enemy02.x > this.enemy02.initialX) ? -1 : 1;
       this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
@@ -983,13 +1005,11 @@ class Jeu extends Phaser.Scene {
     }
 
     if (this.enemy02.isAttacking) {
-      // Ensure attack animation completes fully
       this.enemy02.setVelocityX(0);
       return;
     }
 
     if (this.enemy02.postAttackCooldown) {
-      // If in post-attack cooldown, do nothing
       return;
     }
 
@@ -1012,19 +1032,38 @@ class Jeu extends Phaser.Scene {
         this.enemy02.setVelocityX(0);
         if (this.enemy02.canAttack && this.enemy02.attackCooldown <= 0) {
           this.enemy02.isAttacking = true;
-          this.enemy02.anims.play("enemy02_attack", true);
-          this.createEnemyHitbox(this.enemy02);
-          this.enemy02.attackCooldown = 1500;
           this.enemy02.canAttack = false;
+          this.enemy02.attackCooldown = 1500; // Set cooldown between attacks
 
+          // Check if the enemy is not being hit before playing the attack sound
+          if (!this.enemy02isHit) {
+            this.hitSound02.play(); // Only play attack sound if not hit
+          }
+
+          // Play the attack animation
+          this.enemy02.anims.play("enemy02_attack", true);
+
+          // Create hitbox on specific frame in attack animation
+          this.enemy02.on('animationupdate', (animation, frame) => {
+            if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02.hitbox) {
+              this.createEnemyHitbox(this.enemy02);
+            }
+          });
 
           this.enemy02.on('animationcomplete-enemy02_attack', () => {
             this.enemy02.isAttacking = false;
             this.enemy02.canAttack = true;
-            this.enemy02.anims.play("enemy02_idle", true);
 
+            // Clear the hitbox after the attack animation finishes
+            if (this.enemy02.hitbox) {
+              this.enemy02.hitbox.destroy();
+              this.enemy02.hitbox = null;
+            }
+
+            this.enemy02.anims.play("enemy02_idle", true);
             this.enemy02.postAttackCooldown = true;
-            this.time.delayedCall(600, () => { // son cooldown pour la prochaine action
+
+            this.time.delayedCall(600, () => {
               this.enemy02.postAttackCooldown = false;
               const currentDistanceToPlayer = Phaser.Math.Distance.Between(
                 this.enemy02.x,
@@ -1032,13 +1071,13 @@ class Jeu extends Phaser.Scene {
                 this.player.x,
                 this.player.y
               );
-
               if (currentDistanceToPlayer <= this.enemy02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
                 this.enemy02.anims.play("enemy02_attack", true);
+                this.hitSound02.play();
               } else if (currentDistanceToPlayer < this.enemy02.attackRange) {
                 this.enemy02.anims.play("enemy02_walk", true);
               } else {
-                this.enemy02.anims.play("enemy02_walk", true);
+                this.enemy02.anims.play("enemy02_idle", true);
               }
               this.enemy02.attackCooldown = 0;
             });
@@ -1050,6 +1089,7 @@ class Jeu extends Phaser.Scene {
         }
       }
     } else {
+      // Existing patrolling logic
       if (this.enemy02.body.onFloor()) {
         if (this.enemy02.isPatrolling) {
           if (this.enemy02.x <= patrolLeftLimit) {
@@ -1061,7 +1101,7 @@ class Jeu extends Phaser.Scene {
           } else {
             this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
           }
-          if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy 02_walk") {
+          if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_walk") {
             this.enemy02.anims.play("enemy02_walk", true);
           }
         } else {
@@ -1265,6 +1305,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy01Life <= 0 && this.enemy01) {
       this.enemy01.body.enable = false;
       this.enemy01.anims.play("enemy01_death");
+      this.enemyDeathSound.play();
       this.enemy01.on("animationcomplete", () => {
         this.enemy01.destroy();
         this.enemy01 = null;
@@ -1274,6 +1315,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy02Life <= 0 && this.enemy02) {
       this.enemy02.body.enable = false;
       this.enemy02.anims.play("enemy02_death");
+      this.enemyDeathSound.play();
       this.enemy02.on("animationcomplete", () => {
         this.enemy02.destroy();
         this.enemy02 = null;
@@ -1283,6 +1325,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy03Life <= 0 && this.enemy03) {
       this.enemy03.body.enable = false;
       this.enemy03.anims.play("enemy03_death");
+      this.enemyDeathSound.play();
       this.enemy03.on("animationcomplete", () => {
         this.enemy03.destroy();
         this.enemy03 = null;
@@ -1292,6 +1335,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy04Life <= 0 && this.enemy04) {
       this.enemy04.body.enable = false;
       this.enemy04.anims.play("enemy04_death");
+      this.enemyDeathSound.play();
       this.enemy04.on("animationcomplete", () => {
         this.enemy04.destroy();
         this.enemy04 = null;
@@ -1301,6 +1345,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy05Life <= 0 && this.enemy05) {
       this.enemy05.body.enable = false;
       this.enemy05.anims.play("enemy05_death");
+      this.enemyDeathSound.play();
       this.enemy05.on("animationcomplete", () => {
         this.enemy05.destroy();
         this.enemy05 = null;
@@ -1313,6 +1358,7 @@ class Jeu extends Phaser.Scene {
     if (this.player.alpha === 1) {
       this.playerLife--;
       this.playerIsHit = true;
+      this.hitSound01.play();
       let flashTween = this.tweens.add({
         targets: this.player,
         alpha: {
@@ -1340,6 +1386,7 @@ class Jeu extends Phaser.Scene {
           heart.setActive(false);
           heart.setVisible(false);
           heart.destroy();
+          this.itemPickupSound.play();
           this.handleHud();
         } else {
           console.log("Player life is already at max, cannot pick up heart.");
@@ -1392,12 +1439,14 @@ class Jeu extends Phaser.Scene {
           dagger.body.allowGravity = false;
           daggerHitEnemy = false;
           daggerThrown = true;
+          this.hitSound05.play();
 
           this.time.delayedCall(5000, () => {
             if (!daggerHitEnemy) {
               let explosion = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
               explosion.setScale(2).setDepth(1);
               explosion.play("dagger_hit");
+              this.hitSound06.play();
               this.time.delayedCall(50, () => {
                 explosion.on("animationcomplete", () => {
                   explosion.destroy();
@@ -1468,6 +1517,7 @@ class Jeu extends Phaser.Scene {
           dagger.setVisible(false);
           dagger.destroy();
           daggerThrown = true;
+          this.hitSound06.play();
 
           let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
           explosionEnemy.setScale(2).setDepth(1);
@@ -1522,7 +1572,6 @@ class Jeu extends Phaser.Scene {
     if (this.playerIsDead) return;
     if (this.isAttacking) return;
 
-
     if (this.keys.left.isDown) {
       this.player.body.setVelocityX(-280);
       if (!this.player.flipX) {
@@ -1548,12 +1597,32 @@ class Jeu extends Phaser.Scene {
       this.player.setVelocityY(-400);
       this.jumpCount++;
       this.jumpKeyReleased = false;
+      this.jumpSound.play();
     }
+    if (this.player.body.onFloor() && !this.playerHasLanded) {
+      this.landingSound.play();
+      this.playerHasLanded = true;
+    }
+    if (!this.player.body.onFloor()) {
+      this.playerHasLanded = false;
+    }
+
     // Reset le jumpcount
     if (this.player.body.onFloor()) {
       this.jumpCount = 0;
     }
 
+    if (this.keys.left.isDown && this.player.body.onFloor() || this.keys.right.isDown && this.player.body.onFloor()) {
+      if (!this.isWalking) {
+        this.walkingSound.play();
+        this.isWalking = true;
+      }
+    } else {
+      if (this.isWalking) {
+        this.walkingSound.stop();
+        this.isWalking = false;
+      }
+    }
 
   }
 
@@ -1588,6 +1657,7 @@ class Jeu extends Phaser.Scene {
     if (this.playerIsDead) return;
 
     this.playerIsDead = true;
+    this.playerDeathSound.play();
     if (this.player && this.player.body) {
       this.player.body.enable = false;
       this.player.anims.play("player_death", true);
@@ -1614,21 +1684,22 @@ class Jeu extends Phaser.Scene {
       }
     });
 
-    // Disable all enemies
+    // Désactiver les ennemis
     this.enemies.forEach(enemy => {
       if (enemy && enemy.body) {
         enemy.body.enable = false;
       }
     });
 
-    // Adjust player visibility
     if (this.player) {
       this.player.setAlpha(0.7);
       this.tweens.killTweensOf(this.player);
     }
   }
 
-  /* performComboAttack(comboCount) {
+  // Combo attaque je laisse en commentaire a revoir plus tard dans N2C
+
+  /* performComboAttack(comboCount) {  
     let attackKey;
 
     if (comboCount > 4) {

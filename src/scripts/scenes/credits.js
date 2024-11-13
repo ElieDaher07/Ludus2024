@@ -12,15 +12,21 @@ class Credits extends Phaser.Scene {
     );
 
     this.load.image(
-      "return",
-      "./assets/images/ui/Large_Buttons/Back_Button.png"
+      "x",
+      "./assets/images/ui/Small_Buttons/X_Square_Button.png"
     );
+
+    this.load.image("creditsMenu", "./assets/images/ui/creditsMenu.png");
   }
 
   create() {
-    this.cameras.main.fadeIn(1000, 0, 0, 0);
+    //this.cameras.main.fadeIn(1000, 0, 0, 0);
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
+
+    // Sons hover/clic
+    this.hoverSound = this.sound.add("buttonHoverSfx");
+    this.confirmSound = this.sound.add("buttonConfirmSfx");
 
     // Background
 
@@ -30,20 +36,56 @@ class Credits extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY);
     img.setScale(scale);
 
+    // Image contrôles
+
+    let imgCredits = this.add.image(config.width / 2, config.height / 2, "creditsMenu");
+    imgCredits.setScale(0.5);
+
     // Boutons
 
-    let returnBtn = this.add
-      .image(config.width / 2, config.height / 2, "return")
-      .setScale(0.3);
+    let xBtn = this.add
+      .image(config.width / 2 + 265, config.height / 2 - 295, "x")
+      .setScale(0.2);
 
-    hudContainer.add(returnBtn);
+    hudContainer.add(xBtn);
 
     // Interactifs
 
-    returnBtn.setInteractive();
+    xBtn.setInteractive();
+    this.addHoverEffectSmall(xBtn);
 
-    returnBtn.on("pointerdown", () => {
+    xBtn.on("pointerover", () => {
+      this.hoverSound.play();
+    })
+
+    xBtn.on("pointerdown", () => {
       this.scene.start("accueil");
+      this.confirmSound.play();
+    });
+
+    this.confirmSound.setVolume(0.4);
+    this.hoverSound.setVolume(0.4);
+  }
+
+  addHoverEffectSmall(button) {
+    button.setInteractive();
+    button.on('pointerover', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.21,
+        scaleY: 0.21,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+    button.on('pointerout', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
     });
   }
 

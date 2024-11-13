@@ -20,9 +20,13 @@ class Tutoriel extends Phaser.Scene {
   }
 
   create() {
-    //this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
+
+    // Sons hover/clic
+    this.hoverSound = this.sound.add("buttonHoverSfx");
+    this.confirmSound = this.sound.add("buttonConfirmSfx");
 
     // Background
 
@@ -50,13 +54,18 @@ class Tutoriel extends Phaser.Scene {
     xBtn.setInteractive();
     this.addHoverEffectSmall(xBtn);
 
-    xBtn.on("pointerdown", () => {
-      //this.cameras.main.fadeOut(1000, 0, 0, 0);
+    xBtn.on("pointerover", () => {
+      this.hoverSound.play();
+    })
 
-      //this.time.delayedCall(1000, () => {
+    xBtn.on("pointerdown", () => {
       this.scene.start("accueil");
+      this.confirmSound.play();
     });
-    //});
+
+    this.confirmSound.setVolume(0.4);
+    this.hoverSound.setVolume(0.4);
+
   }
 
   addHoverEffectSmall(button) {
