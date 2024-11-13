@@ -6,57 +6,101 @@ class Pause extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('pause', './assets/images/ui/pauseMenu.png');
+       
     }
 
     create() {
 
         this.unpauseSound = this.sound.add("unpauseSfx");
-        this.unpauseSound.setVolume(0.4);
+        this.hoverSound = this.sound.add("buttonHoverSfx");
+        this.confirmSound = this.sound.add("buttonConfirmSfx");
 
         // HUD
         const hudContainer = this.add.container(0, 0).setDepth(1);
 
         // Interactions avec le(s) bouton(s)
 
-        let pauseImg = this.add.image(config.width / 2, config.height / 2, "pause");
-        let quitBtn = this.add.image(
-            (config.width / 2),
-            (config.height / 2 - 300),
-            "quit"
-        ).setScale(0.3);
+        let pauseImg = this.add.image(config.width / 2, config.height / 2, "pause").setScale(0.5);
+
+        let quitBtn = this.add.image((config.width / 2),(config.height / 2),"quit").setScale(0.4);
+
+        let continueBtn = this.add.image(config.width / 2, (config.height / 2 - 100), "continue").setScale(0.4);
 
         quitBtn.setInteractive();
-        quitBtn.on("pointerdown", () => {
-            this.cameras.main.fadeOut(1000, 0, 0, 0);
-
-            this.time.delayedCall(1000, () => {
-                this.scene.start("accueil");
-            });
-        });
-
-
-        pauseImg.setScale(0.5);
-
+        continueBtn.setInteractive();
+       
         hudContainer.add(pauseImg);
         hudContainer.add(quitBtn);
+        hudContainer.add(continueBtn);
 
         this.input.keyboard.on("keydown-ESC", () => {
             this.unpauseSound.play();
             this.scene.stop("pause");
-
             let bgMusic = this.game.registry.get("bgMusic");
             if (bgMusic && !this.game.registry.get("isMuted")) {
                 bgMusic.resume();
             }
-
             this.scene.get("jeu").isPaused = false;
             this.scene.resume("jeu");
         });
+
+        quitBtn.on("pointerover", () => {
+            this.hoverSound.play();
+          })
+      
+        quitBtn.on("pointerdown", () => {
+            quitBtn.disableInteractive();
+            continueBtn.disableInteractive();
+            this.cameras.main.fadeOut(1000, 0, 0, 0);
+            this.confirmSound.play();
+            this.time.delayedCall(1000, () => {
+                this.scene.stop("jeu");
+                this.scene.start("accueil");
+            });
+        });
+
+        continueBtn.on("pointerover", () => {
+            this.hoverSound.play();
+          })
+
+          continueBtn.on("pointerdown", () => {
+            quitBtn.disableInteractive();
+            continueBtn.disableInteractive();
+            this.unpauseSound.play();
+            this.scene.get("jeu").isPaused = false;
+            this.scene.resume("jeu");
+            this.scene.stop("pause");
+        });
+
+        this.addHoverEffectBig(quitBtn);
+        this.addHoverEffectBig(continueBtn);
+
+        this.confirmSound.setVolume(0.4);
+        this.hoverSound.setVolume(0.4);
+        this.unpauseSound.setVolume(0.4);
 
     }
 
     update() {}
 
-
+    addHoverEffectBig(button) {
+        button.on('pointerover', () => {
+          this.tweens.add({
+            targets: button,
+            scaleX: 0.41,
+            scaleY: 0.41,
+            duration: 100,
+            ease: 'Cubic.Out',
+          });
+        });
+        button.on('pointerout', () => {
+          this.tweens.add({
+            targets: button,
+            scaleX: 0.4,
+            scaleY: 0.4,
+            duration: 100,
+            ease: 'Cubic.Out',
+          });
+        });
+      }
 }

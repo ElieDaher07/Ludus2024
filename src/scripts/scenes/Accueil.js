@@ -15,24 +15,16 @@ class Accueil extends Phaser.Scene {
 
     this.load.image("logo", "./assets/images/backgrounds/logo.png");
 
-    this.load.image("play", "./assets/images/ui/Large_Buttons/Play_Button.png");
-    this.load.image(
-      "controls",
-      "./assets/images/ui/Large_Buttons/Controls_Button.png"
-    );
-    this.load.image(
-      "credits",
-      "./assets/images/ui/Small_Buttons/Info_Square_Button.png"
-    );
-
-    this.load.image(
-      "audio",
-      "./assets/images/ui/Small_Buttons/Audio_Square_Button.png"
-    );
-
-    // Preload le(s) bouton(s)
+    // Preload le(s) bouton(s) et les menus
     this.load.image("quit", "./assets/images/ui/Large_Buttons/Quit_Button.png");
     this.load.image("continue", "./assets/images/ui/Large_Buttons/Continue_Button.png")
+    this.load.image('pause', './assets/images/ui/pauseMenu.png');
+    this.load.image("play", "./assets/images/ui/Large_Buttons/Play_Button.png");
+    this.load.image("controls","./assets/images/ui/Large_Buttons/Controls_Button.png");
+    this.load.image("credits","./assets/images/ui/Small_Buttons/Info_Square_Button.png");
+    this.load.image("audio","./assets/images/ui/Small_Buttons/Audio_Square_Button.png");
+    this.load.image("x","./assets/images/ui/Small_Buttons/X_Square_Button.png");
+    
 
     // Preload le Tiled map
     this.load.tilemapTiledJSON("carte_json", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");

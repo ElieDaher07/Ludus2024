@@ -19,4 +19,4 @@ const config = {
 const game = new Phaser.Game(config);
 
 game.registry.set('isMuted', 0);
-game.registry.set('leftFromAccueil', false);
+//game.registry.set('leftFromAccueil', false);

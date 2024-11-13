@@ -6,17 +6,8 @@ class Tutoriel extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(
-      "bg",
-      "./assets/images/backgrounds/Rocky_Level/background1.png"
-    );
-
-    this.load.image(
-      "x",
-      "./assets/images/ui/Small_Buttons/X_Square_Button.png"
-    );
-
     this.load.image("controles", "./assets/images/ui/controles.png");
+    this.load.image("x","./assets/images/ui/Small_Buttons/X_Square_Button.png");
   }
 
   create() {
