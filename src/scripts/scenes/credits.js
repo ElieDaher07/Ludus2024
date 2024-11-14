@@ -6,27 +6,19 @@ class Credits extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(
-      "bg",
-      "./assets/images/backgrounds/Rocky_Level/background1.png"
-    );
-
-    this.load.image(
-      "x",
-      "./assets/images/ui/Small_Buttons/X_Square_Button.png"
-    );
-
-    this.load.image("creditsMenu", "./assets/images/ui/creditsMenu.png");
+    // les preloads sont tous dans accueil.js pour le moment
   }
 
   create() {
-    //this.cameras.main.fadeIn(1000, 0, 0, 0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
-    // Sons hover/clic
+    // Sons
+
     this.hoverSound = this.sound.add("buttonHoverSfx");
     this.confirmSound = this.sound.add("buttonConfirmSfx");
+
 
     // Background
 
@@ -36,7 +28,7 @@ class Credits extends Phaser.Scene {
     let scale = Math.max(scaleX, scaleY);
     img.setScale(scale);
 
-    // Image contrôles
+    // Image credit
 
     let imgCredits = this.add.image(config.width / 2, config.height / 2, "creditsMenu");
     imgCredits.setScale(0.5);

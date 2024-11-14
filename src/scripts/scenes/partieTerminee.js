@@ -6,68 +6,134 @@ class PartieTerminee extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(
-      "bg",
-      "./assets/images/backgrounds/Rocky_Level/background1.png"
-    );
+    // les preloads sont tous dans accueil.js pour le moment
+    this.load.image("partieTermineeMenu", "./assets/images/ui/partietermineeMenu.png");
 
-    this.load.image(
-      "menu",
-      "./assets/images/ui/Small_Buttons/Home_Square_Button.png"
-    );
-
-    this.load.image(
-      "recommencer",
-      "./assets/images/ui/Small_Buttons/Return_Square_Button.png"
-    );
   }
 
   create() {
 
-    this.cameras.main.fadeIn(1000, 0, 0, 0);
+    this.cameras.main.fadeIn(1500, 0, 0, 0);
+
+    this.diamondCount = 0;
+
+    // Sons
+
+    this.hoverSound = this.sound.add("buttonHoverSfx", {
+      volume: 0.4
+    });
+    this.confirmSound = this.sound.add("buttonConfirmSfx", {
+      volume: 0.4
+    });
+
+    this.gameoverSound = this.sound.add("gameoverBg", {
+      volume: 0,
+      loop: true
+    });
+    this.gameoverSound.play();
+
+    this.time.delayedCall(50, () => {
+      this.tweens.add({
+        targets: this.gameoverSound,
+        volume: 0.4,
+        duration: 1500,
+        ease: 'Linear'
+      });
+    });
 
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
     // Background
 
-    let img = this.add.image(config.width / 2, config.height / 2, "bg");
-    let scaleX = config.width / img.width;
-    let scaleY = config.height / img.height;
-    let scale = Math.max(scaleX, scaleY);
-    img.setScale(scale);
+    let partieTermineeMenu = this.add.image(config.width / 2, config.height / 2, "partieTermineeMenu");
+
+    hudContainer.add(partieTermineeMenu);
 
     // Boutons
 
-    // Les boutons seront à placer et à resize correctement quand je pourrais voir avec un preview
+    let xBtn = this.add
+      .image(config.width / 2 + 30, config.height / 2 + 150, "x")
+      .setScale(0.3);
 
-    let menuBtn = this.add
-      .image(config.width / 2 + 100, config.height / 2, "menu")
-      .setScale(0.5);
+    hudContainer.add(xBtn);
 
-    hudContainer.add(menuBtn);
+    let vBtn = this.add
+      .image(config.width / 2 - 60, config.height / 2 + 150, "v")
+      .setScale(0.3);
 
-    let restartBtn = this.add
-      .image(config.width / 2 - 100, config.height / 2, "recommencer")
-      .setScale(0.5);
-
-    hudContainer.add(restartBtn);
+    hudContainer.add(vBtn);
 
     // Interactifs
 
-    menuBtn.setInteractive();
-    restartBtn.setInteractive();
+    xBtn.setInteractive();
+    vBtn.setInteractive();
+    this.addHoverEffectSmall(xBtn);
+    this.addHoverEffectSmall(vBtn);
 
-    menuBtn.on("pointerdown", () => {
-      this.scene.start("accueil");
+    xBtn.on("pointerover", () => {
+      this.hoverSound.play();
+    })
+
+    vBtn.on("pointerover", () => {
+      this.hoverSound.play();
+    })
+
+    xBtn.on("pointerdown", () => {
+      this.confirmSound.play();
+      this.tweens.add({
+        targets: this.gameoverSound,
+        volume: 0,
+        duration: 1500,
+        ease: 'Linear'
+      });
+      this.cameras.main.fade(1500, 0, 0, 0)
+      this.time.delayedCall(1500, () => {
+        this.gameoverSound.stop();
+        this.scene.start("accueil");
+      });
     });
 
-    restartBtn.on("pointerdown", () => {
-      this.scene.start("jeu");
+    vBtn.on("pointerdown", () => {
+      this.confirmSound.play();
+      this.tweens.add({
+        targets: this.gameoverSound,
+        volume: 0,
+        duration: 1500,
+        ease: 'Linear'
+      });
+      this.cameras.main.fade(1500, 0, 0, 0)
+      this.time.delayedCall(1500, () => {
+        this.gameoverSound.stop();
+        this.scene.start("jeu");
+      });
     });
+
   }
 
   update() {}
+
+  addHoverEffectSmall(button) {
+    button.setInteractive();
+    button.on('pointerover', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.31,
+        scaleY: 0.31,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+    button.on('pointerout', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.3,
+        scaleY: 0.3,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+  }
 
 
 }

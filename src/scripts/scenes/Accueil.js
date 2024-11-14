@@ -8,23 +8,32 @@ class Accueil extends Phaser.Scene {
   }
 
   preload() {
+
+    // Image background menu
     this.load.image(
       "bg",
       "./assets/images/backgrounds/Rocky_Level/background1.png"
     );
 
+    // Logo
     this.load.image("logo", "./assets/images/backgrounds/logo.png");
 
-    // Preload le(s) bouton(s) et les menus
+    // Preload le(s) bouton(s) et le(s) menus
+
+    this.load.image("controlesMenu", "./assets/images/ui/controlesMenu.png");
+    this.load.image("creditsMenu", "./assets/images/ui/creditsMenu.png");
     this.load.image("quit", "./assets/images/ui/Large_Buttons/Quit_Button.png");
     this.load.image("continue", "./assets/images/ui/Large_Buttons/Continue_Button.png")
     this.load.image('pause', './assets/images/ui/pauseMenu.png');
     this.load.image("play", "./assets/images/ui/Large_Buttons/Play_Button.png");
-    this.load.image("controls","./assets/images/ui/Large_Buttons/Controls_Button.png");
-    this.load.image("credits","./assets/images/ui/Small_Buttons/Info_Square_Button.png");
-    this.load.image("audio","./assets/images/ui/Small_Buttons/Audio_Square_Button.png");
-    this.load.image("x","./assets/images/ui/Small_Buttons/X_Square_Button.png");
-    
+    this.load.image("controls", "./assets/images/ui/Large_Buttons/Controls_Button.png");
+    this.load.image("credits", "./assets/images/ui/Small_Buttons/Info_Square_Button.png");
+    this.load.image("audio", "./assets/images/ui/Small_Buttons/Audio_Square_Button.png");
+    this.load.image("x", "./assets/images/ui/Small_Buttons/X_Square_Button.png");
+    this.load.image("v", "./assets/images/ui/Small_Buttons/V_Square_Button.png");
+    this.load.image("bg", "./assets/images/backgrounds/Rocky_Level/background1.png");
+    this.load.image("menu", "./assets/images/ui/Small_Buttons/Home_Square_Button.png");
+    this.load.image("recommencer", "./assets/images/ui/Small_Buttons/Return_Square_Button.png");
 
     // Preload le Tiled map
     this.load.tilemapTiledJSON("carte_json", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");
@@ -70,7 +79,8 @@ class Accueil extends Phaser.Scene {
 
     // Preload les items
 
-    this.load.image("heart01", "./assets/images/items/heart01.png")
+    this.load.image("heart01", "./assets/images/items/heart01.png");
+    this.load.image("diamond01", "./assets/images/items/diamond_big_01.png");
 
     // Preload les ennemis
 
@@ -93,7 +103,6 @@ class Accueil extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
-
 
     this.load.spritesheet("enemy05", "./assets/images/characters/enemy/enemy05_sheet.png", {
       frameWidth: 64,
@@ -119,29 +128,23 @@ class Accueil extends Phaser.Scene {
 
     // Preload audio
 
-    this.load.audio("gameoverBg", "./assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 32 05.ogg"); // game over?
+    this.load.audio("gameoverBg", "./assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 32 05.ogg");
+    this.load.audio("victoryBg", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 09.ogg")
+    // ou assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 30 01.ogg
 
     // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 30 01.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 28 03.ogg // boss music?
-
     // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 28 02.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 07.ogg
-
     //  assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 27.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 28.ogg
-
     //  assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 29.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 30.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 14.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 13.ogg
-
     // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 11.ogg
+
+    this.load.audio("surpriseSfx", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 15.ogg")
 
     this.load.audio("buttonHoverSfx", "./assets/audio/sfx/10_UI_Menu_SFX/001_Hover_01.wav");
 
@@ -193,8 +196,12 @@ class Accueil extends Phaser.Scene {
 
   create() {
     //this.cameras.main.fadeIn(1000, 0, 0, 0);
+    this.input.keyboard.enabled = true;
+    this.input.mouse.enabled = true;
     this.input.mouse.disableContextMenu();
     this.currentBgMusicIndex = -1;
+
+    this.diamondCount = 0;
 
     let isMuted = this.game.registry.get("isMuted");
 

@@ -6,8 +6,7 @@ class Tutoriel extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("controles", "./assets/images/ui/controles.png");
-    this.load.image("x","./assets/images/ui/Small_Buttons/X_Square_Button.png");
+    // les preloads sont tous dans accueil.js pour le moment
   }
 
   create() {
@@ -29,7 +28,7 @@ class Tutoriel extends Phaser.Scene {
 
     // Image contrôles
 
-    let imgControle = this.add.image(config.width / 2, config.height / 2, "controles");
+    let imgControle = this.add.image(config.width / 2, config.height / 2, "controlesMenu");
     imgControle.setScale(0.5);
 
     // Boutons
