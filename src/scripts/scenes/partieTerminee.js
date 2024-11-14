@@ -80,6 +80,8 @@ class PartieTerminee extends Phaser.Scene {
     })
 
     xBtn.on("pointerdown", () => {
+      xBtn.disableInteractive();
+      vBtn.disableInteractive();
       this.confirmSound.play();
       this.tweens.add({
         targets: this.gameoverSound,
@@ -95,6 +97,8 @@ class PartieTerminee extends Phaser.Scene {
     });
 
     vBtn.on("pointerdown", () => {
+      xBtn.disableInteractive();
+      vBtn.disableInteractive();
       this.confirmSound.play();
       this.tweens.add({
         targets: this.gameoverSound,
