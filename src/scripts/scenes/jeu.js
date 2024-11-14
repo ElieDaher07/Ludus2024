@@ -767,7 +767,7 @@ class Jeu extends Phaser.Scene {
         this.scene.start("victoire");
       });
 
-    } else if (!this.diamondMessageCooldown) {
+    } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
       this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
       this.diamondMessageCooldown = true;
     }
