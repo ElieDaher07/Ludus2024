@@ -347,9 +347,9 @@ class Jeu extends Phaser.Scene {
     });
 
     this.game.registry.set("bgMusic", this.bgMusic);
-    let isMuted = this.game.registry.get("isMuted");
+    this.isMuted = this.game.registry.get("isMuted");
 
-    if (!isMuted) {
+    if (!this.isMuted) {
       this.bgMusic.play();
       this.bgMusic.setVolume(0.1);
     }
@@ -380,8 +380,9 @@ class Jeu extends Phaser.Scene {
 
     this.surpriseSound = this.sound.add("surpriseSfx", {
       loop: true,
-      volume: 0.43,
-      detune: -1200
+      volume: 0.53,
+      rate: 3.2,
+      detune: -2600
     })
 
     this.playerDeathSound = this.sound.add("playerDeathSound");
@@ -780,7 +781,7 @@ class Jeu extends Phaser.Scene {
         this.itemPickupSound.play();
 
         if (this.diamondCount === 1) {
-          this.showPlayerDialogue("Je devrais ramasser tous les diamants avant de partir");
+          this.showPlayerDialogue("Je devrais ramasser tous les diamants que je peux trouver");
         }
 
         if (this.diamondCount === 4) {
@@ -1074,7 +1075,6 @@ class Jeu extends Phaser.Scene {
                 this.enemy03_bisHit = true;
                 this.enemy03_b.play("enemy03_hit", true);
                 this.hitSound04.play();
-
               }
               break;
             case this.enemy04:
@@ -1815,83 +1815,113 @@ class Jeu extends Phaser.Scene {
 
 
   handleEnemyLife() {
-    if (this.enemy01Life <= 0 && this.enemy01) {
-      this.enemy01.body.enable = false;
-      this.enemy01.anims.play("enemy01_death");
-      this.enemyDeathSound.play();
-      this.enemy01.on("animationcomplete", () => {
-        this.enemy01.destroy();
-        this.enemy01 = null;
-      });
+    if (this.enemy01) {
+      if (this.enemy01Life <= 0) {
+        this.enemy01.body.enable = false;
+        this.enemy01.anims.play("enemy01_death");
+        this.enemyDeathSound.play();
+        this.enemy01.on("animationcomplete", () => {
+          this.enemy01.destroy();
+          this.enemy01.setActive(false);
+          this.enemy01.setVisible(false);
+          this.enemy01 = null;
+        });
+      }
     }
 
-    if (this.enemy02Life <= 0 && this.enemy02) {
-      this.enemy02.body.enable = false;
-      this.enemy02.anims.play("enemy02_death");
-      this.enemyDeathSound.play();
-      this.enemy02.on("animationcomplete", () => {
-        this.enemy02.setActive(false);
-        this.enemy02.setVisible(false);
-        this.enemy02 = null;
-      });
+    if (this.enemy02) {
+      if (this.enemy02Life <= 0) {
+        this.enemy02.body.enable = false;
+        this.enemy02.anims.play("enemy02_death");
+        this.enemyDeathSound.play();
+        this.enemy02.on("animationcomplete", () => {
+          this.enemy02.destroy();
+          this.enemy02.setActive(false);
+          this.enemy02.setVisible(false);
+          this.enemy02 = null;
+        });
+      }
     }
 
-    if (this.enemy02_bLife <= 0 && this.enemy02_b) {
-      this.enemy02_b.body.enable = false;
-      this.enemy02_b.anims.play("enemy02_death");
-      this.enemyDeathSound.play();
-      this.enemy02_b.on("animationcomplete", () => {
-        this.enemy02_b.setActive(false);
-        this.enemy02_b.setVisible(false);
-        this.enemy02_b = null;
-      });
+    if (this.enemy02_b) {
+      if (this.enemy02_bLife <= 0) {
+        this.enemy02_b.body.enable = false;
+        this.enemy02_b.anims.play("enemy02_death");
+        this.enemyDeathSound.play();
+        this.enemy02_b.on("animationcomplete", () => {
+          this.enemy02_b.destroy();
+          this.enemy02_b.setActive(false);
+          this.enemy02_b.setVisible(false);
+          this.enemy02_b = null;
+        });
+      }
     }
 
-    if (this.enemy03Life <= 0) {
-      this.enemy03.body.enable = false;
-      this.enemy03.anims.play("enemy03_death");
-      this.enemyDeathSound.play();
-      this.enemy03.on("animationcomplete", () => {
-        console.log("this boy dead, function handleEnemyLife");
-        this.enemy03.setActive(false);
-        this.enemy03.setVisible(false);
-        this.enemy03 = null;
-      });
+    if (this.enemy03) {
+      if (this.enemy03Life <= 0) {
+        this.enemy03.body.enable = false;
+        this.enemy03.disableBody();
+        this.enemy03.anims.play("enemy03_death");
+        this.enemyDeathSound.play();
+        this.enemy03.on("animationcomplete", () => {
+          console.log("this boy dead, function handleEnemyLife");
+          this.enemy03.destroy();
+          this.enemy03.setActive(false);
+          this.enemy03.setVisible(false);
+          this.enemy03 = null;
+        });
+      }
     }
 
-    if (this.enemy03_bLife <= 0 && this.enemy03_b) {
-      this.enemy03_b.body.enable = false;
-      this.enemy03_b.anims.play("enemy03_death");
-      this.enemyDeathSound.play();
-      this.surpriseSound.stop();
-      this.time.delayedCall(2050, () => {
-        this.bgMusic.play();
-      });
-      this.enemy03_b.on("animationcomplete", () => {
-        this.enemy03_b.setActive(false);
-        this.enemy03_b.setVisible(false);
-        this.enemy03_b = null;
-      });
+    if (this.enemy03_b) {
+      if (this.enemy03_bLife <= 0) {
+        this.enemy03_b.body.enable = false;
+        this.enemy03_b.anims.play("enemy03_death");
+        this.enemyDeathSound.play();
+        this.surpriseSound.stop();
+        this.time.delayedCall(2050, () => {
+          if (!this.isMuted) {
+            this.bgMusic.play();
+          }
+        });
+        this.enemy03_b.on("animationcomplete", () => {
+          this.enemy03_b.destroy();
+          this.enemy03_b.setActive(false);
+          this.enemy03_b.setVisible(false);
+          this.enemy03_b = null;
+        });
+      }
     }
 
-    if (this.enemy04Life <= 0 && this.enemy04) {
-      this.enemy04.body.enable = false;
-      this.enemy04.anims.play("enemy04_death");
-      this.enemyDeathSound.play();
-      this.enemy04.on("animationcomplete", () => {
-        this.enemy04.destroy();
-        this.enemy04 = null;
-      });
+    if (this.enemy04) {
+      if (this.enemy04Life <= 0 /*&& this.enemy04*/ ) {
+        this.enemy04.disableBody();
+        this.enemy04.body.enable = false;
+        this.enemy04.anims.play("enemy04_death");
+        this.enemyDeathSound.play();
+        this.enemy04.on("animationcomplete", () => {
+          this.enemy04.destroy();
+          this.enemy04.setActive(false);
+          this.enemy04.setVisible(false);
+          this.enemy04.destroy();
+          this.enemy04 = null;
+        });
+      }
     }
 
-    if (this.enemy05Life <= 0 && this.enemy05) {
-      this.enemy05.body.enable = false;
-      this.enemy05.anims.play("enemy05_death");
-      this.enemyDeathSound.play();
-      this.enemy05.on("animationcomplete", () => {
-        this.enemy05.destroy();
-        this.enemy05 = null;
-      });
+    if (this.enemy05) {
+      if (this.enemy05Life <= 0 /*&& this.enemy05*/ ) {
+        this.enemy05.disableBody();
+        this.enemy05.body.enable = false;
+        this.enemy05.anims.play("enemy05_death");
+        this.enemyDeathSound.play();
+        this.enemy05.on("animationcomplete", () => {
+          this.enemy05.destroy();
+          this.enemy05.setActive();
+          this.enemy05.setVisible(false);
+          this.enemy05 = null;
+        });
+      }
     }
   }
 
@@ -1908,7 +1938,7 @@ class Jeu extends Phaser.Scene {
         },
         ease: "Linear",
         duration: 100,
-        repeat: 10,
+        repeat: 3,
         yoyo: true,
         onComplete: () => {
           if (!this.playerIsDead) {
@@ -2065,14 +2095,12 @@ class Jeu extends Phaser.Scene {
           dagger.destroy();
           daggerThrown = true;
           this.hitSound06.play();
-
           let explosionEnemy = this.add.sprite(dagger.x, dagger.y, "dagger_hit");
           explosionEnemy.setScale(2).setDepth(1);
           explosionEnemy.anims.play("dagger_hit");
           explosionEnemy.on("animationcomplete", () => {
             explosionEnemy.destroy();
           });
-
           this.handleEnemyLife();
         }
       });
