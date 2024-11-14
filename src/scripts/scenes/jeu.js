@@ -1778,13 +1778,40 @@ class Jeu extends Phaser.Scene {
         }
       }
     } else {
-      this.enemy03_b.setVelocityX(0);
-      if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
-        this.enemy03_b.anims.play("enemy03_idle", true);
+      if (this.enemy03_b.body.onFloor()) {
+        if (this.enemy03_b.isPatrolling) {
+          const patrolLeftLimit = this.enemy03_b.initialX - 100;
+          const patrolRightLimit = this.enemy03_b.initialX + 100;
+
+          if (this.enemy03_b.x <= patrolLeftLimit) {
+            this.enemy03_b.direction = 1;
+            this.enemy03_b.setVelocityX(this.enemy03_b.speed);
+          } else if (this.enemy03_b.x >= patrolRightLimit) {
+            this.enemy03_b.direction = -1;
+            this.enemy03_b.setVelocityX(-this.enemy03_b.speed);
+          } else {
+            this.enemy03_b.setVelocityX(this.enemy03_b.speed * this.enemy03_b.direction);
+          }
+          if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_walk") {
+            this.enemy03_b.anims.play("enemy03_walk", true);
+          }
+        } else {
+          this.enemy03_b.setVelocityX(0);
+          if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
+            this.enemy03_b.anims.play("enemy03_idle", true);
+          }
+        }
+      } else {
+        this.enemy03_b.setVelocityX(0);
+        if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
+          this.enemy03_b.anims.play("enemy03_idle", true);
+        }
       }
     }
+
     this.enemy03_b.flipX = this.enemy03_b.direction === 1;
   }
+
 
   handleEnemyLife() {
     if (this.enemy01Life <= 0 && this.enemy01) {
