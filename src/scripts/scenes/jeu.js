@@ -395,6 +395,7 @@ class Jeu extends Phaser.Scene {
       if (!this.isPaused) {
         this.pauseSound.play();
         this.scene.launch("pause");
+        this.surpriseSound.pause();
         this.bgMusic.pause();
         this.scene.pause();
         this.isPaused = true;
@@ -402,6 +403,7 @@ class Jeu extends Phaser.Scene {
         this.unpauseSound.play();
         this.scene.stop("pause");
         this.bgMusic.resume();
+        this.surpriseSound.resume();
         this.scene.resume();
         this.isPaused = false;
       }
@@ -967,20 +969,23 @@ class Jeu extends Phaser.Scene {
     this.enemy03_b.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
     this.enemy03_b.setScale(3).setDepth(1);
     this.enemy03_b.setTint(0xFF6666);
+    this.enemy03_bisHit = false;
+    this.enemy03_b.hitCooldown = null;
 
     this.enemy03_b.setActive(false);
     this.enemy03_b.setVisible(false);
 
     this.enemy03_b.speed = 50;
     this.enemy03_b.direction = -1;
+    this.enemy03_b.initialX = this.enemy03_b.x;
 
     this.enemy03_b.attackRange = 250;
     this.enemy03_b.attackCooldown = 0;
     this.enemy03_b.canAttack = true;
     this.enemy03_b.patrolTimer = 0;
     this.enemy03_b.isPatrolling = true;
-    this.enemy03_b.patrolLeftLimit = this.enemy03.initialX - 100;
-    this.enemy03_b.patrolRightLimit = this.enemy03.initialX + 100;
+    this.enemy03_b.patrolLeftLimit = this.enemy03_b.initialX - 100;
+    this.enemy03_b.patrolRightLimit = this.enemy03_b.initialX + 100;
     this.enemy03_b.anims.play("enemy03_idle", true);
   }
 
@@ -1854,7 +1859,7 @@ class Jeu extends Phaser.Scene {
       });
     }
 
-    if (this.enemy03_bLife <= 0 && this.enemy03) {
+    if (this.enemy03_bLife <= 0 && this.enemy03_b) {
       this.enemy03_b.body.enable = false;
       this.enemy03_b.anims.play("enemy03_death");
       this.enemyDeathSound.play();
