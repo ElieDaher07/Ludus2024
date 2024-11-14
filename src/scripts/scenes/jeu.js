@@ -1015,7 +1015,7 @@ class Jeu extends Phaser.Scene {
     this.enemy02Life = 3;
     this.enemy02_bLife = 3;
     this.enemy03Life = 5;
-    this.enemy03_bLife = 7;
+    this.enemy03_bLife = 9;
     this.enemy04Life = 2;
     this.enemy05Life = 2;
 
