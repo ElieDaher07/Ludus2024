@@ -75,7 +75,6 @@ class Victoire extends Phaser.Scene {
     });
 
     xBtn.on("pointerdown", () => {
-
       this.confirmSound.play();
       this.tweens.add({
         targets: this.victorySound,
@@ -91,7 +90,6 @@ class Victoire extends Phaser.Scene {
     });
 
     vBtn.on("pointerdown", () => {
-
       this.confirmSound.play();
       this.tweens.add({
         targets: this.victorySound,

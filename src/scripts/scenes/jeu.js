@@ -736,20 +736,18 @@ class Jeu extends Phaser.Scene {
   handleSurpriseOverlap() {
     this.physics.add.overlap(this.player, this.surpriseHitbox, (player, surpriseHitbox) => {
       this.surpriseHitbox.destroy();
-      // Assuming you want to activate enemy03_b when the player overlaps with the surpriseHitbox
+
       if (!this.enemy03_b.active) {
         this.enemy03_b.setActive(true);
         this.enemy03_b.setVisible(true);
-        this.enemy03_b.isHit = false; // Reset hit state
-        this.enemy03_b.canAttack = true; // Reset attack state
-        this.enemy03_b.attackCooldown = 0; // Reset attack cooldown
-        this.enemy03_b.anims.play("enemy03_walk", true); // Start walking animation
+        this.enemy03_b.isHit = false;
+        this.enemy03_b.canAttack = true;
+        this.enemy03_b.attackCooldown = 0;
+        this.enemy03_b.anims.play("enemy03_walk", true);
         this.surpriseSound.play();
         this.bgMusic.stop();
 
       }
-
-
     });
   }
 
@@ -2171,7 +2169,6 @@ class Jeu extends Phaser.Scene {
 
   handlePlayerDeath() {
     if (this.playerIsDead) return;
-
     this.playerIsDead = true;
     this.sound.stopAll();
     this.playerDeathSound.play();
