@@ -380,7 +380,7 @@ class Jeu extends Phaser.Scene {
 
     this.surpriseSound = this.sound.add("surpriseSfx", {
       loop: true,
-      volume: 0.23,
+      volume: 0.43,
       detune: -1200
     })
 
@@ -749,10 +749,7 @@ class Jeu extends Phaser.Scene {
 
       }
 
-      if (this.enemy03_bLife < 0) {
-        this.surpriseSound.stop();
 
-      }
     });
   }
 
@@ -1078,6 +1075,7 @@ class Jeu extends Phaser.Scene {
                 this.enemy03_bisHit = true;
                 this.enemy03_b.play("enemy03_hit", true);
                 this.hitSound04.play();
+
               }
               break;
             case this.enemy04:
@@ -1146,7 +1144,7 @@ class Jeu extends Phaser.Scene {
       this.handleSurpriseOverlap();
     }
 
-    console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
+    // console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
 
@@ -1703,12 +1701,14 @@ class Jeu extends Phaser.Scene {
       this.player.y
     );
 
+    const chaseDistance = 600;
+
     if (this.enemy03_b.isAttacking || this.enemy03_b.postAttackCooldown) {
       this.enemy03_b.setVelocityX(0);
       return;
     }
 
-    if (distanceToPlayer < this.enemy03_b.attackRange) {
+    if (distanceToPlayer < chaseDistance) {
       const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03_b.x) ||
         (!this.player.flipX && this.player.x < this.enemy03_b.x);
 
@@ -1716,10 +1716,10 @@ class Jeu extends Phaser.Scene {
 
       if (distanceToPlayer > minimumAttackDistance) {
         if (this.player.x < this.enemy03_b.x) {
-          this.enemy03_b.setVelocityX(-this.enemy03_b.speed * 2.4);
+          this.enemy03_b.setVelocityX(-this.enemy03_b.speed * 2.8);
           this.enemy03_b.direction = -1;
         } else {
-          this.enemy03_b.setVelocityX(this.enemy03_b.speed * 2.4);
+          this.enemy03_b.setVelocityX(this.enemy03_b.speed * 2.8);
           this.enemy03_b.direction = 1;
         }
         this.enemy03_b.anims.play("enemy03_walk", true);
@@ -1833,6 +1833,10 @@ class Jeu extends Phaser.Scene {
       this.enemy03_b.body.enable = false;
       this.enemy03_b.anims.play("enemy03_death");
       this.enemyDeathSound.play();
+      this.surpriseSound.stop();
+      this.time.delayedCall(2050, () => {
+        this.bgMusic.play();
+      });
       this.enemy03_b.on("animationcomplete", () => {
         this.enemy03_b.destroy();
         this.enemy03_b = null;
