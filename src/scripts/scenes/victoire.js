@@ -66,7 +66,6 @@ class Victoire extends Phaser.Scene {
     this.addHoverEffectSmall(xBtn);
     this.addHoverEffectSmall(vBtn);
 
-    // Add event listeners for buttons
     xBtn.on("pointerover", () => {
       this.hoverSound.play();
     });
@@ -75,7 +74,6 @@ class Victoire extends Phaser.Scene {
       this.hoverSound.play();
     });
 
-    // Define pointerdown events for buttons
     xBtn.on("pointerdown", () => {
 
       this.confirmSound.play();
