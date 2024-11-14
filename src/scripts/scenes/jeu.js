@@ -439,10 +439,6 @@ class Jeu extends Phaser.Scene {
     this.playerHasLanded = false;
     this.isWalking = false;
 
-    // Camera surprise
-
-    this.colorOverlay = this.add.graphics();
-
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
     this.createAnimation();
@@ -1834,7 +1830,8 @@ class Jeu extends Phaser.Scene {
       this.enemy02.anims.play("enemy02_death");
       this.enemyDeathSound.play();
       this.enemy02.on("animationcomplete", () => {
-        this.enemy02.destroy();
+        this.enemy02.setActive(false);
+        this.enemy02.setVisible(false);
         this.enemy02 = null;
       });
     }
@@ -1844,17 +1841,20 @@ class Jeu extends Phaser.Scene {
       this.enemy02_b.anims.play("enemy02_death");
       this.enemyDeathSound.play();
       this.enemy02_b.on("animationcomplete", () => {
-        this.enemy02_b.destroy();
+        this.enemy02_b.setActive(false);
+        this.enemy02_b.setVisible(false);
         this.enemy02_b = null;
       });
     }
 
-    if (this.enemy03Life <= 0 && this.enemy03) {
+    if (this.enemy03Life <= 0) {
       this.enemy03.body.enable = false;
       this.enemy03.anims.play("enemy03_death");
       this.enemyDeathSound.play();
       this.enemy03.on("animationcomplete", () => {
-        this.enemy03.destroy();
+        console.log("this boy dead, function handleEnemyLife");
+        this.enemy03.setActive(false);
+        this.enemy03.setVisible(false);
         this.enemy03 = null;
       });
     }
@@ -1868,7 +1868,8 @@ class Jeu extends Phaser.Scene {
         this.bgMusic.play();
       });
       this.enemy03_b.on("animationcomplete", () => {
-        this.enemy03_b.destroy();
+        this.enemy03_b.setActive(false);
+        this.enemy03_b.setVisible(false);
         this.enemy03_b = null;
       });
     }
