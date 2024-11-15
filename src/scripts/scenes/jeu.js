@@ -1143,7 +1143,6 @@ class Jeu extends Phaser.Scene {
       this.handleEnemy03Behavior();
 
     }
-
     // console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
