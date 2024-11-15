@@ -612,8 +612,7 @@ class Jeu extends Phaser.Scene {
 
     this.createHearts();
     this.createDiamonds();
-
-
+    9
     //  ---------------- CRÉATION DU WORLD SETBOUND ---------------- 
 
     // LE MONDE
