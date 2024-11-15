@@ -668,11 +668,11 @@ class Jeu extends Phaser.Scene {
 
     // COLLISION JOUEUR ET HORS NIVEAU
 
-    this.physics.add.overlap(this.player, this.exitHitbox, this.handleExitOverlap, null, this);
+    this.createExitOverlap();
 
     // COLLISION SURPRISE
 
-    this.physics.add.overlap(this.player, this.surpriseHitbox);
+    this.createSurpriseOverlap();
 
     // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
 
@@ -732,8 +732,8 @@ class Jeu extends Phaser.Scene {
     this.handleDiamondPickup(this.diamonds);
   }
 
-  handleSurpriseOverlap() {
-    this.physics.add.overlap(this.player, this.surpriseHitbox, (player, surpriseHitbox) => {
+  createSurpriseOverlap() {
+    this.physics.add.overlap(this.player, this.surpriseHitbox, () => {
       this.surpriseHitbox.destroy();
 
       if (!this.enemy03_b.active) {
@@ -750,24 +750,26 @@ class Jeu extends Phaser.Scene {
     });
   }
 
-  handleExitOverlap() {
-    if (this.diamondCount === 4 && !this.sceneTransitionInProgress) {
+  createExitOverlap() {
+    this.physics.add.overlap(this.player, this.exitHitbox, () => {
+      if (this.diamondCount === 4 && !this.sceneTransitionInProgress) {
 
-      this.sceneTransitionInProgress = true;
-      this.input.keyboard.enabled = false;
-      this.input.mouse.enabled = false;
-      this.cameras.main.fadeOut(1500, 0, 0, 0);
+        this.sceneTransitionInProgress = true;
+        this.input.keyboard.enabled = false;
+        this.input.mouse.enabled = false;
+        this.cameras.main.fadeOut(1500, 0, 0, 0);
 
-      this.time.delayedCall(1500, () => {
-        this.scene.stop("jeu");
-        this.sound.stopAll();
-        this.scene.start("victoire");
-      });
+        this.time.delayedCall(1500, () => {
+          this.scene.stop("jeu");
+          this.sound.stopAll();
+          this.scene.start("victoire");
+        });
 
-    } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
-      this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
-      this.diamondMessageCooldown = true;
-    }
+      } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
+        this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
+        this.diamondMessageCooldown = true;
+      }
+    });
   }
 
   handleDiamondPickup() {
@@ -1140,7 +1142,7 @@ class Jeu extends Phaser.Scene {
       }
 
       this.handleEnemy03Behavior();
-      this.handleSurpriseOverlap();
+
     }
 
     // console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
