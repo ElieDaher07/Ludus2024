@@ -516,7 +516,6 @@ class Jeu extends Phaser.Scene {
     this.createEnemy03();
     this.createEnemy03_b();
 
-
     this.createEnemy04();
     this.createEnemy05();
 
