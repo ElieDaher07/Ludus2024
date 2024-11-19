@@ -12,19 +12,46 @@
             "scaleInDock": 2,
             "scaleInEditor": 1
         },
-        "map_rocky.tmx": {
-            "scale": 0.5,
-            "selectedLayer": 2,
+        "map_crystal.tmx": {
+            "scale": 2,
+            "selectedLayer": 7,
             "viewCenter": {
-                "x": 578,
-                "y": 631
+                "x": 256.5,
+                "y": 48
+            }
+        },
+        "map_crystal.tmx#background01": {
+            "scaleInDock": 1
+        },
+        "map_crystal.tmx#background02": {
+            "scaleInDock": 1
+        },
+        "map_crystal.tmx#background03": {
+            "scaleInDock": 1
+        },
+        "map_crystal.tmx#main_lev_build_1": {
+            "scaleInDock": 0.75
+        },
+        "map_crystal.tmx#main_lev_build_2": {
+            "scaleInDock": 0.75
+        },
+        "map_crystal.tmx#rocks": {
+            "scaleInDock": 1
+        },
+        "map_rocky.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 8,
+            "viewCenter": {
+                "x": 345.33333333333337,
+                "y": 631.3333333333333
             }
         },
         "map_rocky.tmx#background1": {
             "scaleInDock": 1
         },
         "map_rocky.tmx#background2": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "map_rocky.tmx#background3": {
             "scaleInDock": 1
@@ -38,7 +65,7 @@
         }
     },
     "last.exportedFilePath": "C:/Users/V/Documents/GitHub/Ludus2024/assets/images/backgrounds/Rocky_Level",
-    "last.imagePath": "C:/Users/V/Documents/GitHub/Ludus2024/Tiled",
+    "last.imagePath": "C:/Users/V/Documents/GitHub/Ludus2024/assets/images/backgrounds/Crystal_Level",
     "map.height": 45,
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
     "map.lastUsedFormat": "tmx",
