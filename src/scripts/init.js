@@ -4,11 +4,11 @@ const config = {
   pixelArt: true,
   width: 1280,
   height: 720,
-  scene: [Accueil, Jeu, Credits, Victoire, PartieTerminee, Tutoriel, Pause],
+  scene: [Accueil, Jeu, Jeu2, Jeu3, Credits, Victoire, PartieTerminee, Tutoriel, Pause],
   physics: {
     default: "arcade",
     arcade: {
-      debug: false, // Debug
+      debug: true, // Debug
       gravity: {
         y: 1000
       },
@@ -19,4 +19,5 @@ const config = {
 const game = new Phaser.Game(config);
 
 game.registry.set('isMuted', 0);
-//game.registry.set('leftFromAccueil', false);
+
+let niveauActuel = "jeu";

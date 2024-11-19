@@ -317,6 +317,20 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
+
+    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
+
+    niveauActuel = "jeu";
+
+    this.checkpointHitbox = this.add.rectangle(1736, 296, 250, 250, 0x000000, 0).setOrigin(0.5);
+    this.physics.add.existing(this.checkpointHitbox);
+    this.checkpointHitbox.body.setAllowGravity(false);
+    this.checkpointHitbox.body.setImmovable(true);
+
+
+    // this.localStorage.clear()
+
+
     // Réinitialization
 
     this.cameras.main.fadeIn(1000, 0, 0, 0);
@@ -326,7 +340,7 @@ class Jeu extends Phaser.Scene {
 
     // Creation variables progression
 
-    this.diamondCount = 0;
+    this.diamondCount = (sauvegarde) ? sauvegarde.nbDiamant : 0;
     this.diamondMessageCooldown = false;
     this.sceneTransitionInProgress = false;
 
@@ -433,7 +447,7 @@ class Jeu extends Phaser.Scene {
 
     // Joueur
 
-    this.playerLife = 6;
+    this.playerLife = (sauvegarde) ? sauvegarde.nbVie : 6;
     this.maxPlayerLife = 8;
     this.playerIsHit = false; // a revoir
     this.playerIsDead = false;
@@ -530,6 +544,23 @@ class Jeu extends Phaser.Scene {
     this.player.setScale(2).setDepth(1);
 
     this.createPlayerLife();
+
+    this.physics.add.overlap(this.player, this.checkpointHitbox, () => {
+
+      const sauvegarde = {
+        niveau: niveauActuel,
+        nbDiamant: this.diamondCount,
+        nbVie: this.playerLife,
+        positionX: this.player.x,
+        positionY: this.player.y,
+      }
+      localStorage.setItem(`sauvegardeJeu`, JSON.stringify(sauvegarde));
+    });
+
+    if (sauvegarde) {
+      this.player.x = sauvegarde.positionX;
+      this.player.y = sauvegarde.positionY;
+    }
 
     // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
 
@@ -748,6 +779,7 @@ class Jeu extends Phaser.Scene {
     });
   }
 
+
   createExitOverlap() {
     this.physics.add.overlap(this.player, this.exitHitbox, () => {
       if (this.diamondCount === 4 && !this.sceneTransitionInProgress) {
@@ -760,7 +792,7 @@ class Jeu extends Phaser.Scene {
         this.time.delayedCall(1500, () => {
           this.scene.stop("jeu");
           this.sound.stopAll();
-          this.scene.start("victoire");
+          this.scene.start("jeu2");
         });
 
       } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
@@ -1142,7 +1174,7 @@ class Jeu extends Phaser.Scene {
       this.handleEnemy03Behavior();
 
     }
-    // console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
+    console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
 
@@ -2249,7 +2281,9 @@ class Jeu extends Phaser.Scene {
             this.time.delayedCall(800, () => {
               this.cameras.main.fade(1500, 0, 0, 0, false, (camera, progress) => {
                 if (progress === 1) {
+
                   this.scene.start("gameover");
+
                 }
               });
             });
