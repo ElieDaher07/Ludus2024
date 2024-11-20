@@ -22,9 +22,11 @@ class Pause extends Phaser.Scene {
 
     let pauseImg = this.add.image(config.width / 2, config.height / 2, "pause").setScale(0.5);
 
-    let quitBtn = this.add.image((config.width / 2), (config.height / 2 + 100), "quit").setScale(0.5);
+    let continueBtn = this.add.image(config.width / 2, (config.height / 2 - 100), "continue").setScale(0.5);
 
-    let continueBtn = this.add.image(config.width / 2, (config.height / 2 - 50), "continue").setScale(0.5);
+    let resetBtn = this.add.image(config.width / 2, (config.height / 2 + 50), "reset").setScale(0.5).setTint(0xB0B0B0);
+
+    let quitBtn = this.add.image((config.width / 2), (config.height / 2 + 200), "quit").setScale(0.5);
 
     quitBtn.setInteractive();
     continueBtn.setInteractive();
@@ -32,6 +34,7 @@ class Pause extends Phaser.Scene {
     hudContainer.add(pauseImg);
     hudContainer.add(quitBtn);
     hudContainer.add(continueBtn);
+    hudContainer.add(resetBtn);
 
     this.input.keyboard.on("keydown-ESC", () => {
       this.unpauseSound.play();

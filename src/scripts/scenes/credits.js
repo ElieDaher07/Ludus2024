@@ -64,8 +64,8 @@ class Credits extends Phaser.Scene {
     button.on('pointerover', () => {
       this.tweens.add({
         targets: button,
-        scaleX: 0.21,
-        scaleY: 0.21,
+        scaleX: 0.22,
+        scaleY: 0.22,
         duration: 100,
         ease: 'Cubic.Out',
       });

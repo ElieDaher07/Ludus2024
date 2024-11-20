@@ -116,8 +116,8 @@ class Victoire extends Phaser.Scene {
     button.on('pointerover', () => {
       this.tweens.add({
         targets: button,
-        scaleX: 0.31,
-        scaleY: 0.31,
+        scaleX: 0.32,
+        scaleY: 0.32,
         duration: 100,
         ease: 'Cubic.Out',
       });

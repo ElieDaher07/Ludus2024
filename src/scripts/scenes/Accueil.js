@@ -21,11 +21,15 @@ class Accueil extends Phaser.Scene {
     // Preload le(s) bouton(s) et le(s) menus
 
     this.load.image("controlesMenu", "./assets/images/ui/controlesMenu.png");
+    this.load.image("controlesMenu02", "./assets/images/ui/controlesMenu02.png");
+
     this.load.image("creditsMenu", "./assets/images/ui/creditsMenu.png");
     this.load.image("quit", "./assets/images/ui/Large_Buttons/Quit_Button.png");
-    this.load.image("continue", "./assets/images/ui/Large_Buttons/Continue_Button.png")
+    this.load.image("continue", "./assets/images/ui/Large_Buttons/Continue_Button.png");
+    this.load.image("reset", "./assets/images/ui/Large_Buttons/Reset_Button.png");
     this.load.image('pause', './assets/images/ui/pauseMenu.png');
     this.load.image("play", "./assets/images/ui/Large_Buttons/Play_Button.png");
+    this.load.image("recommencer", "./assets/images/ui/Small_Buttons/Return_Square_Button.png");
     this.load.image("controls", "./assets/images/ui/Large_Buttons/Controls_Button.png");
     this.load.image("credits", "./assets/images/ui/Small_Buttons/Info_Square_Button.png");
     this.load.image("musique", "./assets/images/ui/Small_Buttons/Music_Square_Button.png");
@@ -34,7 +38,10 @@ class Accueil extends Phaser.Scene {
     this.load.image("v", "./assets/images/ui/Small_Buttons/V_Square_Button.png");
     this.load.image("bg", "./assets/images/backgrounds/Rocky_Level/background1.png");
     this.load.image("menu", "./assets/images/ui/Small_Buttons/Home_Square_Button.png");
-    this.load.image("recommencer", "./assets/images/ui/Small_Buttons/Return_Square_Button.png");
+
+    this.load.image("left_arrow", "./assets/images/ui/Small_Buttons/Back_Square_Button.png");
+    this.load.image("right_arrow", "./assets/images/ui/Small_Buttons/Next_Square_Button.png");
+
 
     // Preload le Tiled map
     this.load.tilemapTiledJSON("carte_json", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");
@@ -397,8 +404,8 @@ class Accueil extends Phaser.Scene {
     button.on('pointerover', () => {
       this.tweens.add({
         targets: button,
-        scaleX: 0.31,
-        scaleY: 0.31,
+        scaleX: 0.32,
+        scaleY: 0.32,
         duration: 100,
         ease: 'Cubic.Out',
       });
@@ -418,8 +425,8 @@ class Accueil extends Phaser.Scene {
     button.on('pointerover', () => {
       this.tweens.add({
         targets: button,
-        scaleX: 0.16,
-        scaleY: 0.16,
+        scaleX: 0.17,
+        scaleY: 0.17,
         duration: 200,
         ease: 'Cubic.Out',
       });

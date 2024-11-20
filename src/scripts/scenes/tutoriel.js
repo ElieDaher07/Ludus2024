@@ -37,12 +37,28 @@ class Tutoriel extends Phaser.Scene {
       .image(config.width / 2 + 265, config.height / 2 - 295, "x")
       .setScale(0.2);
 
+    let left_arrow = this.add.image(config.width / 2 - 50, config.height / 2 + 220, "left_arrow").setScale(0.3).setTint(0xB0B0B0);
+    let right_arrow = this.add.image(config.width / 2 + 50, config.height / 2 + 220, "right_arrow").setScale(0.3);
+
+
     hudContainer.add(xBtn);
 
     // Interactifs
 
     xBtn.setInteractive();
     this.addHoverEffectSmall(xBtn);
+
+    right_arrow.setInteractive();
+    this.addHoverEffectMedium(right_arrow);
+
+    right_arrow.on("pointerover", () => {
+      this.hoverSound.play();
+    })
+
+    right_arrow.on("pointerdown", () => {
+      this.scene.start("tutoriel02");
+      this.confirmSound.play();
+    })
 
     xBtn.on("pointerover", () => {
       this.hoverSound.play();
@@ -63,8 +79,8 @@ class Tutoriel extends Phaser.Scene {
     button.on('pointerover', () => {
       this.tweens.add({
         targets: button,
-        scaleX: 0.21,
-        scaleY: 0.21,
+        scaleX: 0.22,
+        scaleY: 0.22,
         duration: 100,
         ease: 'Cubic.Out',
       });
@@ -74,6 +90,28 @@ class Tutoriel extends Phaser.Scene {
         targets: button,
         scaleX: 0.2,
         scaleY: 0.2,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+  }
+
+  addHoverEffectMedium(button) {
+    button.setInteractive();
+    button.on('pointerover', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.32,
+        scaleY: 0.32,
+        duration: 100,
+        ease: 'Cubic.Out',
+      });
+    });
+    button.on('pointerout', () => {
+      this.tweens.add({
+        targets: button,
+        scaleX: 0.3,
+        scaleY: 0.3,
         duration: 100,
         ease: 'Cubic.Out',
       });

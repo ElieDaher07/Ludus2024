@@ -317,19 +317,8 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
-
-    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
-
     niveauActuel = "jeu";
-
-    this.checkpointHitbox = this.add.rectangle(1736, 296, 250, 250, 0x000000, 0).setOrigin(0.5);
-    this.physics.add.existing(this.checkpointHitbox);
-    this.checkpointHitbox.body.setAllowGravity(false);
-    this.checkpointHitbox.body.setImmovable(true);
-
-
-    // this.localStorage.clear()
-
+    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
     // Réinitialization
 
@@ -344,7 +333,7 @@ class Jeu extends Phaser.Scene {
     this.diamondMessageCooldown = false;
     this.sceneTransitionInProgress = false;
 
-    this.exitHitbox = this.add.rectangle(2564, 1160, 50, 50, 0x000000, 0).setOrigin(0.5);
+    this.exitHitbox = this.add.rectangle(2664, 1160, 250, 250, 0x000000, 0).setOrigin(0.5);
     this.physics.add.existing(this.exitHitbox);
     this.exitHitbox.body.setAllowGravity(false);
     this.exitHitbox.body.setImmovable(true);
@@ -545,22 +534,7 @@ class Jeu extends Phaser.Scene {
 
     this.createPlayerLife();
 
-    this.physics.add.overlap(this.player, this.checkpointHitbox, () => {
-
-      const sauvegarde = {
-        niveau: niveauActuel,
-        nbDiamant: this.diamondCount,
-        nbVie: this.playerLife,
-        positionX: this.player.x,
-        positionY: this.player.y,
-      }
-      localStorage.setItem(`sauvegardeJeu`, JSON.stringify(sauvegarde));
-    });
-
-    if (sauvegarde) {
-      this.player.x = sauvegarde.positionX;
-      this.player.y = sauvegarde.positionY;
-    }
+    // this.localStorage.clear()
 
     // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
 
@@ -737,6 +711,9 @@ class Jeu extends Phaser.Scene {
 
     this.createBirds();
 
+    console.log(`Player Life: ${this.playerLife}`);
+    console.log(`Diamond count: ${this.diamondCount}`);
+
   }
 
   createDiamonds() {
@@ -779,10 +756,9 @@ class Jeu extends Phaser.Scene {
     });
   }
 
-
   createExitOverlap() {
     this.physics.add.overlap(this.player, this.exitHitbox, () => {
-      if (this.diamondCount === 4 && !this.sceneTransitionInProgress) {
+      if (this.diamondCount >= 4 && !this.sceneTransitionInProgress) {
 
         this.sceneTransitionInProgress = true;
         this.input.keyboard.enabled = false;
@@ -792,9 +768,24 @@ class Jeu extends Phaser.Scene {
         this.time.delayedCall(1500, () => {
           this.scene.stop("jeu");
           this.sound.stopAll();
+          // SAUVEGARDE
+
+          this.physics.add.overlap(this.player, this.exitHitbox, () => {
+            const sauvegarde = {
+              niveau: niveauActuel,
+              nbDiamant: this.diamondCount,
+              nbVie: this.playerLife,
+              // positionX: this.player.x,
+              // positionY: this.player.y,
+            }
+            localStorage.setItem(`sauvegardeJeu`, JSON.stringify(sauvegarde));
+          });
+          /* if (sauvegarde) {
+             this.player.x = sauvegarde.positionX;
+             this.player.y = sauvegarde.positionY;
+           } */
           this.scene.start("jeu2");
         });
-
       } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
         this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
         this.diamondMessageCooldown = true;
@@ -1174,7 +1165,8 @@ class Jeu extends Phaser.Scene {
       this.handleEnemy03Behavior();
 
     }
-    console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
+
+    //console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
 
@@ -2281,9 +2273,7 @@ class Jeu extends Phaser.Scene {
             this.time.delayedCall(800, () => {
               this.cameras.main.fade(1500, 0, 0, 0, false, (camera, progress) => {
                 if (progress === 1) {
-
                   this.scene.start("gameover");
-
                 }
               });
             });

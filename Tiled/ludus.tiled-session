@@ -3,21 +3,21 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map_rocky.tmx",
+    "activeFile": "map_crystal.tmx",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "": {
             "scaleInDock": 2,
-            "scaleInEditor": 1
+            "scaleInEditor": 0.75
         },
         "map_crystal.tmx": {
-            "scale": 2,
+            "scale": 0.75,
             "selectedLayer": 7,
             "viewCenter": {
-                "x": 256.5,
-                "y": 48
+                "x": 776.6666666666665,
+                "y": 220
             }
         },
         "map_crystal.tmx#background01": {
@@ -33,17 +33,17 @@
             "scaleInDock": 0.75
         },
         "map_crystal.tmx#main_lev_build_2": {
-            "scaleInDock": 0.75
-        },
-        "map_crystal.tmx#rocks": {
             "scaleInDock": 1
         },
+        "map_crystal.tmx#rocks": {
+            "scaleInDock": 0.75
+        },
         "map_rocky.tmx": {
-            "scale": 1.5,
+            "scale": 1,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 345.33333333333337,
-                "y": 631.3333333333333
+                "x": 640.5,
+                "y": 359.5
             }
         },
         "map_rocky.tmx#background1": {
@@ -73,12 +73,14 @@
     "map.tileWidth": 16,
     "map.width": 80,
     "openFiles": [
-        "map_rocky.tmx"
+        "map_rocky.tmx",
+        "map_crystal.tmx"
     ],
     "project": "ludus.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "map_rocky.tmx"
+        "map_rocky.tmx",
+        "map_crystal.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

@@ -6,7 +6,6 @@ class Jeu2 extends Phaser.Scene {
         });
     }
 
-
     createAnimation() {
 
         // PLAYER //
@@ -313,6 +312,7 @@ class Jeu2 extends Phaser.Scene {
     create() {
 
         niveauActuel = "jeu2";
+        const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
         // Réinitialization
 
@@ -323,7 +323,7 @@ class Jeu2 extends Phaser.Scene {
 
         // Creation variables progression
 
-        this.diamondCount = 0;
+        this.diamondCount = (sauvegarde) ? sauvegarde.nbDiamant : 0;
         this.diamondMessageCooldown = false;
         this.sceneTransitionInProgress = false;
 
@@ -430,7 +430,7 @@ class Jeu2 extends Phaser.Scene {
 
         // Joueur
 
-        this.playerLife = 6;
+        this.playerLife = (sauvegarde) ? sauvegarde.nbVie : 6;
         this.maxPlayerLife = 8;
         this.playerIsHit = false; // a revoir
         this.playerIsDead = false;
@@ -702,6 +702,9 @@ class Jeu2 extends Phaser.Scene {
         // ---------------- CRÉATION OISEAUX QUI VOLENT DANS LE BACKGROUND ----------------
 
         this.createBirds();
+
+        console.log(`Player Life: ${this.playerLife}`);
+        console.log(`Diamond count: ${this.diamondCount}`);
 
     }
 
@@ -1138,7 +1141,9 @@ class Jeu2 extends Phaser.Scene {
 
             this.handleEnemy03Behavior();
 
+
         }
+
         // console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
         //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
     }
