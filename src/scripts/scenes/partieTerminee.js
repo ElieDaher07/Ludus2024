@@ -53,13 +53,13 @@ class PartieTerminee extends Phaser.Scene {
     // Boutons
 
     let xBtn = this.add
-      .image(config.width / 2 + 30, config.height / 2 + 150, "x")
+      .image(config.width / 2 + 30, config.height / 2 + 200, "x")
       .setScale(0.3);
 
     hudContainer.add(xBtn);
 
     let vBtn = this.add
-      .image(config.width / 2 - 60, config.height / 2 + 150, "v")
+      .image(config.width / 2 - 60, config.height / 2 + 200, "v")
       .setScale(0.3);
 
     hudContainer.add(vBtn);

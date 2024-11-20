@@ -13,11 +13,11 @@
             "scaleInEditor": 0.75
         },
         "map_crystal.tmx": {
-            "scale": 0.75,
-            "selectedLayer": 7,
+            "scale": 1,
+            "selectedLayer": 10,
             "viewCenter": {
-                "x": 776.6666666666665,
-                "y": 220
+                "x": 696.5,
+                "y": 333
             }
         },
         "map_crystal.tmx#background01": {
