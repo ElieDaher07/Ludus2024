@@ -18,6 +18,7 @@ const config = {
 };
 const game = new Phaser.Game(config);
 
-game.registry.set('isMuted', 0);
+game.registry.set('musicIsMuted', 0);
+game.registry.set('audioIsMuted', 0);
 
 let niveauActuel = "jeu";

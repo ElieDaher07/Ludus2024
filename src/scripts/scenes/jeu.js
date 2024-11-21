@@ -350,9 +350,11 @@ class Jeu extends Phaser.Scene {
     });
 
     this.game.registry.set("bgMusic", this.bgMusic);
-    this.isMuted = this.game.registry.get("isMuted");
+    this.musicIsMuted = this.game.registry.get("musicIsMuted") || 0;
 
-    if (!this.isMuted) {
+    if (this.musicIsMuted) {
+      this.bgMusic.stop();
+    } else {
       this.bgMusic.play();
       this.bgMusic.setVolume(0.1);
     }
@@ -1903,7 +1905,7 @@ class Jeu extends Phaser.Scene {
         this.enemyDeathSound.play();
         this.surpriseSound.stop();
         this.time.delayedCall(2050, () => {
-          if (!this.isMuted) {
+          if (!this.musicIsMuted) {
             this.bgMusic.play();
           }
         });

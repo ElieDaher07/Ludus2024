@@ -211,7 +211,7 @@ class Accueil extends Phaser.Scene {
 
     this.diamondCount = 0;
 
-    let isMuted = this.game.registry.get("isMuted");
+    let musicIsMuted = this.game.registry.get("musicIsMuted");
 
     this.hoverSound = this.sound.add("buttonHoverSfx");
     this.confirmSound = this.sound.add("buttonConfirmSfx");
@@ -268,11 +268,16 @@ class Accueil extends Phaser.Scene {
       .image(config.width / 2 + 50, config.height / 2 + 150, "musique")
       .setScale(0.15);
 
-    if (isMuted) {
+    let audioBtn = this.add.image(config.width / 2, config.height / 2 + 150, "audio").setScale(0.15);
+
+
+
+    if (musicIsMuted) {
       musicBtn.setTint(0xff0000);
     }
 
     hudContainer.add(musicBtn);
+    hudContainer.add(audioBtn);
 
     // Interactifs
 
@@ -280,6 +285,7 @@ class Accueil extends Phaser.Scene {
     controlsBtn.setInteractive();
     creditsBtn.setInteractive();
     musicBtn.setInteractive();
+    audioBtn.setInteractive();
 
     // Pointerdown, pointerover
 
@@ -287,6 +293,7 @@ class Accueil extends Phaser.Scene {
     this.addHoverEffectBig(controlsBtn);
     this.addHoverEffectSmall(creditsBtn);
     this.addHoverEffectSmall(musicBtn);
+    this.addHoverEffectSmall(audioBtn);
 
     playBtn.on('pointerover', () => {
       this.hoverSound.play();
@@ -301,6 +308,10 @@ class Accueil extends Phaser.Scene {
     });
 
     musicBtn.on('pointerover', () => {
+      this.hoverSound.play();
+    });
+
+    audioBtn.on('pointerover', () => {
       this.hoverSound.play();
     });
 
@@ -343,22 +354,74 @@ class Accueil extends Phaser.Scene {
     musicBtn.on('pointerdown', () => {
       this.confirmSound.play();
 
-      let currentMuteState = this.game.registry.get("isMuted") || 0;
+      let currentMuteState = this.game.registry.get("musicIsMuted") || 0;
       let newMuteState = currentMuteState ? 0 : 1;
-      this.game.registry.set('isMuted', newMuteState);
+      this.game.registry.set('musicIsMuted', newMuteState);
 
       if (newMuteState) {
-        if (this.currentBgMusic) {
+        if (this.currentBgMusic && this.currentBgMusic.isPlaying) {
           this.currentBgMusic.pause();
         }
         musicBtn.setTint(0xff0000);
       } else {
         if (this.currentBgMusic) {
-          this.currentBgMusic.resume();
+          if (this.currentBgMusic.isPaused) {
+            this.currentBgMusic.resume();
+          } else {
+            this.currentBgMusic.play();
+          }
         }
         musicBtn.clearTint();
       }
     });
+
+    let musicMuteState = this.game.registry.get('musicIsMuted') || 0;
+    if (musicMuteState) {
+      if (this.currentBgMusic && this.currentBgMusic.isPlaying) {
+        this.currentBgMusic.pause();
+      }
+      musicBtn.setTint(0xff0000);
+    } else {
+      if (this.currentBgMusic) {
+        if (this.currentBgMusic.isPaused) {
+          this.currentBgMusic.resume();
+        } else {
+          this.currentBgMusic.play();
+        }
+      }
+      musicBtn.clearTint();
+    }
+
+
+    audioBtn.on('pointerdown', () => {
+      this.confirmSound.play();
+
+      let currentAudioMuteState = this.game.registry.get("audioIsMuted") || 0;
+      let newAudioMuteState = currentAudioMuteState ? 0 : 1;
+
+      this.game.registry.set('audioIsMuted', newAudioMuteState);
+
+      if (newAudioMuteState) {
+        if (!this.game.sound.mute) {
+          this.game.sound.mute = true;
+        }
+        audioBtn.setTint(0xff0000);
+      } else {
+        if (this.game.sound.mute) {
+          this.game.sound.mute = false;
+        }
+        audioBtn.clearTint();
+      }
+    });
+
+    let audioMuteState = this.game.registry.get('audioIsMuted') || 0;
+    if (audioMuteState) {
+      this.game.sound.mute = true;
+      audioBtn.setTint(0xff0000);
+    } else {
+      this.game.sound.mute = false;
+      audioBtn.clearTint();
+    }
 
     this.bgMusics = [
       this.sound.add("accueilBg01"),
@@ -391,8 +454,8 @@ class Accueil extends Phaser.Scene {
     this.currentBgMusic = this.bgMusics[this.currentBgMusicIndex];
     this.currentBgMusic.setVolume(0.4);
 
-    let isMuted = this.game.registry.get("isMuted");
-    if (!isMuted) {
+    let musicIsMuted = this.game.registry.get("musicIsMuted");
+    if (!musicIsMuted) {
       this.currentBgMusic.play();
     }
     this.currentBgMusic.on('complete', () => {
