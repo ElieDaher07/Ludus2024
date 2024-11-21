@@ -18,7 +18,7 @@ class Accueil extends Phaser.Scene {
     // Logo
     this.load.image("logo", "./assets/images/backgrounds/logo.png");
 
-    // Preload le(s) bouton(s) et le(s) menus
+    // Preload le(s) bouton(s) et le(s) menus , le cursor
 
     this.load.image("controlesMenu", "./assets/images/ui/controlesMenu.png");
     this.load.image("controlesMenu02", "./assets/images/ui/controlesMenu02.png");
@@ -42,6 +42,7 @@ class Accueil extends Phaser.Scene {
     this.load.image("left_arrow", "./assets/images/ui/Small_Buttons/Back_Square_Button.png");
     this.load.image("right_arrow", "./assets/images/ui/Small_Buttons/Next_Square_Button.png");
 
+    this.load.image("cursor", "./assets/images/ui/CursorDefault.png");
 
     // Preload le Tiled map
     this.load.tilemapTiledJSON("carte_json", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");
@@ -203,7 +204,12 @@ class Accueil extends Phaser.Scene {
   }
 
   create() {
-    //this.cameras.main.fadeIn(1000, 0, 0, 0);
+
+    this.input.setDefaultCursor('none');
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     this.input.keyboard.enabled = true;
     this.input.mouse.enabled = true;
     this.input.mouse.disableContextMenu();
@@ -377,19 +383,17 @@ class Accueil extends Phaser.Scene {
 
     let musicMuteState = this.game.registry.get('musicIsMuted') || 0;
     if (musicMuteState) {
+      musicBtn.setTint(0xff0000);
       if (this.currentBgMusic && this.currentBgMusic.isPlaying) {
         this.currentBgMusic.pause();
       }
-      musicBtn.setTint(0xff0000);
     } else {
-      if (this.currentBgMusic) {
-        if (this.currentBgMusic.isPaused) {
-          this.currentBgMusic.resume();
-        } else {
-          this.currentBgMusic.play();
-        }
-      }
       musicBtn.clearTint();
+      if (this.currentBgMusic && this.currentBgMusic.isPaused) {
+        this.currentBgMusic.resume();
+      } else if (this.currentBgMusic && !this.currentBgMusic.isPlaying) {
+        this.playNextBgMusic();
+      }
     }
 
 
@@ -430,6 +434,7 @@ class Accueil extends Phaser.Scene {
       this.sound.add("accueilBg04"),
       this.sound.add("accueilBg05")
     ];
+
     if (!this.sound.get('accueilBg01')) {
       this.playNextBgMusic();
     }
@@ -450,7 +455,7 @@ class Accueil extends Phaser.Scene {
     this.sound.stopByKey('accueilBg04');
     this.sound.stopByKey('accueilBg05');
 
-    this.currentBgMusicIndex = (this.currentBgMusicIndex + 1) % this.bgMusics.length;
+    this.currentBgMusicIndex = 0;
     this.currentBgMusic = this.bgMusics[this.currentBgMusicIndex];
     this.currentBgMusic.setVolume(0.4);
 
@@ -505,5 +510,8 @@ class Accueil extends Phaser.Scene {
     });
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 }

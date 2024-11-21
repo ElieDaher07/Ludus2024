@@ -11,6 +11,11 @@ class Tutoriel extends Phaser.Scene {
 
   create() {
 
+    // Cursor
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
@@ -40,8 +45,9 @@ class Tutoriel extends Phaser.Scene {
     let left_arrow = this.add.image(config.width / 2 - 50, config.height / 2 + 220, "left_arrow").setScale(0.3).setTint(0xB0B0B0);
     let right_arrow = this.add.image(config.width / 2 + 50, config.height / 2 + 220, "right_arrow").setScale(0.3);
 
-
     hudContainer.add(xBtn);
+    hudContainer.add(left_arrow);
+    hudContainer.add(right_arrow);
 
     // Interactifs
 
@@ -118,5 +124,8 @@ class Tutoriel extends Phaser.Scene {
     });
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 }

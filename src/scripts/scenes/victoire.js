@@ -12,6 +12,11 @@ class Victoire extends Phaser.Scene {
   }
 
   create() {
+    // Cursor
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     this.cameras.main.fadeIn(1000, 0, 0, 0);
     this.input.keyboard.enabled = true;
     this.input.mouse.enabled = true;
@@ -110,7 +115,10 @@ class Victoire extends Phaser.Scene {
     });
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 
   addHoverEffectSmall(button) {
     button.on('pointerover', () => {

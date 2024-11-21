@@ -11,6 +11,11 @@ class Credits extends Phaser.Scene {
 
   create() {
 
+    // Cursor
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     // HUD
     const hudContainer = this.add.container(0, 0).setDepth(1);
 
@@ -81,5 +86,8 @@ class Credits extends Phaser.Scene {
     });
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 }

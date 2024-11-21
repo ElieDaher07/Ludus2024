@@ -11,6 +11,11 @@ class Pause extends Phaser.Scene {
 
   create() {
 
+
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     this.unpauseSound = this.sound.add("unpauseSfx");
     this.hoverSound = this.sound.add("buttonHoverSfx");
     this.confirmSound = this.sound.add("buttonConfirmSfx");
@@ -88,7 +93,10 @@ class Pause extends Phaser.Scene {
 
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 
   addHoverEffectBig(button) {
     button.on('pointerover', () => {

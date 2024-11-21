@@ -13,6 +13,11 @@ class PartieTerminee extends Phaser.Scene {
 
   create() {
 
+    // Cursor
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+    this.customCursor.setOrigin(0);
+
     this.cameras.main.fadeIn(1500, 0, 0, 0);
 
     this.diamondCount = 0;
@@ -115,7 +120,10 @@ class PartieTerminee extends Phaser.Scene {
 
   }
 
-  update() {}
+  update() {
+    const pointer = this.input.activePointer;
+    this.customCursor.setPosition(pointer.x, pointer.y);
+  }
 
   addHoverEffectSmall(button) {
     button.setInteractive();
