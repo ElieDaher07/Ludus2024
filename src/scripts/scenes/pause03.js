@@ -79,7 +79,7 @@ class Pause03 extends Phaser.Scene {
             }
             this.scene.get("jeu3").isPaused = false;
             this.scene.resume("jeu3");
-            this.scene.stop("pause");
+            this.scene.stop("pause03");
         });
 
         this.addHoverEffectBig(quitBtn);

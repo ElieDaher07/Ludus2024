@@ -318,7 +318,7 @@ class Jeu extends Phaser.Scene {
   create() {
 
     niveauActuel = "jeu";
-    console.log(niveauActuel);
+
     const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
     this.input.mouse.disableContextMenu();
 
@@ -691,7 +691,7 @@ class Jeu extends Phaser.Scene {
     this.physics.add.collider(this.player, collisionLayer02);
     this.physics.add.collider(this.player, collisionDanger, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      this.handlePlayerIsHit();
+      this.handlePlayerIsHit(1);
       this.handleHud();
       this.handleHealthPickup();
       //console.log(this.playerLife);
@@ -754,6 +754,7 @@ class Jeu extends Phaser.Scene {
 
     console.log(`Player Life: ${this.playerLife}`);
     console.log(`Diamond count: ${this.diamondCount}`);
+    console.log(`Niveau Jeu: ${niveauActuel}`);
 
   }
 
@@ -922,7 +923,7 @@ class Jeu extends Phaser.Scene {
     this.handleHud();
     this.physics.add.overlap(this.player, this.enemies, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      this.handlePlayerIsHit();
+      this.handlePlayerIsHit(1);
       //console.log(this.playerLife);
       this.handleHealthPickup();
       this.handleHud();
@@ -1174,7 +1175,7 @@ class Jeu extends Phaser.Scene {
 
     this.physics.add.overlap(enemy.hitbox, this.player, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      this.handlePlayerIsHit();
+      this.handlePlayerIsHit(2);
       this.handleHud();
       this.handleHealthPickup();
       //console.log(this.playerLife);
@@ -1990,10 +1991,9 @@ class Jeu extends Phaser.Scene {
     }
   }
 
-  handlePlayerIsHit() {
+  handlePlayerIsHit(damage) {
     if (this.player.alpha === 1) {
-      this.playerLife--;
-      //this.playerIsHit = true;
+      this.playerLife -= damage;
       this.hitSound01.play();
       let flashTween = this.tweens.add({
         targets: this.player,
@@ -2013,6 +2013,7 @@ class Jeu extends Phaser.Scene {
       });
     }
   }
+
 
   handleHealthPickup() {
     this.hearts.forEach((heart) => {

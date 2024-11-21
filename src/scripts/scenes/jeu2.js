@@ -312,7 +312,7 @@ class Jeu2 extends Phaser.Scene {
     create() {
 
         niveauActuel = "jeu2";
-        console.log(niveauActuel);
+
         const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
         // Réinitialization
@@ -706,6 +706,7 @@ class Jeu2 extends Phaser.Scene {
 
         console.log(`Player Life: ${this.playerLife}`);
         console.log(`Diamond count: ${this.diamondCount}`);
+        console.log(`Niveau Jeu: ${niveauActuel}`);
 
     }
 
@@ -761,8 +762,8 @@ class Jeu2 extends Phaser.Scene {
                 this.time.delayedCall(1500, () => {
                     this.scene.stop("jeu");
                     this.sound.stopAll();
+                    // SAUVEGARDE
 
-                    // SAUVEGARDE 
                     this.physics.add.overlap(this.player, this.exitHitbox, () => {
                         const sauvegarde = {
                             niveau: niveauActuel,
@@ -777,7 +778,7 @@ class Jeu2 extends Phaser.Scene {
                        this.player.x = sauvegarde.positionX;
                        this.player.y = sauvegarde.positionY;
                      } */
-                    this.scene.start("jeu2");
+                    this.scene.start("jeu3");
                 });
             } else if (!this.diamondMessageCooldown && this.diamondCount < 4) {
                 this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
