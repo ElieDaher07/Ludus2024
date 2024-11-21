@@ -205,8 +205,6 @@ class Accueil extends Phaser.Scene {
 
   create() {
 
-
-
     this.input.setDefaultCursor('none');
 
     this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
