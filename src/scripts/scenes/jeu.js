@@ -317,6 +317,9 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
+    niveauActuel = "jeu";
+    console.log(niveauActuel);
+    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
     this.input.mouse.disableContextMenu();
 
     // Commence le "cutscene" 
@@ -331,9 +334,9 @@ class Jeu extends Phaser.Scene {
         this.game.cutscenePlayed = true;
         this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
         this.cameras.main.once('camerapancomplete', () => {
-          this.cameras.main.stopFollow();
+          this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
           this.time.delayedCall(1000, () => {
-            this.cameras.main.pan(50, 100, 3000, 'Linear');
+            this.cameras.main.pan(0, 0, 3000, 'Linear');
             this.time.delayedCall(3000, () => {
               this.input.keyboard.enabled = true;
               this.input.mouse.enabled = true;
@@ -346,10 +349,6 @@ class Jeu extends Phaser.Scene {
         this.input.mouse.enabled = true;
       }
     });
-
-    niveauActuel = "jeu";
-    console.log(niveauActuel);
-    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
     // Creation variables progression
 
@@ -382,8 +381,6 @@ class Jeu extends Phaser.Scene {
       this.bgMusic.play();
       this.bgMusic.setVolume(0.1);
     }
-
-
 
     this.hoverSound = this.sound.add("buttonHoverSfx");
     this.confirmSound = this.sound.add("buttonConfirmSfx");
@@ -490,6 +487,19 @@ class Jeu extends Phaser.Scene {
     this.avatarHud = this.add.image(config.width / 2, config.height / 2, "hud");
     this.healthHud = this.add.image(config.width / 2, config.height / 2, "health");
     this.daggerHud = this.add.image(config.width / 2, config.height / 2, "hud");
+    this.textCountNeeded = this.add.text(135, 35, " /4", {
+      fontFamily: '"Press Start 2P"',
+      fontSize: "25px",
+      fill: "#ffffff",
+      resolution: 3
+    });
+
+    this.textCounter = this.add.text(135, 35, "0", {
+      fontFamily: '"Press Start 2P"',
+      fontSize: "25px",
+      fill: "#ffffff",
+      resolution: 3
+    });
 
     this.healthHud.setOrigin(0, 0);
     this.healthHud.setScale(5);
@@ -507,6 +517,9 @@ class Jeu extends Phaser.Scene {
     hudContainer.add(this.healthHud);
     hudContainer.add(this.avatarHud);
     hudContainer.add(this.daggerHud);
+    hudContainer.add(this.textCountNeeded);
+    hudContainer.add(this.textCounter);
+
 
     // ---------------- CRÉATION DES TILESETS ----------------
 
@@ -825,6 +838,7 @@ class Jeu extends Phaser.Scene {
     this.diamonds.forEach((diamond) => {
       this.physics.add.overlap(this.player, diamond, () => {
         this.diamondCount++;
+        this.textCounter.setText(this.diamondCount);
         diamond.setActive(false);
         diamond.setVisible(false);
         diamond.destroy();
