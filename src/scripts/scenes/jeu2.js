@@ -312,6 +312,7 @@ class Jeu2 extends Phaser.Scene {
     create() {
 
         niveauActuel = "jeu2";
+        console.log(niveauActuel);
         const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
         // Réinitialization
@@ -392,14 +393,14 @@ class Jeu2 extends Phaser.Scene {
         this.input.keyboard.on("keydown-ESC", () => {
             if (!this.isPaused) {
                 this.pauseSound.play();
-                this.scene.launch("pause");
+                this.scene.launch("pause02");
                 this.surpriseSound.pause();
                 this.bgMusic.pause();
                 this.scene.pause();
                 this.isPaused = true;
             } else {
                 this.unpauseSound.play();
-                this.scene.stop("pause");
+                this.scene.stop("pause02");
                 this.bgMusic.resume();
                 this.surpriseSound.resume();
                 this.scene.resume();
@@ -750,7 +751,7 @@ class Jeu2 extends Phaser.Scene {
 
     createExitOverlap() {
         this.physics.add.overlap(this.player, this.exitHitbox, () => {
-            if (this.diamondCount === 4 && !this.sceneTransitionInProgress) {
+            if (this.diamondCount >= 4 && !this.sceneTransitionInProgress) {
 
                 this.sceneTransitionInProgress = true;
                 this.input.keyboard.enabled = false;
@@ -760,10 +761,25 @@ class Jeu2 extends Phaser.Scene {
                 this.time.delayedCall(1500, () => {
                     this.scene.stop("jeu");
                     this.sound.stopAll();
+
+                    // SAUVEGARDE 
+                    this.physics.add.overlap(this.player, this.exitHitbox, () => {
+                        const sauvegarde = {
+                            niveau: niveauActuel,
+                            nbDiamant: this.diamondCount,
+                            nbVie: this.playerLife,
+                            // positionX: this.player.x,
+                            // positionY: this.player.y,
+                        }
+                        localStorage.setItem(`sauvegardeJeu`, JSON.stringify(sauvegarde));
+                    });
+                    /* if (sauvegarde) {
+                       this.player.x = sauvegarde.positionX;
+                       this.player.y = sauvegarde.positionY;
+                     } */
                     this.scene.start("jeu2");
                 });
-
-            } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
+            } else if (!this.diamondMessageCooldown && this.diamondCount < 4) {
                 this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
                 this.diamondMessageCooldown = true;
             }

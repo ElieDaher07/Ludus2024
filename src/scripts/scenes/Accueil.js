@@ -259,28 +259,26 @@ class Accueil extends Phaser.Scene {
     hudContainer.add(playBtn);
 
     let controlsBtn = this.add
-      .image(config.width / 2, config.height / 2 + 80, "controls")
+      .image(config.width / 2, config.height / 2 + 160, "controls")
       .setScale(0.3);
+
+    let resetBtn = this.add.image(config.width / 2, (config.height / 2 + 80), "reset").setScale(0.3);
+
+    hudContainer.add(resetBtn);
 
     hudContainer.add(controlsBtn);
 
     let creditsBtn = this.add
-      .image(config.width / 2 - 50, config.height / 2 + 150, "credits")
+      .image(config.width / 2 - 50, config.height / 2 + 230, "credits")
       .setScale(0.15);
 
     hudContainer.add(creditsBtn);
 
     let musicBtn = this.add
-      .image(config.width / 2 + 50, config.height / 2 + 150, "musique")
+      .image(config.width / 2 + 50, config.height / 2 + 230, "musique")
       .setScale(0.15);
 
-    let audioBtn = this.add.image(config.width / 2, config.height / 2 + 150, "audio").setScale(0.15);
-
-
-
-    if (musicIsMuted) {
-      musicBtn.setTint(0xff0000);
-    }
+    let audioBtn = this.add.image(config.width / 2, config.height / 2 + 230, "audio").setScale(0.15);
 
     hudContainer.add(musicBtn);
     hudContainer.add(audioBtn);
@@ -288,6 +286,7 @@ class Accueil extends Phaser.Scene {
     // Interactifs
 
     playBtn.setInteractive();
+    resetBtn.setInteractive();
     controlsBtn.setInteractive();
     creditsBtn.setInteractive();
     musicBtn.setInteractive();
@@ -297,6 +296,7 @@ class Accueil extends Phaser.Scene {
 
     this.addHoverEffectBig(playBtn);
     this.addHoverEffectBig(controlsBtn);
+    this.addHoverEffectBig(resetBtn);
     this.addHoverEffectSmall(creditsBtn);
     this.addHoverEffectSmall(musicBtn);
     this.addHoverEffectSmall(audioBtn);
@@ -306,6 +306,10 @@ class Accueil extends Phaser.Scene {
     });
 
     controlsBtn.on('pointerover', () => {
+      this.hoverSound.play();
+    })
+
+    resetBtn.on('pointerover', () => {
       this.hoverSound.play();
     });
 
@@ -338,6 +342,11 @@ class Accueil extends Phaser.Scene {
         this.scene.start(niveauActuel);
       });
     });
+
+    resetBtn.on("pointerdown", () => {
+      this.confirmSound.play();
+      localStorage.clear();
+    })
 
     controlsBtn.on("pointerdown", () => {
       playBtn.disableInteractive();
@@ -391,11 +400,8 @@ class Accueil extends Phaser.Scene {
       musicBtn.clearTint();
       if (this.currentBgMusic && this.currentBgMusic.isPaused) {
         this.currentBgMusic.resume();
-      } else if (this.currentBgMusic && !this.currentBgMusic.isPlaying) {
-        this.playNextBgMusic();
       }
     }
-
 
     audioBtn.on('pointerdown', () => {
       this.confirmSound.play();
@@ -455,7 +461,7 @@ class Accueil extends Phaser.Scene {
     this.sound.stopByKey('accueilBg04');
     this.sound.stopByKey('accueilBg05');
 
-    this.currentBgMusicIndex = 0;
+    this.currentBgMusicIndex = (this.currentBgMusicIndex + 1) % this.bgMusics.length;
     this.currentBgMusic = this.bgMusics[this.currentBgMusicIndex];
     this.currentBgMusic.setVolume(0.4);
 

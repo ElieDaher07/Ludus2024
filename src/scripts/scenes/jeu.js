@@ -317,15 +317,39 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
-    niveauActuel = "jeu";
-    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
+    this.input.mouse.disableContextMenu();
 
-    // Réinitialization
+    // Commence le "cutscene" 
+    this.game.cutscenePlayed = false;
+    this.input.keyboard.enabled = false;
+    this.input.mouse.enabled = false;
 
     this.cameras.main.fadeIn(1000, 0, 0, 0);
-    this.input.mouse.disableContextMenu();
-    this.input.keyboard.enabled = true;
-    this.input.mouse.enabled = true;
+
+    this.time.delayedCall(1000, () => {
+      if (!this.game.cutscenePlayed) {
+        this.game.cutscenePlayed = true;
+        this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
+        this.cameras.main.once('camerapancomplete', () => {
+          this.cameras.main.stopFollow();
+          this.time.delayedCall(1000, () => {
+            this.cameras.main.pan(50, 100, 3000, 'Linear');
+            this.time.delayedCall(3000, () => {
+              this.input.keyboard.enabled = true;
+              this.input.mouse.enabled = true;
+            });
+          });
+        });
+
+      } else {
+        this.input.keyboard.enabled = true;
+        this.input.mouse.enabled = true;
+      }
+    });
+
+    niveauActuel = "jeu";
+    console.log(niveauActuel);
+    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
     // Creation variables progression
 
@@ -358,6 +382,8 @@ class Jeu extends Phaser.Scene {
       this.bgMusic.play();
       this.bgMusic.setVolume(0.1);
     }
+
+
 
     this.hoverSound = this.sound.add("buttonHoverSfx");
     this.confirmSound = this.sound.add("buttonConfirmSfx");
@@ -770,8 +796,8 @@ class Jeu extends Phaser.Scene {
         this.time.delayedCall(1500, () => {
           this.scene.stop("jeu");
           this.sound.stopAll();
-          // SAUVEGARDE
 
+          // SAUVEGARDE
           this.physics.add.overlap(this.player, this.exitHitbox, () => {
             const sauvegarde = {
               niveau: niveauActuel,
@@ -788,7 +814,7 @@ class Jeu extends Phaser.Scene {
            } */
           this.scene.start("jeu2");
         });
-      } else if (!this.diamondMessageCooldown && this.diamondCount !== 4) {
+      } else if (!this.diamondMessageCooldown && this.diamondCount < 4) {
         this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
         this.diamondMessageCooldown = true;
       }
@@ -799,7 +825,6 @@ class Jeu extends Phaser.Scene {
     this.diamonds.forEach((diamond) => {
       this.physics.add.overlap(this.player, diamond, () => {
         this.diamondCount++;
-        //console.log(this.diamondCount);
         diamond.setActive(false);
         diamond.setVisible(false);
         diamond.destroy();
@@ -1901,6 +1926,7 @@ class Jeu extends Phaser.Scene {
     if (this.enemy03_b) {
       if (this.enemy03_bLife <= 0) {
         this.enemy03_b.body.enable = false;
+        this.cameras.main.flash(550);
         this.enemy03_b.anims.play("enemy03_death");
         this.enemyDeathSound.play();
         this.surpriseSound.stop();
