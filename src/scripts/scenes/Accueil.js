@@ -121,7 +121,9 @@ class Accueil extends Phaser.Scene {
     // Preload l'élément hud du joueur
 
     this.load.image("hud", "./assets/images/ui/Gui.png");
-    this.load.image("health", "./assets/images/ui/health_sheet.png")
+    this.load.image("health", "./assets/images/ui/health_sheet.png");
+    this.load.image("noDagger", "./assets/images/ui/Gui_nodagger.png");
+    this.load.image("yesDagger", "./assets/images/ui/Gui_dagger.png");
 
     // Preload effects
 
@@ -198,12 +200,21 @@ class Accueil extends Phaser.Scene {
     this.load.audio("jumpSound", "./assets/audio/sfx/12_Player_Movement_SFX/30_Jump_03.wav");
     this.load.audio("walkingSound", "./assets/audio/sfx/12_Player_Movement_SFX/08_Step_rock_02.wav");
 
+    this.load.audio("daggerRecuperated", "./assets/audio/sfx/10_UI_Menu_SFX/dagger.mp3");
+
     // assets/audio/sfx/8_Atk_Magic_SFX/04_Fire_explosion_04_medium.wav
     // assets/audio/sfx/8_Atk_Magic_SFX/1 _Ice_explosion_01.wav
 
   }
 
   create() {
+
+    const sauvegarde = JSON.parse(localStorage.getItem("sauvegardeJeu"));
+
+    if (sauvegarde) {
+      checkpoint = sauvegarde.checkpoint;
+      niveau = sauvegarde.niveau;
+    }
 
     this.input.setDefaultCursor('none');
 
@@ -262,7 +273,7 @@ class Accueil extends Phaser.Scene {
       .image(config.width / 2, config.height / 2 + 160, "controls")
       .setScale(0.3);
 
-    let resetBtn = this.add.image(config.width / 2, (config.height / 2 + 80), "reset").setScale(0.3);
+    let resetBtn = this.add.image(config.width / 2, (config.height / 2 + 80), "reset").setScale(0.3).setTint(0xB0B0B0);
 
     hudContainer.add(resetBtn);
 
@@ -296,7 +307,6 @@ class Accueil extends Phaser.Scene {
 
     this.addHoverEffectBig(playBtn);
     this.addHoverEffectBig(controlsBtn);
-    this.addHoverEffectBig(resetBtn);
     this.addHoverEffectSmall(creditsBtn);
     this.addHoverEffectSmall(musicBtn);
     this.addHoverEffectSmall(audioBtn);
@@ -309,9 +319,36 @@ class Accueil extends Phaser.Scene {
       this.hoverSound.play();
     })
 
-    resetBtn.on('pointerover', () => {
-      this.hoverSound.play();
-    });
+
+
+    if (checkpoint >= 1) {
+      let resetDisabled = false;
+
+
+      this.addHoverEffectBig(resetBtn);
+
+
+      resetBtn.clearTint();
+
+      resetBtn.on('pointerover', () => {
+        if (!resetDisabled) {
+
+          this.hoverSound.play();
+        }
+      });
+
+      resetBtn.on("pointerdown", () => {
+        if (!resetDisabled) {
+          checkpoint = 0;
+          niveau = "jeu";
+          this.confirmSound.play();
+          localStorage.clear();
+          resetBtn.setTint(0xB0B0B0);
+          resetDisabled = true;
+        }
+      })
+
+    }
 
     creditsBtn.on('pointerover', () => {
       this.hoverSound.play();
@@ -339,14 +376,11 @@ class Accueil extends Phaser.Scene {
       this.cameras.main.fadeOut(1000, 0, 0, 0);
       this.time.delayedCall(1000, () => {
         isMenuMusicPlaying = false;
-        this.scene.start(niveauActuel);
+        this.scene.start(niveau);
       });
     });
 
-    resetBtn.on("pointerdown", () => {
-      this.confirmSound.play();
-      localStorage.clear();
-    })
+
 
     controlsBtn.on("pointerdown", () => {
       playBtn.disableInteractive();

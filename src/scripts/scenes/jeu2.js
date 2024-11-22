@@ -311,9 +311,16 @@ class Jeu2 extends Phaser.Scene {
 
     create() {
 
-        niveauActuel = "jeu2";
+        niveau = "jeu2";
 
         const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
+
+        if (sauvegarde) {
+            checkpoint = sauvegarde.checkpoint;
+            niveau = sauvegarde.niveau;
+            this.diamondCount = sauvegarde.nbDiamant;
+            this.playerLife = sauvegarde.nbVie;
+        }
 
         // Réinitialization
 
@@ -706,7 +713,7 @@ class Jeu2 extends Phaser.Scene {
 
         console.log(`Player Life: ${this.playerLife}`);
         console.log(`Diamond count: ${this.diamondCount}`);
-        console.log(`Niveau Jeu: ${niveauActuel}`);
+        console.log(`Niveau Jeu: ${niveau}`);
 
     }
 
@@ -766,7 +773,7 @@ class Jeu2 extends Phaser.Scene {
 
                     this.physics.add.overlap(this.player, this.exitHitbox, () => {
                         const sauvegarde = {
-                            niveau: niveauActuel,
+                            niveau: niveau,
                             nbDiamant: this.diamondCount,
                             nbVie: this.playerLife,
                             // positionX: this.player.x,

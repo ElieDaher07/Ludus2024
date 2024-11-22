@@ -12,7 +12,8 @@ const config = {
       gravity: {
         y: 1000
       },
-
+      fps: 60,
+      timeScale: 1
     }
   }
 };
@@ -21,4 +22,8 @@ const game = new Phaser.Game(config);
 game.registry.set('musicIsMuted', 0);
 game.registry.set('audioIsMuted', 0);
 
-let niveauActuel = "jeu";
+let checkpoint = 0;
+
+let niveau = "jeu";
+
+1677

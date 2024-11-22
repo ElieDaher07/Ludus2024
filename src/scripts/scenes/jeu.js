@@ -317,38 +317,45 @@ class Jeu extends Phaser.Scene {
 
   create() {
 
-    niveauActuel = "jeu";
+    niveau = "jeu";
 
     const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
+
+    if (sauvegarde) {
+      checkpoint = sauvegarde.checkpoint;
+      niveau = sauvegarde.niveau;
+    }
+
     this.input.mouse.disableContextMenu();
 
     // Commence le "cutscene" 
-    this.game.cutscenePlayed = false;
-    this.input.keyboard.enabled = false;
-    this.input.mouse.enabled = false;
+    /* this.game.cutscenePlayed = false;
+     this.input.keyboard.enabled = false;
+     this.input.mouse.enabled = false;
 
-    this.cameras.main.fadeIn(1000, 0, 0, 0);
+     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
-    this.time.delayedCall(1000, () => {
-      if (!this.game.cutscenePlayed) {
-        this.game.cutscenePlayed = true;
-        this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
-        this.cameras.main.once('camerapancomplete', () => {
-          this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
-          this.time.delayedCall(1000, () => {
-            this.cameras.main.pan(0, 0, 3000, 'Linear');
-            this.time.delayedCall(3000, () => {
-              this.input.keyboard.enabled = true;
-              this.input.mouse.enabled = true;
-            });
-          });
-        });
+     this.time.delayedCall(1000, () => {
+       if (!this.game.cutscenePlayed) {
+         this.game.cutscenePlayed = true;
+         this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
+         this.cameras.main.once('camerapancomplete', () => {
+           this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
+           this.time.delayedCall(1000, () => {
+             this.cameras.main.pan(0, 0, 3000, 'Linear');
+             this.time.delayedCall(3000, () => {
+               this.input.keyboard.enabled = true;
+               this.input.mouse.enabled = true;
+             });
+           });
+         });
 
-      } else {
-        this.input.keyboard.enabled = true;
-        this.input.mouse.enabled = true;
-      }
-    });
+       } else {
+         this.input.keyboard.enabled = true;
+         this.input.mouse.enabled = true;
+       }
+     });
+     */
 
     // Creation variables progression
 
@@ -415,6 +422,9 @@ class Jeu extends Phaser.Scene {
 
     this.playerDeathSound = this.sound.add("playerDeathSound");
     this.itemPickupSound = this.sound.add("itemPickupSound");
+    this.daggerRecuperatedSound = this.sound.add("daggerRecuperated");
+
+    this.daggerRecuperatedSound.setVolume(0.9);
 
     // Creation du bouton pause
 
@@ -486,7 +496,8 @@ class Jeu extends Phaser.Scene {
 
     this.avatarHud = this.add.image(config.width / 2, config.height / 2, "hud");
     this.healthHud = this.add.image(config.width / 2, config.height / 2, "health");
-    this.daggerHud = this.add.image(config.width / 2, config.height / 2, "hud");
+    this.noDaggerHud = this.add.image(config.width / 2, config.height / 2, "noDagger");
+    this.yesDaggerHud = this.add.image(config.width / 2 + 100, config.height / 2, "yesDagger")
     this.textCountNeeded = this.add.text(135, 35, " /4", {
       fontFamily: '"Press Start 2P"',
       fontSize: "25px",
@@ -509,14 +520,16 @@ class Jeu extends Phaser.Scene {
     this.avatarHud.setScale(5);
     this.avatarHud.setPosition(-30, -35)
 
-    this.daggerHud.setCrop(5, 70, 25, 80);
-    this.daggerHud.setOrigin(0, 0);
-    this.daggerHud.setScale(5);
-    this.daggerHud.setPosition(-20, -270)
+    this.noDaggerHud.setScale(0.06)
+    this.noDaggerHud.setPosition(60, 160);
+
+    this.yesDaggerHud.setScale(0.06);
+    this.yesDaggerHud.setPosition(65, 160)
 
     hudContainer.add(this.healthHud);
     hudContainer.add(this.avatarHud);
-    hudContainer.add(this.daggerHud);
+    hudContainer.add(this.noDaggerHud);
+    hudContainer.add(this.yesDaggerHud);
     hudContainer.add(this.textCountNeeded);
     hudContainer.add(this.textCounter);
 
@@ -754,7 +767,7 @@ class Jeu extends Phaser.Scene {
 
     console.log(`Player Life: ${this.playerLife}`);
     console.log(`Diamond count: ${this.diamondCount}`);
-    console.log(`Niveau Jeu: ${niveauActuel}`);
+    console.log(`Niveau Jeu: ${niveau}`);
 
   }
 
@@ -813,10 +826,12 @@ class Jeu extends Phaser.Scene {
 
           // SAUVEGARDE
           this.physics.add.overlap(this.player, this.exitHitbox, () => {
+            checkpoint++;
             const sauvegarde = {
-              niveau: niveauActuel,
+              niveau: "jeu2",
               nbDiamant: this.diamondCount,
               nbVie: this.playerLife,
+              checkpoint: checkpoint,
               // positionX: this.player.x,
               // positionY: this.player.y,
             }
@@ -826,6 +841,7 @@ class Jeu extends Phaser.Scene {
              this.player.x = sauvegarde.positionX;
              this.player.y = sauvegarde.positionY;
            } */
+
           this.scene.start("jeu2");
         });
       } else if (!this.diamondMessageCooldown && this.diamondCount < 4) {
@@ -1576,7 +1592,7 @@ class Jeu extends Phaser.Scene {
       }
 
       if (!this.enemy03.hitCooldown) {
-        this.enemy03.hitCooldown = this.time.delayedCall(500, () => {
+        this.enemy03.hitCooldown = this.time.delayedCall(1000, () => {
           this.enemy03isHit = false;
           this.enemy03.hitCooldown = null;
           this.enemy03.isPatrolling = true;
@@ -1621,7 +1637,9 @@ class Jeu extends Phaser.Scene {
 
       this.enemy03.isPatrolling = true;
       this.enemy03.direction = (this.enemy03.x > this.enemy03.initialX) ? -1 : 1;
+
       this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
+
       return;
     }
 
@@ -1661,7 +1679,10 @@ class Jeu extends Phaser.Scene {
           this.enemy03.anims.play("enemy03_attack", true);
           this.enemy03.on('animationupdate', (animation, frame) => {
             if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03.hitbox) {
-              this.createEnemyHitbox(this.enemy03);
+              this.time.delayedCall(490, () => {
+                this.hitSound02.play();
+                this.createEnemyHitbox(this.enemy03);
+              });
             }
           });
 
@@ -1744,7 +1765,7 @@ class Jeu extends Phaser.Scene {
       }
 
       if (!this.enemy03_b.hitCooldown) {
-        this.enemy03_b.hitCooldown = this.time.delayedCall(500, () => {
+        this.enemy03_b.hitCooldown = this.time.delayedCall(1000, () => {
           this.enemy03_bisHit = false;
           this.enemy03_b.hitCooldown = null;
           this.enemy03_b.canAttack = true;
@@ -1802,7 +1823,10 @@ class Jeu extends Phaser.Scene {
 
           this.enemy03_b.on('animationupdate', (animation, frame) => {
             if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03_b.hitbox) {
-              this.createEnemyHitbox(this.enemy03_b);
+              this.time.delayedCall(490, () => {
+                this.hitSound02.play();
+                this.createEnemyHitbox(this.enemy03_b);
+              });
             }
           });
 
@@ -2076,6 +2100,7 @@ class Jeu extends Phaser.Scene {
           dagger.body.allowGravity = false;
           daggerHitEnemy = false;
           daggerThrown = true;
+          this.yesDaggerHud.setVisible(false);
           this.hitSound05.play();
 
           this.time.delayedCall(5000, () => {
@@ -2090,9 +2115,13 @@ class Jeu extends Phaser.Scene {
                 });
                 dagger.destroy();
                 daggerThrown = false;
+                this.yesDaggerHud.setVisible(true);
+                this.daggerRecuperatedSound.play();
               });
             } else {
               daggerThrown = false;
+              this.yesDaggerHud.setVisible(true);
+              this.daggerRecuperatedSound.play();
             }
           });
 
