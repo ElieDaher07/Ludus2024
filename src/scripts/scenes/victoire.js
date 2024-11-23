@@ -17,7 +17,7 @@ class Victoire extends Phaser.Scene {
     this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
     this.customCursor.setOrigin(0);
 
-    this.cameras.main.fadeIn(1000, 0, 0, 0);
+    this.cameras.main.fadeIn(1500, 0, 0, 0);
     this.input.keyboard.enabled = true;
     this.input.mouse.enabled = true;
 
@@ -66,51 +66,53 @@ class Victoire extends Phaser.Scene {
     hudContainer.add(vBtn);
 
     // Interactifs
-    xBtn.setInteractive();
-    vBtn.setInteractive();
-    this.addHoverEffectSmall(xBtn);
-    this.addHoverEffectSmall(vBtn);
+    this.cameras.main.once("camerafadeincomplete", () => {
+      xBtn.setInteractive();
+      vBtn.setInteractive();
+      this.addHoverEffectSmall(xBtn);
+      this.addHoverEffectSmall(vBtn);
 
-    xBtn.on("pointerover", () => {
-      this.hoverSound.play();
-    });
-
-    vBtn.on("pointerover", () => {
-      this.hoverSound.play();
-    });
-
-    xBtn.on("pointerdown", () => {
-      xBtn.disableInteractive();
-      vBtn.disableInteractive();
-      this.confirmSound.play();
-      this.tweens.add({
-        targets: this.victorySound,
-        volume: 0,
-        duration: 1500,
-        ease: 'Linear'
+      xBtn.on("pointerover", () => {
+        this.hoverSound.play();
       });
-      this.cameras.main.fade(1500, 0, 0, 0);
-      this.time.delayedCall(1500, () => {
-        this.victorySound.stop();
-        this.scene.start("accueil");
-      });
-    });
 
-    vBtn.on("pointerdown", () => {
-      xBtn.disableInteractive();
-      vBtn.disableInteractive();
-      this.confirmSound.play();
-      this.tweens.add({
-        targets: this.victorySound,
-        volume: 0,
-        duration: 1500,
-        ease: 'Linear'
+      vBtn.on("pointerover", () => {
+        this.hoverSound.play();
       });
-      this.cameras.main.fade(1500, 0, 0, 0);
-      this.time.delayedCall(1500, () => {
-        this.victorySound.stop();
-        this.scene.stop("jeu");
-        this.scene.start("jeu");
+
+      xBtn.on("pointerdown", () => {
+        xBtn.disableInteractive();
+        vBtn.disableInteractive();
+        this.confirmSound.play();
+        this.tweens.add({
+          targets: this.victorySound,
+          volume: 0,
+          duration: 1500,
+          ease: "Linear"
+        });
+        this.cameras.main.fade(1500, 0, 0, 0);
+        this.time.delayedCall(1500, () => {
+          this.victorySound.stop();
+          this.scene.start("accueil");
+        });
+      });
+
+      vBtn.on("pointerdown", () => {
+        xBtn.disableInteractive();
+        vBtn.disableInteractive();
+        this.confirmSound.play();
+        this.tweens.add({
+          targets: this.victorySound,
+          volume: 0,
+          duration: 1500,
+          ease: "Linear"
+        });
+        this.cameras.main.fade(1500, 0, 0, 0);
+        this.time.delayedCall(1500, () => {
+          this.victorySound.stop();
+          this.scene.stop("jeu");
+          this.scene.start("jeu");
+        });
       });
     });
   }

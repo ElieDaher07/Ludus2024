@@ -1133,6 +1133,7 @@ class Jeu extends Phaser.Scene {
     this.enemy04.speed = 50;
     this.enemy04.direction = 1;
     this.enemy04.initialX = this.enemy04.x;
+    this.enemy04.stunned = false;
 
     this.enemy04.attackRange = 350;
     this.enemy04.attackCooldown = 0;
@@ -1351,88 +1352,103 @@ class Jeu extends Phaser.Scene {
   handleEnemy01Behavior() {
     if (!this.enemy01 || this.enemy01Life <= 0) return;
 
-    if (this.enemy01) {
-      if (this.enemy01isHit) {
-        this.enemy01.setVelocityX(0);
+    // Check if the enemy is hit and reset states accordingly
+    if (this.enemy01isHit) {
+      this.enemy01.setVelocityX(0);
 
-        if (this.enemy01.hitbox) {
-          this.enemy01.hitbox.destroy();
-          this.enemy01.hitbox = null;
-        }
-
-        if (!this.enemy01.hitCooldown) {
-          this.enemy01.hitCooldown = this.time.delayedCall(500, () => {
-            this.enemy01isHit = false;
-            this.enemy01.hitCooldown = null;
-            this.enemy01.canAttack = true;
-            this.enemy01.attackCooldown = 0;
-            if (this.enemy01 && this.enemy01.anims && !this.enemy01.anims.isPlaying) {
-              this.enemy01.anims.play("enemy01_idle", true);
-            }
-          });
-        }
-        this.enemy01.isAttacking = false;
-        return;
+      // Destroy hitbox if exists
+      if (this.enemy01.hitbox) {
+        this.enemy01.hitbox.destroy();
+        this.enemy01.hitbox = null;
       }
 
-      const distanceToPlayer = Phaser.Math.Distance.Between(
-        this.enemy01.x,
-        this.enemy01.y,
-        this.player.x,
-        this.player.y
-      );
-
-      if (this.player.x > this.enemy01.x) {
-        this.enemy01.flipX = true;
-      } else {
-        this.enemy01.flipX = false;
+      if (!this.enemy01.hitCooldown) {
+        this.enemy01.hitCooldown = this.time.delayedCall(500, () => {
+          this.enemy01isHit = false;
+          this.enemy01.hitCooldown = null;
+          this.enemy01.canAttack = true;
+          this.enemy01.attackCooldown = 0;
+          if (this.enemy01 && this.enemy01.anims && !this.enemy01.anims.isPlaying) {
+            this.enemy01.anims.play("enemy01_idle", true);
+          }
+        });
       }
+      this.enemy01.isAttacking = false;
+      return;
+    }
 
-      if (distanceToPlayer < this.enemy01.attackRange) {
-        if (this.enemy01.canAttack && this.enemy01.attackCooldown <= 0 && !this.enemy01.isAttacking) {
-          this.enemy01.isAttacking = true;
-          this.enemy01.canAttack = false;
-          this.enemy01.attackCooldown = 1500;
+    const distanceToPlayer = Phaser.Math.Distance.Between(
+      this.enemy01.x,
+      this.enemy01.y,
+      this.player.x,
+      this.player.y
+    );
 
-          if (!this.enemy01isHit) {
-            this.time.delayedCall(500, () => {
-              this.hitSound05.play();
-            });
-          }
+    // Flip the enemy based on player's position
+    if (this.player.x > this.enemy01.x) {
+      this.enemy01.flipX = true;
+    } else {
+      this.enemy01.flipX = false;
+    }
 
-          if (this.enemy01 && this.enemy01.anims) {
-            this.enemy01.anims.play("enemy01_attack", true);
-          }
+    // If the player is in attack range, check for attack conditions
+    if (distanceToPlayer < this.enemy01.attackRange) {
+      if (this.enemy01.canAttack && this.enemy01.attackCooldown <= 0 && !this.enemy01.isAttacking) {
+        this.enemy01.isAttacking = true;
+        this.enemy01.canAttack = false;
+        this.enemy01.attackCooldown = 1500;
 
-          this.enemy01.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy01_attack" && frame.index === 6 && !this.enemy01.hitbox) {
-              this.createEnemyHitboxB(this.enemy01);
-            }
-          });
-
-          this.enemy01.on('animationcomplete-enemy01_attack', () => {
-            this.enemy01.isAttacking = false;
-
-            if (this.enemy01.hitbox) {
-              this.enemy01.hitbox.destroy();
-              this.enemy01.hitbox = null;
-            }
-
-            if (this.enemy01 && this.enemy01.anims) {
-              this.enemy01.anims.play("enemy01_idle", true);
-            }
-            this.enemy01.canAttack = true;
-
-            this.time.delayedCall(this.enemy01.attackCooldown, () => {
-              this.enemy01.attackCooldown = 0;
-            });
+        // Play attack sound
+        if (!this.enemy01isHit) {
+          this.time.delayedCall(500, () => {
+            this.hitSound05.play();
           });
         }
+
+        // Play attack animation
+        if (this.enemy01 && this.enemy01.anims) {
+          this.enemy01.anims.play("enemy01_attack", true);
+        }
+
+        // Create hitbox on attack animation frame 6
+        this.enemy01.on('animationupdate', (animation, frame) => {
+          if (animation.key === "enemy01_attack" && frame.index === 6 && !this.enemy01.hitbox) {
+            this.createEnemyHitboxB(this.enemy01);
+          }
+        });
+
+        // On animation completion, reset attack state
+        this.enemy01.on('animationcomplete-enemy01_attack', () => {
+          this.enemy01.isAttacking = false;
+          this.enemy01.canAttack = true;
+
+          if (this.enemy01.hitbox) {
+            this.enemy01.hitbox.destroy();
+            this.enemy01.hitbox = null;
+          }
+
+          // Reset to idle after attack
+          this.enemy01.anims.play("enemy01_idle", true);
+          this.enemy01.postAttackCooldown = true;
+          this.time.delayedCall(600, () => {
+            this.enemy01.postAttackCooldown = false;
+          });
+
+          // Reset attack cooldown
+          this.enemy01.attackCooldown = 0;
+        });
       } else {
-        if (this.enemy01.isAttacking) {
-          return;
+        // If not attacking, just reset to idle state
+        if (!this.enemy01.isAttacking) {
+          this.enemy01.setVelocityX(0);
+          if (this.enemy01 && this.enemy01.anims && (!this.enemy01.anims.isPlaying || this.enemy01.anims.currentAnim.key !== "enemy01_idle")) {
+            this.enemy01.anims.play("enemy01_idle", true);
+          }
         }
-
+      }
+    } else {
+      // If the player is not in range, stop the attack
+      if (!this.enemy01.isAttacking) {
         this.enemy01.setVelocityX(0);
         if (this.enemy01 && this.enemy01.anims && (!this.enemy01.anims.isPlaying || this.enemy01.anims.currentAnim.key !== "enemy01_idle")) {
           this.enemy01.anims.play("enemy01_idle", true);
@@ -1440,6 +1456,7 @@ class Jeu extends Phaser.Scene {
       }
     }
   }
+
 
 
   handleEnemy02Behavior() {
@@ -2127,10 +2144,17 @@ class Jeu extends Phaser.Scene {
     }
   }
 
+
+
+
+
+
   handleEnemy04Behavior() {
     if (this.enemy04Life <= 0 || !this.enemy04) return;
 
     const maxChaseDistance = 500;
+    const patrolLeftLimit = this.enemy04.initialX - 100;
+    const patrolRightLimit = this.enemy04.initialX + 100;
 
     if (this.enemy04isHit) {
       this.enemy04.setVelocityX(0);
@@ -2141,18 +2165,25 @@ class Jeu extends Phaser.Scene {
       }
 
       if (!this.enemy04.hitCooldown) {
-        this.enemy04.hitCooldown = this.time.delayedCall(500, () => {
+        this.enemy04.hitCooldown = this.time.delayedCall(1000, () => {
           this.enemy04isHit = false;
           this.enemy04.hitCooldown = null;
-          this.enemy04.isPatrolling = true;
           this.enemy04.canAttack = true;
           this.enemy04.attackCooldown = 0;
-          if (!this.enemy04.anims.isPlaying) {
-            this.enemy04.anims.play("enemy04_idle", true);
-          }
+          this.enemy04.anims.play("enemy04_idle", true);
+          this.enemy04.isPatrolling = true;
         });
       }
+
       this.enemy04.isAttacking = false;
+      this.enemy04.anims.play("enemy04_hit", true);
+      this.enemy04.anims.currentAnim.loop = false;
+
+      this.enemy04.on('animationcomplete-enemy04_hit', () => {
+        this.enemy04.anims.play("enemy04_idle", true);
+        this.enemy04.isPatrolling = true;
+      });
+
       return;
     }
 
@@ -2170,14 +2201,13 @@ class Jeu extends Phaser.Scene {
       this.enemy04.y
     );
 
-    const patrolLeftLimit = this.enemy04.initialX - 100;
-    const patrolRightLimit = this.enemy04.initialX + 100;
     const chaseSpeedMultiplier = 2;
 
     if (this.enemy04.isAttacking || this.enemy04.postAttackCooldown) {
       this.enemy04.setVelocityX(0);
       return;
     }
+
 
     if (distanceFromOriginalSpot > maxChaseDistance) {
       this.enemy04.initialX = this.enemy04.x;
@@ -2187,15 +2217,17 @@ class Jeu extends Phaser.Scene {
       this.enemy04.isPatrolling = true;
       this.enemy04.direction = (this.enemy04.x > this.enemy04.initialX) ? -1 : 1;
       this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
-      return;
-    }
 
-    if (this.enemy04.isAttacking) {
-      this.enemy04.setVelocityX(0);
-      return;
-    }
 
-    if (this.enemy04.postAttackCooldown) {
+      if (this.enemy04.direction === -1 && !this.enemy04.flipX) {
+        this.enemy04.flipX = true;
+        this.enemy04.setOrigin(1, 0.5);
+        this.enemy04.setOffset(40, 20);
+      } else if (this.enemy04.direction === 1 && this.enemy04.flipX) {
+        this.enemy04.flipX = false;
+        this.enemy04.setOrigin(0.5, 0.5);
+        this.enemy04.setOffset(10, 20);
+      }
       return;
     }
 
@@ -2203,19 +2235,25 @@ class Jeu extends Phaser.Scene {
       const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy04.x) ||
         (!this.player.flipX && this.player.x < this.enemy04.x);
 
-      const minimumAttackDistance = this.enemy04.flipX ? (isPlayerFacingEnemy ? 105 : 135) : (isPlayerFacingEnemy ? 55 : 85);
+      const minimumAttackDistance = this.enemy04.flipX ? (isPlayerFacingEnemy ? 95 : 135) : (isPlayerFacingEnemy ? 55 : 85);
 
       if (distanceToPlayer > minimumAttackDistance) {
         if (this.player.x < this.enemy04.x) {
           this.enemy04.setVelocityX(-this.enemy04.speed * chaseSpeedMultiplier);
           this.enemy04.direction = -1;
-          this.enemy04.setOrigin(1, 0.5);
-          this.enemy04.setOffset(40, 20);
+          if (!this.enemy04.flipX) {
+            this.enemy04.flipX = true;
+            this.enemy04.setOrigin(1, 0.5);
+            this.enemy04.setOffset(40, 20);
+          }
         } else {
           this.enemy04.setVelocityX(this.enemy04.speed * chaseSpeedMultiplier);
           this.enemy04.direction = 1;
-          this.enemy04.setOrigin(0.5, 0.5);
-          this.enemy04.setOffset(10, 20);
+          if (this.enemy04.flipX) {
+            this.enemy04.flipX = false;
+            this.enemy04.setOrigin(0.5, 0.5);
+            this.enemy04.setOffset(10, 20);
+          }
         }
         this.enemy04.anims.play("enemy04_walk", true);
       } else {
@@ -2225,10 +2263,7 @@ class Jeu extends Phaser.Scene {
           this.enemy04.canAttack = false;
           this.enemy04.attackCooldown = 1500;
 
-          if (!this.enemy04isHit) {
-            this.hitSound02.play();
-          }
-
+          this.hitSound02.play();
           this.enemy04.anims.play("enemy04_attack", true);
 
           this.enemy04.on('animationupdate', (animation, frame) => {
@@ -2258,6 +2293,15 @@ class Jeu extends Phaser.Scene {
                 this.player.y
               );
               if (currentDistanceToPlayer <= this.enemy04.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                if (this.player.x < this.enemy04.x && !this.enemy04.flipX) {
+                  this.enemy04.flipX = true;
+                  this.enemy04.setOrigin(1, 0.5);
+                  this.enemy04.setOffset(40, 20);
+                } else if (this.player.x > this.enemy04.x && this.enemy04.flipX) {
+                  this.enemy04.flipX = false;
+                  this.enemy04.setOrigin(0.5, 0.5);
+                  this.enemy04.setOffset(10, 20);
+                }
                 this.enemy04.anims.play("enemy04_attack", true);
                 this.hitSound02.play();
               } else if (currentDistanceToPlayer < this.enemy04.attackRange) {
@@ -2279,37 +2323,32 @@ class Jeu extends Phaser.Scene {
         if (this.enemy04.isPatrolling) {
           if (this.enemy04.x <= patrolLeftLimit) {
             this.enemy04.direction = 1;
-            this.enemy04.setOrigin(0.5, 0.5);
-            this.enemy04.setOffset(10, 20);
             this.enemy04.setVelocityX(this.enemy04.speed);
+            if (this.enemy04.flipX) {
+              this.enemy04.flipX = false;
+              this.enemy04.setOrigin(0.5, 0.5);
+              this.enemy04.setOffset(10, 20);
+            }
           } else if (this.enemy04.x >= patrolRightLimit) {
             this.enemy04.direction = -1;
-            this.enemy04.setOrigin(1, 0.5);
-            this.enemy04.setOffset(40, 20);
             this.enemy04.setVelocityX(-this.enemy04.speed);
+            if (!this.enemy04.flipX) {
+              this.enemy04.flipX = true;
+              this.enemy04.setOrigin(1, 0.5);
+              this.enemy04.setOffset(40, 20);
+            }
           } else {
             this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
           }
+
           if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_walk") {
             this.enemy04.anims.play("enemy04_walk", true);
           }
-        } else {
-          this.enemy04.setVelocityX(0);
-          if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_idle") {
-            this.enemy04.anims.play("enemy04_idle", true);
-          }
-        }
-      } else {
-        this.enemy04.setVelocityX(0);
-        if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_idle") {
-          this.enemy04.anims.play("enemy04_idle", true);
         }
       }
     }
-
-    // Update flipX based on direction
-    this.enemy04.flipX = this.enemy04.direction === -1;
   }
+
 
 
 

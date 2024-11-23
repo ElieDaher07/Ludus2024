@@ -15,10 +15,10 @@ class PartieTerminee extends Phaser.Scene {
 
     // Cursor
 
-    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000);
+
+    this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000).setVisible(false);
     this.customCursor.setOrigin(0);
 
-    this.cameras.main.fadeIn(1500, 0, 0, 0);
 
     this.diamondCount = 0;
 
@@ -70,54 +70,62 @@ class PartieTerminee extends Phaser.Scene {
     hudContainer.add(vBtn);
 
     // Interactifs
+    this.canChangeScene = false;
 
-    xBtn.setInteractive();
-    vBtn.setInteractive();
-    this.addHoverEffectSmall(xBtn);
-    this.addHoverEffectSmall(vBtn);
+    this.cameras.main.once('camerafadeincomplete', () => {
+      this.canChangeScene = true;
 
-    xBtn.on("pointerover", () => {
-      this.hoverSound.play();
-    })
+      this.customCursor.setVisible(true);
 
-    vBtn.on("pointerover", () => {
-      this.hoverSound.play();
-    })
+      xBtn.setInteractive();
+      vBtn.setInteractive();
+      this.addHoverEffectSmall(xBtn);
+      this.addHoverEffectSmall(vBtn);
 
-    xBtn.on("pointerdown", () => {
-      xBtn.disableInteractive();
-      vBtn.disableInteractive();
-      this.confirmSound.play();
-      this.tweens.add({
-        targets: this.gameoverSound,
-        volume: 0,
-        duration: 1500,
-        ease: 'Linear'
+      xBtn.on("pointerover", () => {
+        this.hoverSound.play();
       });
-      this.cameras.main.fade(1500, 0, 0, 0)
-      this.time.delayedCall(1500, () => {
-        this.gameoverSound.stop();
-        this.scene.start("accueil");
+
+      vBtn.on("pointerover", () => {
+        this.hoverSound.play();
+      });
+
+      xBtn.on("pointerdown", () => {
+        xBtn.disableInteractive();
+        vBtn.disableInteractive();
+        this.confirmSound.play();
+        this.tweens.add({
+          targets: this.gameoverSound,
+          volume: 0,
+          duration: 1500,
+          ease: 'Linear'
+        });
+        this.cameras.main.fade(1500, 0, 0, 0);
+        this.time.delayedCall(1500, () => {
+          this.gameoverSound.stop();
+          this.scene.start("accueil");
+        });
+      });
+
+      vBtn.on("pointerdown", () => {
+        xBtn.disableInteractive();
+        vBtn.disableInteractive();
+        this.confirmSound.play();
+        this.tweens.add({
+          targets: this.gameoverSound,
+          volume: 0,
+          duration: 1500,
+          ease: 'Linear'
+        });
+        this.cameras.main.fade(1500, 0, 0, 0);
+        this.time.delayedCall(1500, () => {
+          this.gameoverSound.stop();
+          this.scene.start("jeu");
+        });
       });
     });
 
-    vBtn.on("pointerdown", () => {
-      xBtn.disableInteractive();
-      vBtn.disableInteractive();
-      this.confirmSound.play();
-      this.tweens.add({
-        targets: this.gameoverSound,
-        volume: 0,
-        duration: 1500,
-        ease: 'Linear'
-      });
-      this.cameras.main.fade(1500, 0, 0, 0)
-      this.time.delayedCall(1500, () => {
-        this.gameoverSound.stop();
-        this.scene.start("jeu");
-      });
-    });
-
+    this.cameras.main.fadeIn(1500, 0, 0, 0);
   }
 
   update() {
