@@ -154,7 +154,7 @@ class Jeu extends Phaser.Scene {
       }),
       frameRate: 8,
       repeat: -1
-    })
+    });
 
     // ENEMY 01 - PLANT
     this.anims.create({
@@ -165,17 +165,38 @@ class Jeu extends Phaser.Scene {
       }),
       frameRate: 8,
       repeat: -1
-    })
+    });
 
     this.anims.create({
-      key: "enemy01_attack_left",
+      key: "enemy01_attack",
       frames: this.anims.generateFrameNames("enemy01", {
         start: 8,
-        end: 0 // À CHANGER, NE FAIT RIEN EN CE MOMENT
+        end: 15
       }),
       frameRate: 8,
       repeat: 0
-    })
+    });
+
+
+    this.anims.create({
+      key: "enemy01_hit",
+      frames: this.anims.generateFrameNames("enemy01", {
+        start: 24,
+        end: 26
+      }),
+      frameRate: 8,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "enemy01_death",
+      frames: this.anims.generateFrameNames("destroy_effect", {
+        start: 0,
+        end: 4
+      }),
+      frameRate: 8,
+      repeat: 0
+    });
 
     // ENEMY 02 - SORCERER DAGGER
     this.anims.create({
@@ -288,30 +309,62 @@ class Jeu extends Phaser.Scene {
       }),
       frameRate: 6,
       repeat: 0
-    })
+    });
 
 
     // ENEMY 04 - PLAGUE DOCTOR
+
     this.anims.create({
       key: "enemy04_idle",
       frames: this.anims.generateFrameNames("enemy04", {
         start: 0,
-        end: 7
+        end: 6
       }),
       frameRate: 8,
       repeat: -1
-    })
+    });
 
-    // ENEMY 05 - SCORPION
     this.anims.create({
-      key: "enemy05_idle",
-      frames: this.anims.generateFrameNames("enemy05", {
-        start: 0,
-        end: 7
+      key: "enemy04_walk",
+      frames: this.anims.generateFrameNames("enemy04", {
+        start: 7,
+        end: 12
       }),
       frameRate: 8,
       repeat: -1
-    })
+    });
+
+    this.anims.create({
+      key: "enemy04_attack",
+      frames: this.anims.generateFrameNames("enemy04", {
+        start: 13,
+        end: 19
+      }),
+      frameRate: 8,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "enemy04_hit",
+      frames: this.anims.generateFrameNames("enemy04", {
+        start: 25,
+        end: 27
+      }),
+      frameRate: 8,
+      repeat: 0
+    });
+
+    this.anims.create({
+      key: "enemy04_death",
+      frames: this.anims.generateFrameNames("destroy_effect", {
+        start: 0,
+        end: 4
+      }),
+      frameRate: 8,
+      repeat: 0
+    });
+
+
 
   }
 
@@ -324,6 +377,8 @@ class Jeu extends Phaser.Scene {
     if (sauvegarde) {
       checkpoint = sauvegarde.checkpoint;
       niveau = sauvegarde.niveau;
+      this.diamondCount = sauvegarde.nbDiamant;
+      this.playerLife = sauvegarde.nbVie;
     }
 
     this.input.mouse.disableContextMenu();
@@ -416,8 +471,8 @@ class Jeu extends Phaser.Scene {
     this.surpriseSound = this.sound.add("surpriseSfx", {
       loop: true,
       volume: 0.53,
-      rate: 3.2,
-      detune: -2600
+      rate: 3.7,
+      detune: -2800
     })
 
     this.playerDeathSound = this.sound.add("playerDeathSound");
@@ -463,17 +518,11 @@ class Jeu extends Phaser.Scene {
     this.isAttacking = false;
     this.isAttackingOrThrowing = false;
 
-    // Combo - a revoir dans une autre version
-
-    this.comboCount = 0;
-    this.comboDelay = 300;
-    this.lastClickTime = 0;
-
     // Joueur
 
     this.playerLife = (sauvegarde) ? sauvegarde.nbVie : 6;
     this.maxPlayerLife = 8;
-    this.playerIsHit = false; // a revoir
+    this.playerIsHit = false;
     this.playerIsDead = false;
     this.playerHasLanded = false;
     this.isWalking = false;
@@ -574,7 +623,7 @@ class Jeu extends Phaser.Scene {
     this.createEnemy03_b();
 
     this.createEnemy04();
-    this.createEnemy05();
+
 
     // VIE ENNEMIS 
 
@@ -582,13 +631,11 @@ class Jeu extends Phaser.Scene {
 
     // ------------------------------ CRÉATION DU JOUEUR -------------------------------
 
-    this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump");
+    this.player = this.physics.add.sprite(config.width / 2 - 200, config.height / 2 + 1000, "player_idle_run_jump"); // default spot cfg.width / 2 - 600, y just config.height / 2
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2).setDepth(1);
 
     this.createPlayerLife();
-
-    // this.localStorage.clear()
 
     // ----------------------- PLAYER LEFT-CLICK, RIGHT-CLICK  ------------------------
 
@@ -707,7 +754,7 @@ class Jeu extends Phaser.Scene {
       this.handlePlayerIsHit(1);
       this.handleHud();
       this.handleHealthPickup();
-      //console.log(this.playerLife);
+      this.cameras.main.shake(300, 0.01);
     }, (player, tile) => {
       return tile && tile.properties && tile.properties.collision === true;
     });
@@ -804,7 +851,9 @@ class Jeu extends Phaser.Scene {
         this.enemy03_b.canAttack = true;
         this.enemy03_b.attackCooldown = 0;
         this.enemy03_b.anims.play("enemy03_walk", true);
-        this.surpriseSound.play();
+        this.surpriseSound.play({
+          seek: 6
+        });
         this.bgMusic.stop();
 
       }
@@ -943,6 +992,7 @@ class Jeu extends Phaser.Scene {
       //console.log(this.playerLife);
       this.handleHealthPickup();
       this.handleHud();
+      this.cameras.main.shake(200, 0.01);
     });
   }
 
@@ -970,13 +1020,18 @@ class Jeu extends Phaser.Scene {
   }
 
   createEnemy01() {
-    this.enemy01 = this.physics.add.sprite(1000, config.height / 2 - 70, "enemy01_idle");
+    this.enemy01 = this.physics.add.sprite(config.width / 2 - 100, config.height / 2 + 1000, "enemy01_idle");
     this.enemy01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
     this.enemy01.setScale(2).setDepth(1);
-    this.enemy01.anims.play("enemy01_idle", true);
+    this.enemy01isHit = false;
+    this.enemy01.hitCooldown = null;
 
-    this.enemy01.setVisible(false).setActive(false);
-    this.enemy01.body.enable = false;
+    this.enemy01.direction = 1;
+    this.enemy01.attackRange = 80;
+    this.enemy01.attackCooldown = 0;
+    this.enemy01.canAttack = true;
+
+    this.enemy01.anims.play("enemy01_idle", true);
   }
 
   createEnemy02() {
@@ -1069,24 +1124,27 @@ class Jeu extends Phaser.Scene {
 
   createEnemy04() {
 
-    this.enemy04 = this.physics.add.sprite(config.width / 2 - 500, config.height / 2, "enemy04_idle");
+    this.enemy04 = this.physics.add.sprite(config.width / 2 + 100, config.height / 2 + 800, "enemy04_idle");
     this.enemy04.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
     this.enemy04.setScale(2).setDepth(1);
+    this.enemy04isHit = false;
+    this.enemy04.hitCooldown = null;
+
+    this.enemy04.speed = 50;
+    this.enemy04.direction = 1;
+    this.enemy04.initialX = this.enemy04.x;
+
+    this.enemy04.attackRange = 350;
+    this.enemy04.attackCooldown = 0;
+    this.enemy04.canAttack = true;
+    this.enemy04.patrolTimer = 0;
+    this.enemy04.isPatrolling = true;
+    this.enemy04.patrolLeftLimit = this.enemy04.initialX - 100;
+    this.enemy04.patrolRightLimit = this.enemy04.initialX + 100;
     this.enemy04.anims.play("enemy04_idle", true);
 
-    this.enemy04.setVisible(false).setActive(false);
-    this.enemy04.body.enable = false;
-
   }
 
-  createEnemy05() {
-    this.enemy05 = this.physics.add.sprite(config.width / 2 - 400, config.height / 2 + 55, "enemy05_idle");
-    this.enemy05.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
-    this.enemy05.setScale(2).setDepth(1);
-    this.enemy05.anims.play("enemy05_idle", true);
-    this.enemy05.setVisible(false).setActive(false);
-    this.enemy05.body.enable = false;
-  }
 
   createEnemyLife() {
     this.enemy01Life = 2;
@@ -1095,9 +1153,9 @@ class Jeu extends Phaser.Scene {
     this.enemy03Life = 5;
     this.enemy03_bLife = 9;
     this.enemy04Life = 2;
-    this.enemy05Life = 2;
 
-    this.enemies = [this.enemy01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04, this.enemy05];
+
+    this.enemies = [this.enemy01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04];
   }
 
   createPlayerHitbox() {
@@ -1124,6 +1182,9 @@ class Jeu extends Phaser.Scene {
             case this.enemy01:
               if (this.enemy01Life > 0) {
                 this.enemy01Life--;
+                this.enemy01isHit = true;
+                this.enemy01.play("enemy01_hit", true);
+                this.hitSound03.play();
               }
               break;
             case this.enemy02:
@@ -1161,11 +1222,9 @@ class Jeu extends Phaser.Scene {
             case this.enemy04:
               if (this.enemy04Life > 0) {
                 this.enemy04Life--;
-              }
-              break;
-            case this.enemy05:
-              if (this.enemy05Life > 0) {
-                this.enemy05Life--;
+                this.enemy04isHit = true
+                this.enemy04.play("enemy04_hit", true);
+                this.hitSound03.play();
               }
               break;
           }
@@ -1178,7 +1237,6 @@ class Jeu extends Phaser.Scene {
   createEnemyHitbox(enemy) {
 
     if (enemy.hitbox) return;
-
     enemy.hitbox = this.add.zone(
       enemy.x + (enemy.flipX ? 25 : -25),
       enemy.y,
@@ -1194,7 +1252,7 @@ class Jeu extends Phaser.Scene {
       this.handlePlayerIsHit(2);
       this.handleHud();
       this.handleHealthPickup();
-      //console.log(this.playerLife);
+      this.cameras.main.shake(300, 0.01);
       enemy.hitbox.destroy();
       enemy.hitbox = null;
     });
@@ -1207,184 +1265,348 @@ class Jeu extends Phaser.Scene {
     });
   }
 
+  createEnemyHitboxB(enemy) {
+
+    if (enemy.hitbox) return;
+
+    enemy.hitbox = this.add.zone(
+      enemy.x + (enemy.flipX ? 45 : -45),
+      enemy.y + 30,
+      50,
+      50
+    );
+    this.physics.add.existing(enemy.hitbox);
+    enemy.hitbox.body.setAllowGravity(false);
+    enemy.hitbox.body.setImmovable(true);
+
+    this.physics.add.overlap(enemy.hitbox, this.player, () => {
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      this.handlePlayerIsHit(2);
+      this.handleHud();
+      this.handleHealthPickup();
+      this.cameras.main.shake(300, 0.01);
+      enemy.hitbox.destroy();
+      enemy.hitbox = null;
+    });
+
+    this.time.delayedCall(200, () => {
+      if (enemy.hitbox) {
+        enemy.hitbox.destroy();
+        enemy.hitbox = null;
+      }
+    });
+  }
+
+  createEnemyHitboxC(enemy) {
+
+    if (enemy.hitbox) return;
+
+    enemy.hitbox = this.add.zone(
+      enemy.x + (enemy.flipX ? -95 : 55),
+      enemy.y + 30,
+      20,
+      20
+    );
+    this.physics.add.existing(enemy.hitbox);
+    enemy.hitbox.body.setAllowGravity(false);
+    enemy.hitbox.body.setImmovable(true);
+
+    this.physics.add.overlap(enemy.hitbox, this.player, () => {
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      this.handlePlayerIsHit(2);
+      this.handleHud();
+      this.handleHealthPickup();
+      this.cameras.main.shake(300, 0.01);
+      enemy.hitbox.destroy();
+      enemy.hitbox = null;
+    });
+
+    this.time.delayedCall(200, () => {
+      if (enemy.hitbox) {
+        enemy.hitbox.destroy();
+        enemy.hitbox = null;
+      }
+    });
+  }
+
   update() {
     if (!this.playerIsDead) {
       this.handleParallax();
       this.handlePlayerMovement();
       this.handlePlayerAnimations();
+      this.handleEnemy01Behavior();
       this.handleEnemy02Behavior();
       this.handleEnemy02_bBehavior();
-
-      // Check if enemy03_b is not null and is active
+      this.handleEnemy03Behavior();
       if (this.enemy03_b && this.enemy03_b.active) {
         this.handleEnemy03_bBehavior();
       }
-
-      this.handleEnemy03Behavior();
-
+      this.handleEnemy04Behavior();
     }
 
     //console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
 
+  handleEnemy01Behavior() {
+    if (!this.enemy01 || this.enemy01Life <= 0) return;
+
+    if (this.enemy01) {
+      if (this.enemy01isHit) {
+        this.enemy01.setVelocityX(0);
+
+        if (this.enemy01.hitbox) {
+          this.enemy01.hitbox.destroy();
+          this.enemy01.hitbox = null;
+        }
+
+        if (!this.enemy01.hitCooldown) {
+          this.enemy01.hitCooldown = this.time.delayedCall(500, () => {
+            this.enemy01isHit = false;
+            this.enemy01.hitCooldown = null;
+            this.enemy01.canAttack = true;
+            this.enemy01.attackCooldown = 0;
+            if (this.enemy01 && this.enemy01.anims && !this.enemy01.anims.isPlaying) {
+              this.enemy01.anims.play("enemy01_idle", true);
+            }
+          });
+        }
+        this.enemy01.isAttacking = false;
+        return;
+      }
+
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.enemy01.x,
+        this.enemy01.y,
+        this.player.x,
+        this.player.y
+      );
+
+      if (this.player.x > this.enemy01.x) {
+        this.enemy01.flipX = true;
+      } else {
+        this.enemy01.flipX = false;
+      }
+
+      if (distanceToPlayer < this.enemy01.attackRange) {
+        if (this.enemy01.canAttack && this.enemy01.attackCooldown <= 0 && !this.enemy01.isAttacking) {
+          this.enemy01.isAttacking = true;
+          this.enemy01.canAttack = false;
+          this.enemy01.attackCooldown = 1500;
+
+          if (!this.enemy01isHit) {
+            this.time.delayedCall(500, () => {
+              this.hitSound05.play();
+            });
+          }
+
+          if (this.enemy01 && this.enemy01.anims) {
+            this.enemy01.anims.play("enemy01_attack", true);
+          }
+
+          this.enemy01.on('animationupdate', (animation, frame) => {
+            if (animation.key === "enemy01_attack" && frame.index === 6 && !this.enemy01.hitbox) {
+              this.createEnemyHitboxB(this.enemy01);
+            }
+          });
+
+          this.enemy01.on('animationcomplete-enemy01_attack', () => {
+            this.enemy01.isAttacking = false;
+
+            if (this.enemy01.hitbox) {
+              this.enemy01.hitbox.destroy();
+              this.enemy01.hitbox = null;
+            }
+
+            if (this.enemy01 && this.enemy01.anims) {
+              this.enemy01.anims.play("enemy01_idle", true);
+            }
+            this.enemy01.canAttack = true;
+
+            this.time.delayedCall(this.enemy01.attackCooldown, () => {
+              this.enemy01.attackCooldown = 0;
+            });
+          });
+        }
+      } else {
+        if (this.enemy01.isAttacking) {
+          return;
+        }
+
+        this.enemy01.setVelocityX(0);
+        if (this.enemy01 && this.enemy01.anims && (!this.enemy01.anims.isPlaying || this.enemy01.anims.currentAnim.key !== "enemy01_idle")) {
+          this.enemy01.anims.play("enemy01_idle", true);
+        }
+      }
+    }
+  }
+
+
   handleEnemy02Behavior() {
     if (this.enemy02Life <= 0 || !this.enemy02) return;
 
-    const maxChaseDistance = 500;
+    if (this.enemy02) {
 
-    if (this.enemy02isHit) {
-      this.enemy02.setVelocityX(0);
+      const maxChaseDistance = 500;
 
-      if (this.enemy02.hitbox) {
-        this.enemy02.hitbox.destroy();
-        this.enemy02.hitbox = null;
-      }
-
-      if (!this.enemy02.hitCooldown) {
-        this.enemy02.hitCooldown = this.time.delayedCall(500, () => {
-          this.enemy02isHit = false;
-          this.enemy02.hitCooldown = null;
-          this.enemy02.isPatrolling = true;
-          this.enemy02.canAttack = true;
-          this.enemy02.attackCooldown = 0;
-          if (!this.enemy02.anims.isPlaying) {
-            this.enemy02.anims.play("enemy02_idle", true);
-          }
-        });
-      }
-      this.enemy02.isAttacking = false;
-      return;
-    }
-
-    const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy02.x,
-      this.enemy02.y,
-      this.player.x,
-      this.player.y
-    );
-
-    const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-      this.enemy02.x,
-      this.enemy02.y,
-      this.enemy02.initialX,
-      this.enemy02.y
-    );
-
-    const patrolLeftLimit = this.enemy02.initialX - 100;
-    const patrolRightLimit = this.enemy02.initialX + 100;
-    const chaseSpeedMultiplier = 2;
-
-    if (this.enemy02.isAttacking || this.enemy02.postAttackCooldown) {
-      this.enemy02.setVelocityX(0);
-      return;
-    }
-
-    if (distanceFromOriginalSpot > maxChaseDistance) {
-      this.enemy02.initialX = this.enemy02.x;
-      this.enemy02.patrolLeftLimit = this.enemy02.initialX - 100;
-      this.enemy02.patrolRightLimit = this.enemy02.initialX + 100;
-
-      this.enemy02.isPatrolling = true;
-      this.enemy02.direction = (this.enemy02.x > this.enemy02.initialX) ? -1 : 1;
-      this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
-      return;
-    }
-
-    if (this.enemy02.isAttacking) {
-      this.enemy02.setVelocityX(0);
-      return;
-    }
-
-    if (this.enemy02.postAttackCooldown) {
-      return;
-    }
-
-    if (distanceToPlayer < this.enemy02.attackRange) {
-      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02.x) ||
-        (!this.player.flipX && this.player.x < this.enemy02.x);
-
-      const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-      if (distanceToPlayer > minimumAttackDistance) {
-        if (this.player.x < this.enemy02.x) {
-          this.enemy02.setVelocityX(-this.enemy02.speed * chaseSpeedMultiplier);
-          this.enemy02.direction = -1;
-        } else {
-          this.enemy02.setVelocityX(this.enemy02.speed * chaseSpeedMultiplier);
-          this.enemy02.direction = 1;
-        }
-        this.enemy02.anims.play("enemy02_walk", true);
-      } else {
+      if (this.enemy02isHit) {
         this.enemy02.setVelocityX(0);
-        if (this.enemy02.canAttack && this.enemy02.attackCooldown <= 0) {
-          this.enemy02.isAttacking = true;
-          this.enemy02.canAttack = false;
-          this.enemy02.attackCooldown = 1500;
 
-          if (!this.enemy02isHit) {
-            this.hitSound02.play();
-          }
+        if (this.enemy02.hitbox) {
+          this.enemy02.hitbox.destroy();
+          this.enemy02.hitbox = null;
+        }
 
-          this.enemy02.anims.play("enemy02_attack", true);
-
-          this.enemy02.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02.hitbox) {
-              this.createEnemyHitbox(this.enemy02);
-            }
-          });
-
-          this.enemy02.on('animationcomplete-enemy02_attack', () => {
-            this.enemy02.isAttacking = false;
+        if (!this.enemy02.hitCooldown) {
+          this.enemy02.hitCooldown = this.time.delayedCall(500, () => {
+            this.enemy02isHit = false;
+            this.enemy02.hitCooldown = null;
+            this.enemy02.isPatrolling = true;
             this.enemy02.canAttack = true;
+            this.enemy02.attackCooldown = 0;
+            if (!this.enemy02.anims.isPlaying) {
+              this.enemy02.anims.play("enemy02_idle", true);
+            }
+          });
+        }
+        this.enemy02.isAttacking = false;
+        return;
+      }
 
-            if (this.enemy02.hitbox) {
-              this.enemy02.hitbox.destroy();
-              this.enemy02.hitbox = null;
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.enemy02.x,
+        this.enemy02.y,
+        this.player.x,
+        this.player.y
+      );
+
+      const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
+        this.enemy02.x,
+        this.enemy02.y,
+        this.enemy02.initialX,
+        this.enemy02.y
+      );
+
+      const patrolLeftLimit = this.enemy02.initialX - 100;
+      const patrolRightLimit = this.enemy02.initialX + 100;
+      const chaseSpeedMultiplier = 2;
+
+      if (this.enemy02.isAttacking || this.enemy02.postAttackCooldown) {
+        this.enemy02.setVelocityX(0);
+        return;
+      }
+
+      if (distanceFromOriginalSpot > maxChaseDistance) {
+        this.enemy02.initialX = this.enemy02.x;
+        this.enemy02.patrolLeftLimit = this.enemy02.initialX - 100;
+        this.enemy02.patrolRightLimit = this.enemy02.initialX + 100;
+
+        this.enemy02.isPatrolling = true;
+        this.enemy02.direction = (this.enemy02.x > this.enemy02.initialX) ? -1 : 1;
+        this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
+        return;
+      }
+
+      if (this.enemy02.isAttacking) {
+        this.enemy02.setVelocityX(0);
+        return;
+      }
+
+      if (this.enemy02.postAttackCooldown) {
+        return;
+      }
+
+      if (distanceToPlayer < this.enemy02.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02.x) ||
+          (!this.player.flipX && this.player.x < this.enemy02.x);
+
+        const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
+
+        if (distanceToPlayer > minimumAttackDistance) {
+          if (this.player.x < this.enemy02.x) {
+            this.enemy02.setVelocityX(-this.enemy02.speed * chaseSpeedMultiplier);
+            this.enemy02.direction = -1;
+          } else {
+            this.enemy02.setVelocityX(this.enemy02.speed * chaseSpeedMultiplier);
+            this.enemy02.direction = 1;
+          }
+          this.enemy02.anims.play("enemy02_walk", true);
+        } else {
+          this.enemy02.setVelocityX(0);
+          if (this.enemy02.canAttack && this.enemy02.attackCooldown <= 0) {
+            this.enemy02.isAttacking = true;
+            this.enemy02.canAttack = false;
+            this.enemy02.attackCooldown = 1500;
+
+            if (!this.enemy02isHit) {
+              this.hitSound02.play();
             }
 
-            this.enemy02.anims.play("enemy02_idle", true);
-            this.enemy02.postAttackCooldown = true;
+            this.enemy02.anims.play("enemy02_attack", true);
 
-            this.time.delayedCall(600, () => {
-              this.enemy02.postAttackCooldown = false;
-              const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                this.enemy02.x,
-                this.enemy02.y,
-                this.player.x,
-                this.player.y
-              );
-              if (currentDistanceToPlayer <= this.enemy02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                this.enemy02.anims.play("enemy02_attack", true);
-                this.hitSound02.play();
-              } else if (currentDistanceToPlayer < this.enemy02.attackRange) {
-                this.enemy02.anims.play("enemy02_walk", true);
-              } else {
-                this.enemy02.anims.play("enemy02_idle", true);
+            this.enemy02.on('animationupdate', (animation, frame) => {
+              if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02.hitbox) {
+                this.createEnemyHitbox(this.enemy02);
               }
-              this.enemy02.attackCooldown = 0;
             });
-          });
-        } else {
-          if (!this.enemy02.anims.isPlaying) {
-            this.enemy02.anims.play("enemy02_idle", true);
+
+            this.enemy02.on('animationcomplete-enemy02_attack', () => {
+              this.enemy02.isAttacking = false;
+              this.enemy02.canAttack = true;
+
+              if (this.enemy02.hitbox) {
+                this.enemy02.hitbox.destroy();
+                this.enemy02.hitbox = null;
+              }
+
+              this.enemy02.anims.play("enemy02_idle", true);
+              this.enemy02.postAttackCooldown = true;
+
+              this.time.delayedCall(600, () => {
+                this.enemy02.postAttackCooldown = false;
+                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                  this.enemy02.x,
+                  this.enemy02.y,
+                  this.player.x,
+                  this.player.y
+                );
+                if (currentDistanceToPlayer <= this.enemy02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.enemy02.anims.play("enemy02_attack", true);
+                  this.hitSound02.play();
+                } else if (currentDistanceToPlayer < this.enemy02.attackRange) {
+                  this.enemy02.anims.play("enemy02_walk", true);
+                } else {
+                  this.enemy02.anims.play("enemy02_idle", true);
+                }
+                this.enemy02.attackCooldown = 0;
+              });
+            });
+          } else {
+            if (!this.enemy02.anims.isPlaying) {
+              this.enemy02.anims.play("enemy02_idle", true);
+            }
           }
         }
-      }
-    } else {
-      if (this.enemy02.body.onFloor()) {
-        if (this.enemy02.isPatrolling) {
-          if (this.enemy02.x <= patrolLeftLimit) {
-            this.enemy02.direction = 1;
-            this.enemy02.setVelocityX(this.enemy02.speed);
-          } else if (this.enemy02.x >= patrolRightLimit) {
-            this.enemy02.direction = -1;
-            this.enemy02.setVelocityX(-this.enemy02.speed);
+      } else {
+        if (this.enemy02.body.onFloor()) {
+          if (this.enemy02.isPatrolling) {
+            if (this.enemy02.x <= patrolLeftLimit) {
+              this.enemy02.direction = 1;
+              this.enemy02.setVelocityX(this.enemy02.speed);
+            } else if (this.enemy02.x >= patrolRightLimit) {
+              this.enemy02.direction = -1;
+              this.enemy02.setVelocityX(-this.enemy02.speed);
+            } else {
+              this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
+            }
+            if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_walk") {
+              this.enemy02.anims.play("enemy02_walk", true);
+            }
           } else {
-            this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
-          }
-          if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_walk") {
-            this.enemy02.anims.play("enemy02_walk", true);
+            this.enemy02.setVelocityX(0);
+            if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_idle") {
+              this.enemy02.anims.play("enemy02_idle", true);
+            }
           }
         } else {
           this.enemy02.setVelocityX(0);
@@ -1392,175 +1614,178 @@ class Jeu extends Phaser.Scene {
             this.enemy02.anims.play("enemy02_idle", true);
           }
         }
-      } else {
-        this.enemy02.setVelocityX(0);
-        if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_idle") {
-          this.enemy02.anims.play("enemy02_idle", true);
-        }
       }
+      this.enemy02.flipX = this.enemy02.direction === 1;
     }
-    this.enemy02.flipX = this.enemy02.direction === 1;
   }
 
   handleEnemy02_bBehavior() {
     if (this.enemy02_bLife <= 0 || !this.enemy02_b) return;
 
-    const maxChaseDistance = 500;
+    if (this.enemy02_b) {
 
-    if (this.enemy02_bisHit) {
-      this.enemy02_b.setVelocityX(0);
+      const maxChaseDistance = 500;
 
-      if (this.enemy02_b.hitbox) {
-        this.enemy02_b.hitbox.destroy();
-        this.enemy02_b.hitbox = null;
-      }
-
-      if (!this.enemy02_b.hitCooldown) {
-        this.enemy02_b.hitCooldown = this.time.delayedCall(500, () => {
-          this.enemy02_bisHit = false;
-          this.enemy02_b.hitCooldown = null;
-          this.enemy02_b.isPatrolling = true;
-          this.enemy02_b.canAttack = true;
-          this.enemy02_b.attackCooldown = 0;
-          if (!this.enemy02_b.anims.isPlaying) {
-            this.enemy02_b.anims.play("enemy02_idle", true);
-          }
-        });
-      }
-      this.enemy02_b.isAttacking = false;
-      return;
-    }
-
-    const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy02_b.x,
-      this.enemy02_b.y,
-      this.player.x,
-      this.player.y
-    );
-
-    const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-      this.enemy02_b.x,
-      this.enemy02_b.y,
-      this.enemy02_b.initialX,
-      this.enemy02_b.y
-    );
-
-    const patrolLeftLimit = this.enemy02_b.initialX - 100;
-    const patrolRightLimit = this.enemy02_b.initialX + 100;
-    const chaseSpeedMultiplier = 2;
-
-    if (this.enemy02_b.isAttacking || this.enemy02_b.postAttackCooldown) {
-      this.enemy02_b.setVelocityX(0);
-      return;
-    }
-
-    if (distanceFromOriginalSpot > maxChaseDistance) {
-      this.enemy02_b.initialX = this.enemy02_b.x;
-      this.enemy02_b.patrolLeftLimit = this.enemy02_b.initialX - 100;
-      this.enemy02_b.patrolRightLimit = this.enemy02_b.initialX + 100;
-
-      this.enemy02_b.isPatrolling = true;
-      this.enemy02_b.direction = (this.enemy02_b.x > this.enemy02_b.initialX) ? -1 : 1;
-      this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
-      return;
-    }
-
-    if (this.enemy02_b.isAttacking) {
-      this.enemy02_b.setVelocityX(0);
-      return;
-    }
-
-    if (this.enemy02_b.postAttackCooldown) {
-      return;
-    }
-
-    if (distanceToPlayer < this.enemy02_b.attackRange) {
-      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02_b.x) ||
-        (!this.player.flipX && this.player.x < this.enemy02_b.x);
-
-      const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-      if (distanceToPlayer > minimumAttackDistance) {
-        if (this.player.x < this.enemy02_b.x) {
-          this.enemy02_b.setVelocityX(-this.enemy02_b.speed * chaseSpeedMultiplier);
-          this.enemy02_b.direction = -1;
-        } else {
-          this.enemy02_b.setVelocityX(this.enemy02_b.speed * chaseSpeedMultiplier);
-          this.enemy02_b.direction = 1;
-        }
-        this.enemy02_b.anims.play("enemy02_walk", true);
-      } else {
+      if (this.enemy02_bisHit) {
         this.enemy02_b.setVelocityX(0);
-        if (this.enemy02_b.canAttack && this.enemy02_b.attackCooldown <= 0) {
-          this.enemy02_b.isAttacking = true;
-          this.enemy02_b.canAttack = false;
-          this.enemy02_b.attackCooldown = 1500;
 
+        if (this.enemy02_b.hitbox) {
+          this.enemy02_b.hitbox.destroy();
+          this.enemy02_b.hitbox = null;
+        }
 
-          if (!this.enemy02_bisHit) {
-            this.hitSound02.play();
-          }
-
-
-          this.enemy02_b.anims.play("enemy02_attack", true);
-
-          this.enemy02_b.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02_b.hitbox) {
-              this.createEnemyHitbox(this.enemy02_b);
-            }
-          });
-
-          this.enemy02_b.on('animationcomplete-enemy02_attack', () => {
-            this.enemy02_b.isAttacking = false;
+        if (!this.enemy02_b.hitCooldown) {
+          this.enemy02_b.hitCooldown = this.time.delayedCall(500, () => {
+            this.enemy02_bisHit = false;
+            this.enemy02_b.hitCooldown = null;
+            this.enemy02_b.isPatrolling = true;
             this.enemy02_b.canAttack = true;
+            this.enemy02_b.attackCooldown = 0;
+            if (!this.enemy02_b.anims.isPlaying) {
+              this.enemy02_b.anims.play("enemy02_idle", true);
+            }
+          });
+        }
+        this.enemy02_b.isAttacking = false;
+        return;
+      }
 
-            if (this.enemy02_b.hitbox) {
-              this.enemy02_b.hitbox.destroy();
-              this.enemy02_b.hitbox = null;
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.enemy02_b.x,
+        this.enemy02_b.y,
+        this.player.x,
+        this.player.y
+      );
+
+      const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
+        this.enemy02_b.x,
+        this.enemy02_b.y,
+        this.enemy02_b.initialX,
+        this.enemy02_b.y
+      );
+
+      const patrolLeftLimit = this.enemy02_b.initialX - 100;
+      const patrolRightLimit = this.enemy02_b.initialX + 100;
+      const chaseSpeedMultiplier = 2;
+
+      if (this.enemy02_b.isAttacking || this.enemy02_b.postAttackCooldown) {
+        this.enemy02_b.setVelocityX(0);
+        return;
+      }
+
+      if (distanceFromOriginalSpot > maxChaseDistance) {
+        this.enemy02_b.initialX = this.enemy02_b.x;
+        this.enemy02_b.patrolLeftLimit = this.enemy02_b.initialX - 100;
+        this.enemy02_b.patrolRightLimit = this.enemy02_b.initialX + 100;
+
+        this.enemy02_b.isPatrolling = true;
+        this.enemy02_b.direction = (this.enemy02_b.x > this.enemy02_b.initialX) ? -1 : 1;
+        this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
+        return;
+      }
+
+      if (this.enemy02_b.isAttacking) {
+        this.enemy02_b.setVelocityX(0);
+        return;
+      }
+
+      if (this.enemy02_b.postAttackCooldown) {
+        return;
+      }
+
+      if (distanceToPlayer < this.enemy02_b.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02_b.x) ||
+          (!this.player.flipX && this.player.x < this.enemy02_b.x);
+
+        const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
+
+        if (distanceToPlayer > minimumAttackDistance) {
+          if (this.player.x < this.enemy02_b.x) {
+            this.enemy02_b.setVelocityX(-this.enemy02_b.speed * chaseSpeedMultiplier);
+            this.enemy02_b.direction = -1;
+          } else {
+            this.enemy02_b.setVelocityX(this.enemy02_b.speed * chaseSpeedMultiplier);
+            this.enemy02_b.direction = 1;
+          }
+          this.enemy02_b.anims.play("enemy02_walk", true);
+        } else {
+          this.enemy02_b.setVelocityX(0);
+          if (this.enemy02_b.canAttack && this.enemy02_b.attackCooldown <= 0) {
+            this.enemy02_b.isAttacking = true;
+            this.enemy02_b.canAttack = false;
+            this.enemy02_b.attackCooldown = 1500;
+
+
+            if (!this.enemy02_bisHit) {
+              this.hitSound02.play();
             }
 
-            this.enemy02_b.anims.play("enemy02_idle", true);
-            this.enemy02_b.postAttackCooldown = true;
+            this.enemy02_b.anims.play("enemy02_attack", true);
 
-            this.time.delayedCall(600, () => {
-              this.enemy02_b.postAttackCooldown = false;
-              const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                this.enemy02_b.x,
-                this.enemy02_b.y,
-                this.player.x,
-                this.player.y
-              );
-              if (currentDistanceToPlayer <= this.enemy02_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                this.enemy02_b.anims.play("enemy02_attack", true);
-                this.hitSound02.play();
-              } else if (currentDistanceToPlayer < this.enemy02_b.attackRange) {
-                this.enemy02_b.anims.play("enemy02_walk", true);
-              } else {
-                this.enemy02_b.anims.play("enemy02_idle", true);
+            this.enemy02_b.on('animationupdate', (animation, frame) => {
+              if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02_b.hitbox) {
+                this.createEnemyHitbox(this.enemy02_b);
               }
-              this.enemy02_b.attackCooldown = 0;
             });
-          });
-        } else {
-          if (!this.enemy02_b.anims.isPlaying) {
-            this.enemy02_b.anims.play("enemy02_idle", true);
+
+            this.enemy02_b.on('animationcomplete-enemy02_attack', () => {
+              this.enemy02_b.isAttacking = false;
+              this.enemy02_b.canAttack = true;
+
+              if (this.enemy02_b.hitbox) {
+                this.enemy02_b.hitbox.destroy();
+                this.enemy02_b.hitbox = null;
+              }
+
+              this.enemy02_b.anims.play("enemy02_idle", true);
+              this.enemy02_b.postAttackCooldown = true;
+
+              this.time.delayedCall(600, () => {
+                this.enemy02_b.postAttackCooldown = false;
+                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                  this.enemy02_b.x,
+                  this.enemy02_b.y,
+                  this.player.x,
+                  this.player.y
+                );
+                if (currentDistanceToPlayer <= this.enemy02_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.enemy02_b.anims.play("enemy02_attack", true);
+                  this.hitSound02.play();
+                } else if (currentDistanceToPlayer < this.enemy02_b.attackRange) {
+                  this.enemy02_b.anims.play("enemy02_walk", true);
+                } else {
+                  this.enemy02_b.anims.play("enemy02_idle", true);
+                }
+                this.enemy02_b.attackCooldown = 0;
+              });
+            });
+
+          } else {
+            if (!this.enemy02_b.anims.isPlaying) {
+              this.enemy02_b.anims.play("enemy02_idle", true);
+            }
           }
         }
-      }
-    } else {
-      if (this.enemy02_b.body.onFloor()) {
-        if (this.enemy02_b.isPatrolling) {
-          if (this.enemy02_b.x <= patrolLeftLimit) {
-            this.enemy02_b.direction = 1;
-            this.enemy02_b.setVelocityX(this.enemy02_b.speed);
-          } else if (this.enemy02_b.x >= patrolRightLimit) {
-            this.enemy02_b.direction = -1;
-            this.enemy02_b.setVelocityX(-this.enemy02_b.speed);
+      } else {
+        if (this.enemy02_b.body.onFloor()) {
+          if (this.enemy02_b.isPatrolling) {
+            if (this.enemy02_b.x <= patrolLeftLimit) {
+              this.enemy02_b.direction = 1;
+              this.enemy02_b.setVelocityX(this.enemy02_b.speed);
+            } else if (this.enemy02_b.x >= patrolRightLimit) {
+              this.enemy02_b.direction = -1;
+              this.enemy02_b.setVelocityX(-this.enemy02_b.speed);
+            } else {
+              this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
+            }
+            if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_walk") {
+              this.enemy02_b.anims.play("enemy02_walk", true);
+            }
           } else {
-            this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
-          }
-          if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_walk") {
-            this.enemy02_b.anims.play("enemy02_walk", true);
+            this.enemy02_b.setVelocityX(0);
+            if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_idle") {
+              this.enemy02_b.anims.play("enemy02_idle", true);
+            }
           }
         } else {
           this.enemy02_b.setVelocityX(0);
@@ -1568,174 +1793,176 @@ class Jeu extends Phaser.Scene {
             this.enemy02_b.anims.play("enemy02_idle", true);
           }
         }
-      } else {
-        this.enemy02_b.setVelocityX(0);
-        if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_idle") {
-          this.enemy02_b.anims.play("enemy02_idle", true);
-        }
       }
+      this.enemy02_b.flipX = this.enemy02_b.direction === 1;
     }
-    this.enemy02_b.flipX = this.enemy02_b.direction === 1;
   }
 
   handleEnemy03Behavior() {
     if (this.enemy03Life <= 0 || !this.enemy03) return;
 
-    const maxChaseDistance = 350;
+    if (this.enemy03) {
+      const maxChaseDistance = 350;
 
-    if (this.enemy03isHit) {
-      this.enemy03.setVelocityX(0);
-
-      if (this.enemy03.hitbox) {
-        this.enemy03.hitbox.destroy();
-        this.enemy03.hitbox = null;
-      }
-
-      if (!this.enemy03.hitCooldown) {
-        this.enemy03.hitCooldown = this.time.delayedCall(1000, () => {
-          this.enemy03isHit = false;
-          this.enemy03.hitCooldown = null;
-          this.enemy03.isPatrolling = true;
-          this.enemy03.canAttack = true;
-          this.enemy03.attackCooldown = 0;
-          if (!this.enemy03.anims.isPlaying) {
-            this.enemy03.anims.play("enemy03_idle", true);
-          }
-        });
-      }
-      this.enemy03.isAttacking = false;
-      return;
-    }
-
-    const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy03.x,
-      this.enemy03.y,
-      this.player.x,
-      this.player.y
-    );
-
-    const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-      this.enemy03.x,
-      this.enemy03.y,
-      this.enemy03.initialX,
-      this.enemy03.y
-    );
-
-    const patrolLeftLimit = this.enemy03.initialX - 100;
-    const patrolRightLimit = this.enemy03.initialX + 100;
-    const chaseSpeedMultiplier = 2;
-
-    if (this.enemy03.isAttacking || this.enemy03.postAttackCooldown) {
-      this.enemy03.setVelocityX(0);
-      return;
-    }
-
-    if (distanceFromOriginalSpot > maxChaseDistance) {
-      this.enemy03.initialX = this.enemy03.x;
-      this.enemy03.patrolLeftLimit = this.enemy03.initialX - 100;
-      this.enemy03.patrolRightLimit = this.enemy03.initialX + 100;
-
-      this.enemy03.isPatrolling = true;
-      this.enemy03.direction = (this.enemy03.x > this.enemy03.initialX) ? -1 : 1;
-
-      this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
-
-      return;
-    }
-
-    if (this.enemy03.isAttacking) {
-      this.enemy03.setVelocityX(0);
-      return;
-    }
-
-    if (this.enemy03.postAttackCooldown) {
-      return;
-    }
-
-    if (distanceToPlayer < this.enemy03.attackRange) {
-      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03.x) ||
-        (!this.player.flipX && this.player.x < this.enemy03.x);
-
-      const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-      if (distanceToPlayer > minimumAttackDistance) {
-        if (this.player.x < this.enemy03.x) {
-          this.enemy03.setVelocityX(-this.enemy03.speed * chaseSpeedMultiplier);
-          this.enemy03.direction = -1;
-        } else {
-          this.enemy03.setVelocityX(this.enemy03.speed * chaseSpeedMultiplier);
-          this.enemy03.direction = 1;
-        }
-        this.enemy03.anims.play("enemy03_walk", true);
-      } else {
+      if (this.enemy03isHit) {
         this.enemy03.setVelocityX(0);
-        if (this.enemy03.canAttack && this.enemy03.attackCooldown <= 0) {
-          this.enemy03.isAttacking = true;
-          this.enemy03.canAttack = false;
-          this.enemy03.attackCooldown = 1500;
-          if (!this.enemy03isHit) {
-            this.hitSound03.play();
-          }
-          this.enemy03.anims.play("enemy03_attack", true);
-          this.enemy03.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03.hitbox) {
-              this.time.delayedCall(490, () => {
-                this.hitSound02.play();
-                this.createEnemyHitbox(this.enemy03);
-              });
-            }
-          });
 
-          this.enemy03.on('animationcomplete-enemy03_attack', () => {
-            this.enemy03.isAttacking = false;
+        if (this.enemy03.hitbox) {
+          this.enemy03.hitbox.destroy();
+          this.enemy03.hitbox = null;
+        }
+
+        if (!this.enemy03.hitCooldown) {
+          this.enemy03.hitCooldown = this.time.delayedCall(1000, () => {
+            this.enemy03isHit = false;
+            this.enemy03.hitCooldown = null;
+            this.enemy03.isPatrolling = true;
             this.enemy03.canAttack = true;
-            if (this.enemy03.hitbox) {
-              this.enemy03.hitbox.destroy();
-              this.enemy03.hitbox = null;
+            this.enemy03.attackCooldown = 0;
+            if (!this.enemy03.anims.isPlaying) {
+              this.enemy03.anims.play("enemy03_idle", true);
             }
-
-            this.enemy03.anims.play("enemy03_idle", true);
-            this.enemy03.postAttackCooldown = true;
-
-            this.time.delayedCall(600, () => {
-              this.enemy03.postAttackCooldown = false;
-              const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                this.enemy03.x,
-                this.enemy03.y,
-                this.player.x,
-                this.player.y
-              );
-              if (currentDistanceToPlayer <= this.enemy03.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                this.enemy03.anims.play("enemy03_attack", true);
-                this.hitSound03.play();
-              } else if (currentDistanceToPlayer < this.enemy03.attackRange) {
-                this.enemy03.anims.play("enemy03_walk", true);
-              } else {
-                this.enemy03.anims.play("enemy03_idle", true);
-              }
-              this.enemy03.attackCooldown = 0;
-            });
           });
+        }
+        this.enemy03.isAttacking = false;
+        return;
+      }
+
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.enemy03.x,
+        this.enemy03.y,
+        this.player.x,
+        this.player.y
+      );
+
+      const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
+        this.enemy03.x,
+        this.enemy03.y,
+        this.enemy03.initialX,
+        this.enemy03.y
+      );
+
+      const patrolLeftLimit = this.enemy03.initialX - 100;
+      const patrolRightLimit = this.enemy03.initialX + 100;
+      const chaseSpeedMultiplier = 2;
+
+      if (this.enemy03.isAttacking || this.enemy03.postAttackCooldown) {
+        this.enemy03.setVelocityX(0);
+        return;
+      }
+
+      if (distanceFromOriginalSpot > maxChaseDistance) {
+        this.enemy03.initialX = this.enemy03.x;
+        this.enemy03.patrolLeftLimit = this.enemy03.initialX - 100;
+        this.enemy03.patrolRightLimit = this.enemy03.initialX + 100;
+
+        this.enemy03.isPatrolling = true;
+        this.enemy03.direction = (this.enemy03.x > this.enemy03.initialX) ? -1 : 1;
+
+        this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
+
+        return;
+      }
+
+      if (this.enemy03.isAttacking) {
+        this.enemy03.setVelocityX(0);
+        return;
+      }
+
+      if (this.enemy03.postAttackCooldown) {
+        return;
+      }
+
+      if (distanceToPlayer < this.enemy03.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03.x) ||
+          (!this.player.flipX && this.player.x < this.enemy03.x);
+
+        const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
+
+        if (distanceToPlayer > minimumAttackDistance) {
+          if (this.player.x < this.enemy03.x) {
+            this.enemy03.setVelocityX(-this.enemy03.speed * chaseSpeedMultiplier);
+            this.enemy03.direction = -1;
+          } else {
+            this.enemy03.setVelocityX(this.enemy03.speed * chaseSpeedMultiplier);
+            this.enemy03.direction = 1;
+          }
+          this.enemy03.anims.play("enemy03_walk", true);
         } else {
-          if (!this.enemy03.anims.isPlaying) {
-            this.enemy03.anims.play("enemy03_idle", true);
+          this.enemy03.setVelocityX(0);
+          if (this.enemy03.canAttack && this.enemy03.attackCooldown <= 0) {
+            this.enemy03.isAttacking = true;
+            this.enemy03.canAttack = false;
+            this.enemy03.attackCooldown = 1500;
+            if (!this.enemy03isHit) {
+              this.hitSound03.play();
+            }
+            this.enemy03.anims.play("enemy03_attack", true);
+            this.enemy03.on('animationupdate', (animation, frame) => {
+              if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03.hitbox) {
+                this.time.delayedCall(490, () => {
+                  this.hitSound02.play();
+                  this.createEnemyHitbox(this.enemy03);
+                });
+              }
+            });
+
+            this.enemy03.on('animationcomplete-enemy03_attack', () => {
+              this.enemy03.isAttacking = false;
+              this.enemy03.canAttack = true;
+              if (this.enemy03.hitbox) {
+                this.enemy03.hitbox.destroy();
+                this.enemy03.hitbox = null;
+              }
+
+              this.enemy03.anims.play("enemy03_idle", true);
+              this.enemy03.postAttackCooldown = true;
+
+              this.time.delayedCall(600, () => {
+                this.enemy03.postAttackCooldown = false;
+                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                  this.enemy03.x,
+                  this.enemy03.y,
+                  this.player.x,
+                  this.player.y
+                );
+                if (currentDistanceToPlayer <= this.enemy03.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.enemy03.anims.play("enemy03_attack", true);
+                  this.hitSound03.play();
+                } else if (currentDistanceToPlayer < this.enemy03.attackRange) {
+                  this.enemy03.anims.play("enemy03_walk", true);
+                } else {
+                  this.enemy03.anims.play("enemy03_idle", true);
+                }
+                this.enemy03.attackCooldown = 0;
+              });
+            });
+          } else {
+            if (!this.enemy03.anims.isPlaying) {
+              this.enemy03.anims.play("enemy03_idle", true);
+            }
           }
         }
-      }
-    } else {
-      if (this.enemy03.body.onFloor()) {
-        if (this.enemy03.isPatrolling) {
-          if (this.enemy03.x <= patrolLeftLimit) {
-            this.enemy03.direction = 1;
-            this.enemy03.setVelocityX(this.enemy03.speed);
-          } else if (this.enemy03.x >= patrolRightLimit) {
-            this.enemy03.direction = -1;
-            this.enemy03.setVelocityX(-this.enemy03.speed);
+      } else {
+        if (this.enemy03.body.onFloor()) {
+          if (this.enemy03.isPatrolling) {
+            if (this.enemy03.x <= patrolLeftLimit) {
+              this.enemy03.direction = 1;
+              this.enemy03.setVelocityX(this.enemy03.speed);
+            } else if (this.enemy03.x >= patrolRightLimit) {
+              this.enemy03.direction = -1;
+              this.enemy03.setVelocityX(-this.enemy03.speed);
+            } else {
+              this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
+            }
+            if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_walk") {
+              this.enemy03.anims.play("enemy03_walk", true);
+            }
           } else {
-            this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
-          }
-          if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_walk") {
-            this.enemy03.anims.play("enemy03_walk", true);
+            this.enemy03.setVelocityX(0);
+            if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_idle") {
+              this.enemy03.anims.play("enemy03_idle", true);
+            }
           }
         } else {
           this.enemy03.setVelocityX(0);
@@ -1743,147 +1970,150 @@ class Jeu extends Phaser.Scene {
             this.enemy03.anims.play("enemy03_idle", true);
           }
         }
-      } else {
-        this.enemy03.setVelocityX(0);
-        if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_idle") {
-          this.enemy03.anims.play("enemy03_idle", true);
-        }
       }
+      this.enemy03.flipX = this.enemy03.direction === 1;
     }
-    this.enemy03.flipX = this.enemy03.direction === 1;
   }
 
   handleEnemy03_bBehavior() {
-    if (this.enemy03_bLife <= 0 || !this.enemy03_b) return;
+    if (this.enemy03_bLife <= 0 || !this.enemy03_b || !this.enemy03_b.active) return;
 
-    if (this.enemy03_bisHit) {
-      this.enemy03_b.setVelocityX(0);
+    if (this.enemy03_b.active) {
 
-      if (this.enemy03_b.hitbox) {
-        this.enemy03_b.hitbox.destroy();
-        this.enemy03_b.hitbox = null;
-      }
-
-      if (!this.enemy03_b.hitCooldown) {
-        this.enemy03_b.hitCooldown = this.time.delayedCall(1000, () => {
-          this.enemy03_bisHit = false;
-          this.enemy03_b.hitCooldown = null;
-          this.enemy03_b.canAttack = true;
-          this.enemy03_b.attackCooldown = 0;
-          if (!this.enemy03_b.anims.isPlaying) {
-            this.enemy03_b.anims.play("enemy03_idle", true);
-          }
-        });
-      }
-      this.enemy03_b.isAttacking = false;
-      return;
-    }
-
-    const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy03_b.x,
-      this.enemy03_b.y,
-      this.player.x,
-      this.player.y
-    );
-
-    const chaseDistance = 600;
-
-    if (this.enemy03_b.isAttacking || this.enemy03_b.postAttackCooldown) {
-      this.enemy03_b.setVelocityX(0);
-      return;
-    }
-
-    if (distanceToPlayer < chaseDistance) {
-      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03_b.x) ||
-        (!this.player.flipX && this.player.x < this.enemy03_b.x);
-
-      const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-      if (distanceToPlayer > minimumAttackDistance) {
-        if (this.player.x < this.enemy03_b.x) {
-          this.enemy03_b.setVelocityX(-this.enemy03_b.speed * 2.8);
-          this.enemy03_b.direction = -1;
-        } else {
-          this.enemy03_b.setVelocityX(this.enemy03_b.speed * 2.8);
-          this.enemy03_b.direction = 1;
-        }
-        this.enemy03_b.anims.play("enemy03_walk", true);
-      } else {
+      if (this.enemy03_bisHit) {
         this.enemy03_b.setVelocityX(0);
-        if (this.enemy03_b.canAttack && this.enemy03_b.attackCooldown <= 0) {
-          this.enemy03_b.isAttacking = true;
-          this.enemy03_b.canAttack = false;
-          this.enemy03_b.attackCooldown = 1500;
 
-          if (!this.enemy03_bisHit) {
-            this.hitSound03.play();
-          }
+        if (this.enemy03_b.hitbox) {
+          this.enemy03_b.hitbox.destroy();
+          this.enemy03_b.hitbox = null;
+        }
 
-          this.enemy03_b.anims.play("enemy03_attack", true);
-
-          this.enemy03_b.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03_b.hitbox) {
-              this.time.delayedCall(490, () => {
-                this.hitSound02.play();
-                this.createEnemyHitbox(this.enemy03_b);
-              });
-            }
-          });
-
-          this.enemy03_b.on('animationcomplete-enemy03_attack', () => {
-            this.enemy03_b.isAttacking = false;
+        if (!this.enemy03_b.hitCooldown) {
+          this.enemy03_b.hitCooldown = this.time.delayedCall(1000, () => {
+            this.enemy03_bisHit = false;
+            this.enemy03_b.hitCooldown = null;
             this.enemy03_b.canAttack = true;
+            this.enemy03_b.attackCooldown = 0;
+            if (!this.enemy03_b.anims.isPlaying) {
+              this.enemy03_b.anims.play("enemy03_idle", true);
+            }
+          });
+        }
+        this.enemy03_b.isAttacking = false;
+        return;
+      }
 
-            if (this.enemy03_b.hitbox) {
-              this.enemy03_b.hitbox.destroy();
-              this.enemy03_b.hitbox = null;
+      const distanceToPlayer = Phaser.Math.Distance.Between(
+        this.enemy03_b.x,
+        this.enemy03_b.y,
+        this.player.x,
+        this.player.y
+      );
+
+      const chaseDistance = 600;
+
+      if (this.enemy03_b.isAttacking || this.enemy03_b.postAttackCooldown) {
+        this.enemy03_b.setVelocityX(0);
+        return;
+      }
+
+      if (distanceToPlayer < chaseDistance) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03_b.x) ||
+          (!this.player.flipX && this.player.x < this.enemy03_b.x);
+
+        const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
+
+        if (distanceToPlayer > minimumAttackDistance) {
+          if (this.player.x < this.enemy03_b.x) {
+            this.enemy03_b.setVelocityX(-this.enemy03_b.speed * 2.8);
+            this.enemy03_b.direction = -1;
+          } else {
+            this.enemy03_b.setVelocityX(this.enemy03_b.speed * 2.8);
+            this.enemy03_b.direction = 1;
+          }
+          this.enemy03_b.anims.play("enemy03_walk", true);
+        } else {
+          this.enemy03_b.setVelocityX(0);
+          if (this.enemy03_b.canAttack && this.enemy03_b.attackCooldown <= 0) {
+            this.enemy03_b.isAttacking = true;
+            this.enemy03_b.canAttack = false;
+            this.enemy03_b.attackCooldown = 1500;
+
+            if (!this.enemy03_bisHit) {
+              this.hitSound03.play();
             }
 
-            this.enemy03_b.anims.play("enemy03_idle", true);
-            this.enemy03_b.postAttackCooldown = true;
+            this.enemy03_b.anims.play("enemy03_attack", true);
 
-            this.time.delayedCall(600, () => {
-              this.enemy03_b.postAttackCooldown = false;
-              const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                this.enemy03_b.x,
-                this.enemy03_b.y,
-                this.player.x,
-                this.player.y
-              );
-              if (currentDistanceToPlayer <= this.enemy03_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                this.enemy03_b.anims.play("enemy03_attack", true);
-                this.hitSound03.play();
-              } else if (currentDistanceToPlayer < this.enemy03_b.attackRange) {
-                this.enemy03_b.anims.play("enemy03_walk", true);
-              } else {
-                this.enemy03_b.anims.play("enemy03_idle", true);
+            this.enemy03_b.on('animationupdate', (animation, frame) => {
+              if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03_b.hitbox) {
+                this.time.delayedCall(490, () => {
+                  this.hitSound02.play();
+                  this.createEnemyHitbox(this.enemy03_b);
+                });
               }
-              this.enemy03_b.attackCooldown = 0;
             });
-          });
-        } else {
-          if (!this.enemy03_b.anims.isPlaying) {
-            this.enemy03_b.anims.play("enemy03_idle", true);
+
+            this.enemy03_b.on('animationcomplete-enemy03_attack', () => {
+              this.enemy03_b.isAttacking = false;
+              this.enemy03_b.canAttack = true;
+
+              if (this.enemy03_b.hitbox) {
+                this.enemy03_b.hitbox.destroy();
+                this.enemy03_b.hitbox = null;
+              }
+
+              this.enemy03_b.anims.play("enemy03_idle", true);
+              this.enemy03_b.postAttackCooldown = true;
+
+              this.time.delayedCall(600, () => {
+                this.enemy03_b.postAttackCooldown = false;
+                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                  this.enemy03_b.x,
+                  this.enemy03_b.y,
+                  this.player.x,
+                  this.player.y
+                );
+                if (currentDistanceToPlayer <= this.enemy03_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.enemy03_b.anims.play("enemy03_attack", true);
+                  this.hitSound03.play();
+                } else if (currentDistanceToPlayer < this.enemy03_b.attackRange) {
+                  this.enemy03_b.anims.play("enemy03_walk", true);
+                } else {
+                  this.enemy03_b.anims.play("enemy03_idle", true);
+                }
+                this.enemy03_b.attackCooldown = 0;
+              });
+            });
+          } else {
+            if (!this.enemy03_b.anims.isPlaying) {
+              this.enemy03_b.anims.play("enemy03_idle", true);
+            }
           }
         }
-      }
-    } else {
-      if (this.enemy03_b.body.onFloor()) {
-        if (this.enemy03_b.isPatrolling) {
-          const patrolLeftLimit = this.enemy03_b.initialX - 100;
-          const patrolRightLimit = this.enemy03_b.initialX + 100;
+      } else {
+        if (this.enemy03_b.body.onFloor()) {
+          if (this.enemy03_b.isPatrolling) {
+            const patrolLeftLimit = this.enemy03_b.initialX - 100;
+            const patrolRightLimit = this.enemy03_b.initialX + 100;
 
-          if (this.enemy03_b.x <= patrolLeftLimit) {
-            this.enemy03_b.direction = 1;
-            this.enemy03_b.setVelocityX(this.enemy03_b.speed);
-          } else if (this.enemy03_b.x >= patrolRightLimit) {
-            this.enemy03_b.direction = -1;
-            this.enemy03_b.setVelocityX(-this.enemy03_b.speed);
+            if (this.enemy03_b.x <= patrolLeftLimit) {
+              this.enemy03_b.direction = 1;
+              this.enemy03_b.setVelocityX(this.enemy03_b.speed);
+            } else if (this.enemy03_b.x >= patrolRightLimit) {
+              this.enemy03_b.direction = -1;
+              this.enemy03_b.setVelocityX(-this.enemy03_b.speed);
+            } else {
+              this.enemy03_b.setVelocityX(this.enemy03_b.speed * this.enemy03_b.direction);
+            }
+            if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_walk") {
+              this.enemy03_b.anims.play("enemy03_walk", true);
+            }
           } else {
-            this.enemy03_b.setVelocityX(this.enemy03_b.speed * this.enemy03_b.direction);
-          }
-          if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_walk") {
-            this.enemy03_b.anims.play("enemy03_walk", true);
+            this.enemy03_b.setVelocityX(0);
+            if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
+              this.enemy03_b.anims.play("enemy03_idle", true);
+            }
           }
         } else {
           this.enemy03_b.setVelocityX(0);
@@ -1891,16 +2121,197 @@ class Jeu extends Phaser.Scene {
             this.enemy03_b.anims.play("enemy03_idle", true);
           }
         }
+      }
+
+      this.enemy03_b.flipX = this.enemy03_b.direction === 1;
+    }
+  }
+
+  handleEnemy04Behavior() {
+    if (this.enemy04Life <= 0 || !this.enemy04) return;
+
+    const maxChaseDistance = 500;
+
+    if (this.enemy04isHit) {
+      this.enemy04.setVelocityX(0);
+
+      if (this.enemy04.hitbox) {
+        this.enemy04.hitbox.destroy();
+        this.enemy04.hitbox = null;
+      }
+
+      if (!this.enemy04.hitCooldown) {
+        this.enemy04.hitCooldown = this.time.delayedCall(500, () => {
+          this.enemy04isHit = false;
+          this.enemy04.hitCooldown = null;
+          this.enemy04.isPatrolling = true;
+          this.enemy04.canAttack = true;
+          this.enemy04.attackCooldown = 0;
+          if (!this.enemy04.anims.isPlaying) {
+            this.enemy04.anims.play("enemy04_idle", true);
+          }
+        });
+      }
+      this.enemy04.isAttacking = false;
+      return;
+    }
+
+    const distanceToPlayer = Phaser.Math.Distance.Between(
+      this.enemy04.x,
+      this.enemy04.y,
+      this.player.x,
+      this.player.y
+    );
+
+    const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
+      this.enemy04.x,
+      this.enemy04.y,
+      this.enemy04.initialX,
+      this.enemy04.y
+    );
+
+    const patrolLeftLimit = this.enemy04.initialX - 100;
+    const patrolRightLimit = this.enemy04.initialX + 100;
+    const chaseSpeedMultiplier = 2;
+
+    if (this.enemy04.isAttacking || this.enemy04.postAttackCooldown) {
+      this.enemy04.setVelocityX(0);
+      return;
+    }
+
+    if (distanceFromOriginalSpot > maxChaseDistance) {
+      this.enemy04.initialX = this.enemy04.x;
+      this.enemy04.patrolLeftLimit = this.enemy04.initialX - 100;
+      this.enemy04.patrolRightLimit = this.enemy04.initialX + 100;
+
+      this.enemy04.isPatrolling = true;
+      this.enemy04.direction = (this.enemy04.x > this.enemy04.initialX) ? -1 : 1;
+      this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
+      return;
+    }
+
+    if (this.enemy04.isAttacking) {
+      this.enemy04.setVelocityX(0);
+      return;
+    }
+
+    if (this.enemy04.postAttackCooldown) {
+      return;
+    }
+
+    if (distanceToPlayer < this.enemy04.attackRange) {
+      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy04.x) ||
+        (!this.player.flipX && this.player.x < this.enemy04.x);
+
+      const minimumAttackDistance = this.enemy04.flipX ? (isPlayerFacingEnemy ? 105 : 135) : (isPlayerFacingEnemy ? 55 : 85);
+
+      if (distanceToPlayer > minimumAttackDistance) {
+        if (this.player.x < this.enemy04.x) {
+          this.enemy04.setVelocityX(-this.enemy04.speed * chaseSpeedMultiplier);
+          this.enemy04.direction = -1;
+          this.enemy04.setOrigin(1, 0.5);
+          this.enemy04.setOffset(40, 20);
+        } else {
+          this.enemy04.setVelocityX(this.enemy04.speed * chaseSpeedMultiplier);
+          this.enemy04.direction = 1;
+          this.enemy04.setOrigin(0.5, 0.5);
+          this.enemy04.setOffset(10, 20);
+        }
+        this.enemy04.anims.play("enemy04_walk", true);
       } else {
-        this.enemy03_b.setVelocityX(0);
-        if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
-          this.enemy03_b.anims.play("enemy03_idle", true);
+        this.enemy04.setVelocityX(0);
+        if (this.enemy04.canAttack && this.enemy04.attackCooldown <= 0) {
+          this.enemy04.isAttacking = true;
+          this.enemy04.canAttack = false;
+          this.enemy04.attackCooldown = 1500;
+
+          if (!this.enemy04isHit) {
+            this.hitSound02.play();
+          }
+
+          this.enemy04.anims.play("enemy04_attack", true);
+
+          this.enemy04.on('animationupdate', (animation, frame) => {
+            if (animation.key === "enemy04_attack" && frame.index === 2 && !this.enemy04.hitbox) {
+              this.createEnemyHitboxC(this.enemy04);
+            }
+          });
+
+          this.enemy04.on('animationcomplete-enemy04_attack', () => {
+            this.enemy04.isAttacking = false;
+            this.enemy04.canAttack = true;
+
+            if (this.enemy04.hitbox) {
+              this.enemy04.hitbox.destroy();
+              this.enemy04.hitbox = null;
+            }
+
+            this.enemy04.anims.play("enemy04_idle", true);
+            this.enemy04.postAttackCooldown = true;
+
+            this.time.delayedCall(600, () => {
+              this.enemy04.postAttackCooldown = false;
+              const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                this.enemy04.x,
+                this.enemy04.y,
+                this.player.x,
+                this.player.y
+              );
+              if (currentDistanceToPlayer <= this.enemy04.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                this.enemy04.anims.play("enemy04_attack", true);
+                this.hitSound02.play();
+              } else if (currentDistanceToPlayer < this.enemy04.attackRange) {
+                this.enemy04.anims.play("enemy04_walk", true);
+              } else {
+                this.enemy04.anims.play("enemy04_idle", true);
+              }
+              this.enemy04.attackCooldown = 0;
+            });
+          });
+        } else {
+          if (!this.enemy04.anims.isPlaying) {
+            this.enemy04.anims.play("enemy04_idle", true);
+          }
+        }
+      }
+    } else {
+      if (this.enemy04.body.onFloor()) {
+        if (this.enemy04.isPatrolling) {
+          if (this.enemy04.x <= patrolLeftLimit) {
+            this.enemy04.direction = 1;
+            this.enemy04.setOrigin(0.5, 0.5);
+            this.enemy04.setOffset(10, 20);
+            this.enemy04.setVelocityX(this.enemy04.speed);
+          } else if (this.enemy04.x >= patrolRightLimit) {
+            this.enemy04.direction = -1;
+            this.enemy04.setOrigin(1, 0.5);
+            this.enemy04.setOffset(40, 20);
+            this.enemy04.setVelocityX(-this.enemy04.speed);
+          } else {
+            this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
+          }
+          if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_walk") {
+            this.enemy04.anims.play("enemy04_walk", true);
+          }
+        } else {
+          this.enemy04.setVelocityX(0);
+          if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_idle") {
+            this.enemy04.anims.play("enemy04_idle", true);
+          }
+        }
+      } else {
+        this.enemy04.setVelocityX(0);
+        if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_idle") {
+          this.enemy04.anims.play("enemy04_idle", true);
         }
       }
     }
 
-    this.enemy03_b.flipX = this.enemy03_b.direction === 1;
+    // Update flipX based on direction
+    this.enemy04.flipX = this.enemy04.direction === -1;
   }
+
+
 
 
   handleEnemyLife() {
@@ -1949,11 +2360,10 @@ class Jeu extends Phaser.Scene {
     if (this.enemy03) {
       if (this.enemy03Life <= 0) {
         this.enemy03.body.enable = false;
-        this.enemy03.disableBody();
+        //this.enemy03.disableBody();
         this.enemy03.anims.play("enemy03_death");
         this.enemyDeathSound.play();
         this.enemy03.on("animationcomplete", () => {
-          console.log("this boy dead, function handleEnemyLife");
           this.enemy03.destroy();
           this.enemy03.setActive(false);
           this.enemy03.setVisible(false);
@@ -1984,32 +2394,19 @@ class Jeu extends Phaser.Scene {
     }
 
     if (this.enemy04) {
-      if (this.enemy04Life <= 0 /*&& this.enemy04*/ ) {
-        this.enemy04.disableBody();
+      if (this.enemy04Life <= 0) {
         this.enemy04.body.enable = false;
-        this.enemy04.anims.play("enemy04_death");
+        if (!this.enemy04.flipX) {
+          this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x - 25, this.enemy04.y);
+        } else if (this.enemy04.flipX) {
+          this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x + 40, this.enemy04.y);
+        }
         this.enemyDeathSound.play();
-        this.enemy04.on("animationcomplete", () => {
+        this.time.delayedCall(350, () => {
           this.enemy04.destroy();
           this.enemy04.setActive(false);
           this.enemy04.setVisible(false);
-          this.enemy04.destroy();
           this.enemy04 = null;
-        });
-      }
-    }
-
-    if (this.enemy05) {
-      if (this.enemy05Life <= 0 /*&& this.enemy05*/ ) {
-        this.enemy05.disableBody();
-        this.enemy05.body.enable = false;
-        this.enemy05.anims.play("enemy05_death");
-        this.enemyDeathSound.play();
-        this.enemy05.on("animationcomplete", () => {
-          this.enemy05.destroy();
-          this.enemy05.setActive();
-          this.enemy05.setVisible(false);
-          this.enemy05 = null;
         });
       }
     }
@@ -2037,7 +2434,6 @@ class Jeu extends Phaser.Scene {
       });
     }
   }
-
 
   handleHealthPickup() {
     this.hearts.forEach((heart) => {
@@ -2073,7 +2469,7 @@ class Jeu extends Phaser.Scene {
       this.healthHud.setCrop(58, 0, 42, 10).setPosition(-250, 70);
     } else if (this.playerLife === 1) {
       this.healthHud.setCrop(20, 0, 48, 10).setPosition(-80, 70);
-    } else if (this.playerLife === 0 && !this.playerIsDead) {
+    } else if (this.playerLife <= 0) {
       this.healthHud.setCrop(0, 0, 32, 10).setPosition(90, 70);
       this.handlePlayerDeath();
     }
@@ -2146,7 +2542,9 @@ class Jeu extends Phaser.Scene {
           switch (enemy) {
             case this.enemy01:
               if (this.enemy01Life > 0) {
+                this.enemy01.play("enemy01_hit", true);
                 this.enemy01Life--;
+                this.enemy01isHit = true;
               }
               break;
             case this.enemy02:
@@ -2178,10 +2576,11 @@ class Jeu extends Phaser.Scene {
               }
               break;
             case this.enemy04:
-              if (this.enemy04Life > 0) this.enemy04Life--;
-              break;
-            case this.enemy05:
-              if (this.enemy05Life > 0) this.enemy05Life--;
+              if (this.enemy04Life > 0) {
+                this.enemy04Life--;
+                this.enemy04.play("enemy04_hit", true);
+                this.enemy04isHit = true;
+              }
               break;
           }
           daggerHitEnemy = true;
@@ -2297,7 +2696,6 @@ class Jeu extends Phaser.Scene {
   }
 
   handlePlayerAnimations() {
-    // const currentTime = this.time.now;
 
     if (this.isAttackingOrThrowing) return;
 
@@ -2325,6 +2723,7 @@ class Jeu extends Phaser.Scene {
 
   handlePlayerDeath() {
     if (this.playerIsDead) return;
+
     this.playerIsDead = true;
     this.sound.stopAll();
     this.playerDeathSound.play();
@@ -2366,39 +2765,4 @@ class Jeu extends Phaser.Scene {
       this.tweens.killTweensOf(this.player);
     }
   }
-
-  // Combo attaque je laisse en commentaire a revoir plus tard dans N2C
-
-  /* performComboAttack(comboCount) {  
-      let attackKey;
-
-      if (comboCount > 4) {
-        this.comboCount = 1;
-        attackKey = "attack_1";
-      } else {
-        attackKey = `attack_${comboCount}`;
-      }
-
-      this.player.anims.play(attackKey, true);
-      this.isAttackingOrThrowing = true;
-
-      this.player.on("animationcomplete", () => {
-        this.isAttackingOrThrowing = false;
-        if (this.comboCount < 4) {
-          this.resetCombo();
-        }
-      });
-    }
-
-   resetCombo() {
-      if (this.comboResetTimer) {
-        this.time.removeEvent(this.comboResetTimer);
-      }
-
-      this.comboResetTimer = this.time.delayedCall(3000, () => {
-        this.comboCount = 0;
-      });
-    }
-      */
-
 }

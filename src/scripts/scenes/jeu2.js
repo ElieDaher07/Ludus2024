@@ -6,6 +6,8 @@ class Jeu2 extends Phaser.Scene {
         });
     }
 
+    preload() {}
+
     createAnimation() {
 
         // PLAYER //
