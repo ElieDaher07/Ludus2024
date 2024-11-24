@@ -1335,14 +1335,27 @@ class Jeu extends Phaser.Scene {
       this.handleParallax();
       this.handlePlayerMovement();
       this.handlePlayerAnimations();
-      this.handleEnemy01Behavior();
-      this.handleEnemy02Behavior();
-      this.handleEnemy02_bBehavior();
-      this.handleEnemy03Behavior();
+
+      if (this.enemy01 && this.enemy01.active) {
+        this.handleEnemy01Behavior();
+      }
+      if (this.enemy02 && this.enemy02.active) {
+        this.handleEnemy02Behavior();
+      }
+      if (this.enemy02_b && this.enemy02_b.active) {
+        this.handleEnemy02_bBehavior();
+      }
+      if (this.enemy03 && this.enemy03.active) {
+        this.handleEnemy03Behavior();
+      }
       if (this.enemy03_b && this.enemy03_b.active) {
         this.handleEnemy03_bBehavior();
       }
-      this.handleEnemy04Behavior();
+
+      if (this.enemy04 && this.enemy04.active) {
+        this.handleEnemy04Behavior();
+      }
+
     }
 
     //console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
@@ -1398,13 +1411,6 @@ class Jeu extends Phaser.Scene {
         this.enemy01.canAttack = false;
         this.enemy01.attackCooldown = 1500;
 
-        // Play attack sound
-        if (!this.enemy01isHit) {
-          this.time.delayedCall(500, () => {
-            this.hitSound05.play();
-          });
-        }
-
         // Play attack animation
         if (this.enemy01 && this.enemy01.anims) {
           this.enemy01.anims.play("enemy01_attack", true);
@@ -1414,6 +1420,10 @@ class Jeu extends Phaser.Scene {
         this.enemy01.on('animationupdate', (animation, frame) => {
           if (animation.key === "enemy01_attack" && frame.index === 6 && !this.enemy01.hitbox) {
             this.createEnemyHitboxB(this.enemy01);
+
+            if (!this.enemy01isHit) {
+              this.hitSound02.play();
+            }
           }
         });
 
@@ -1555,15 +1565,17 @@ class Jeu extends Phaser.Scene {
             this.enemy02.canAttack = false;
             this.enemy02.attackCooldown = 1500;
 
-            if (!this.enemy02isHit) {
-              this.hitSound02.play();
-            }
 
             this.enemy02.anims.play("enemy02_attack", true);
 
             this.enemy02.on('animationupdate', (animation, frame) => {
               if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02.hitbox) {
-                this.createEnemyHitbox(this.enemy02);
+
+                if (!this.enemy02isHit) {
+                  this.hitSound02.play();
+
+                  this.createEnemyHitbox(this.enemy02);
+                }
               }
             });
 
@@ -1589,7 +1601,6 @@ class Jeu extends Phaser.Scene {
                 );
                 if (currentDistanceToPlayer <= this.enemy02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
                   this.enemy02.anims.play("enemy02_attack", true);
-                  this.hitSound02.play();
                 } else if (currentDistanceToPlayer < this.enemy02.attackRange) {
                   this.enemy02.anims.play("enemy02_walk", true);
                 } else {
@@ -1733,15 +1744,17 @@ class Jeu extends Phaser.Scene {
             this.enemy02_b.attackCooldown = 1500;
 
 
-            if (!this.enemy02_bisHit) {
-              this.hitSound02.play();
-            }
+
 
             this.enemy02_b.anims.play("enemy02_attack", true);
 
             this.enemy02_b.on('animationupdate', (animation, frame) => {
               if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02_b.hitbox) {
-                this.createEnemyHitbox(this.enemy02_b);
+                if (!this.enemy02_bisHit) {
+                  this.hitSound02.play();
+                  this.createEnemyHitbox(this.enemy02_b);
+                }
+
               }
             });
 
@@ -1767,7 +1780,6 @@ class Jeu extends Phaser.Scene {
                 );
                 if (currentDistanceToPlayer <= this.enemy02_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
                   this.enemy02_b.anims.play("enemy02_attack", true);
-                  this.hitSound02.play();
                 } else if (currentDistanceToPlayer < this.enemy02_b.attackRange) {
                   this.enemy02_b.anims.play("enemy02_walk", true);
                 } else {
@@ -1911,15 +1923,15 @@ class Jeu extends Phaser.Scene {
             this.enemy03.isAttacking = true;
             this.enemy03.canAttack = false;
             this.enemy03.attackCooldown = 1500;
-            if (!this.enemy03isHit) {
-              this.hitSound03.play();
-            }
+
             this.enemy03.anims.play("enemy03_attack", true);
             this.enemy03.on('animationupdate', (animation, frame) => {
               if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03.hitbox) {
                 this.time.delayedCall(490, () => {
-                  this.hitSound02.play();
-                  this.createEnemyHitbox(this.enemy03);
+                  if (!this.enemy03isHit) {
+                    this.hitSound02.play();
+                    this.createEnemyHitbox(this.enemy03);
+                  }
                 });
               }
             });
@@ -1945,7 +1957,6 @@ class Jeu extends Phaser.Scene {
                 );
                 if (currentDistanceToPlayer <= this.enemy03.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
                   this.enemy03.anims.play("enemy03_attack", true);
-                  this.hitSound03.play();
                 } else if (currentDistanceToPlayer < this.enemy03.attackRange) {
                   this.enemy03.anims.play("enemy03_walk", true);
                 } else {
@@ -2056,17 +2067,17 @@ class Jeu extends Phaser.Scene {
             this.enemy03_b.canAttack = false;
             this.enemy03_b.attackCooldown = 1500;
 
-            if (!this.enemy03_bisHit) {
-              this.hitSound03.play();
-            }
 
             this.enemy03_b.anims.play("enemy03_attack", true);
 
             this.enemy03_b.on('animationupdate', (animation, frame) => {
               if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03_b.hitbox) {
+
                 this.time.delayedCall(490, () => {
-                  this.hitSound02.play();
-                  this.createEnemyHitbox(this.enemy03_b);
+                  if (!this.enemy03_bisHit) {
+                    this.hitSound02.play();
+                    this.createEnemyHitbox(this.enemy03_b);
+                  }
                 });
               }
             });
@@ -2093,7 +2104,6 @@ class Jeu extends Phaser.Scene {
                 );
                 if (currentDistanceToPlayer <= this.enemy03_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
                   this.enemy03_b.anims.play("enemy03_attack", true);
-                  this.hitSound03.play();
                 } else if (currentDistanceToPlayer < this.enemy03_b.attackRange) {
                   this.enemy03_b.anims.play("enemy03_walk", true);
                 } else {
@@ -2150,7 +2160,7 @@ class Jeu extends Phaser.Scene {
 
 
   handleEnemy04Behavior() {
-    if (this.enemy04Life <= 0 || !this.enemy04) return;
+    if (this.enemy04Life <= 0 || !this.enemy04 || !this.enemy04.active) return;
 
     const maxChaseDistance = 500;
     const patrolLeftLimit = this.enemy04.initialX - 100;
@@ -2263,12 +2273,16 @@ class Jeu extends Phaser.Scene {
           this.enemy04.canAttack = false;
           this.enemy04.attackCooldown = 1500;
 
-          this.hitSound02.play();
+
           this.enemy04.anims.play("enemy04_attack", true);
 
           this.enemy04.on('animationupdate', (animation, frame) => {
             if (animation.key === "enemy04_attack" && frame.index === 2 && !this.enemy04.hitbox) {
               this.createEnemyHitboxC(this.enemy04);
+
+              if (!this.enemy04isHit) {
+                this.hitSound02.play();
+              }
             }
           });
 
@@ -2303,7 +2317,7 @@ class Jeu extends Phaser.Scene {
                   this.enemy04.setOffset(10, 20);
                 }
                 this.enemy04.anims.play("enemy04_attack", true);
-                this.hitSound02.play();
+
               } else if (currentDistanceToPlayer < this.enemy04.attackRange) {
                 this.enemy04.anims.play("enemy04_walk", true);
               } else {
@@ -2350,9 +2364,6 @@ class Jeu extends Phaser.Scene {
   }
 
 
-
-
-
   handleEnemyLife() {
     if (this.enemy01) {
       if (this.enemy01Life <= 0) {
@@ -2360,10 +2371,13 @@ class Jeu extends Phaser.Scene {
         this.enemy01.anims.play("enemy01_death");
         this.enemyDeathSound.play();
         this.enemy01.on("animationcomplete", () => {
-          this.enemy01.destroy();
+          //this.enemy01.destroy();
           this.enemy01.setActive(false);
           this.enemy01.setVisible(false);
-          this.enemy01 = null;
+          this.time.delayedCall(350, () => {
+            this.enemy01.destroy();
+            this.enemy01 = null;
+          });
         });
       }
     }
@@ -2374,10 +2388,13 @@ class Jeu extends Phaser.Scene {
         this.enemy02.anims.play("enemy02_death");
         this.enemyDeathSound.play();
         this.enemy02.on("animationcomplete", () => {
-          this.enemy02.destroy();
+          //this.enemy02.destroy();
           this.enemy02.setActive(false);
           this.enemy02.setVisible(false);
-          this.enemy02 = null;
+          this.time.delayedCall(350, () => {
+            this.enemy02.destroy();
+            this.enemy02 = null;
+          });
         });
       }
     }
@@ -2388,10 +2405,13 @@ class Jeu extends Phaser.Scene {
         this.enemy02_b.anims.play("enemy02_death");
         this.enemyDeathSound.play();
         this.enemy02_b.on("animationcomplete", () => {
-          this.enemy02_b.destroy();
+          //this.enemy02_b.destroy();
           this.enemy02_b.setActive(false);
           this.enemy02_b.setVisible(false);
-          this.enemy02_b = null;
+          this.time.delayedCall(350, () => {
+            this.enemy02_b.destroy();
+            this.enemy02_b = null;
+          });
         });
       }
     }
@@ -2403,10 +2423,13 @@ class Jeu extends Phaser.Scene {
         this.enemy03.anims.play("enemy03_death");
         this.enemyDeathSound.play();
         this.enemy03.on("animationcomplete", () => {
-          this.enemy03.destroy();
+          //this.enemy03.destroy();
           this.enemy03.setActive(false);
           this.enemy03.setVisible(false);
-          this.enemy03 = null;
+          this.time.delayedCall(350, () => {
+            this.enemy03.destroy();
+            this.enemy03 = null;
+          });
         });
       }
     }
@@ -2424,10 +2447,14 @@ class Jeu extends Phaser.Scene {
           }
         });
         this.enemy03_b.on("animationcomplete", () => {
-          this.enemy03_b.destroy();
+          //this.enemy03_b.destroy();
           this.enemy03_b.setActive(false);
           this.enemy03_b.setVisible(false);
-          this.enemy03_b = null;
+          this.time.delayedCall(350, () => {
+            this.enemy03_b.destroy();
+            this.enemy03_b = null;
+          });
+
         });
       }
     }
@@ -2437,14 +2464,21 @@ class Jeu extends Phaser.Scene {
         this.enemy04.body.enable = false;
         if (!this.enemy04.flipX) {
           this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x - 25, this.enemy04.y);
+          this.enemy04.setOrigin(0.5, 0.5);
+          this.enemy04.setOffset(10, 20);
         } else if (this.enemy04.flipX) {
           this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x + 40, this.enemy04.y);
+          this.enemy04.setPosition(this.enemy04.x, this.enemy04.y)
+          this.enemy04.setOrigin(1, 0.5);
+          this.enemy04.setOffset(40, 20);
         }
         this.enemyDeathSound.play();
-        this.time.delayedCall(350, () => {
-          this.enemy04.destroy();
+        this.time.delayedCall(200, () => {
           this.enemy04.setActive(false);
           this.enemy04.setVisible(false);
+        })
+        this.time.delayedCall(350, () => {
+          this.enemy04.destroy();
           this.enemy04 = null;
         });
       }
@@ -2478,14 +2512,18 @@ class Jeu extends Phaser.Scene {
     this.hearts.forEach((heart) => {
       this.physics.add.overlap(this.player, heart, () => {
         if (this.playerLife < this.maxPlayerLife) {
-          this.playerLife++;
+          if (this.playerLife === 7) {
+            this.playerLife += 1;
+          } else {
+            this.playerLife += 2;
+          }
           heart.setActive(false);
           heart.setVisible(false);
           heart.destroy();
           this.itemPickupSound.play();
           this.handleHud();
         } else {
-          console.log("Player life is already at max, cannot pick up heart.");
+          console.log("MAX HP.");
         }
       });
     });

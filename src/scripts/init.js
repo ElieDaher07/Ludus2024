@@ -13,7 +13,13 @@ const config = {
         y: 1000
       },
       fps: 60,
-      timeScale: 1
+      timeScale: 1,
+      checkCollision: {
+        up: true,
+        down: true,
+        left: true,
+        right: true
+      }
     }
   }
 };
