@@ -384,7 +384,7 @@ class Jeu extends Phaser.Scene {
     this.input.mouse.disableContextMenu();
 
     // Commence le "cutscene" 
-    /* this.game.cutscenePlayed = false;
+     this.game.cutscenePlayed = false;
      this.input.keyboard.enabled = false;
      this.input.mouse.enabled = false;
 
@@ -410,7 +410,7 @@ class Jeu extends Phaser.Scene {
          this.input.mouse.enabled = true;
        }
      });
-     */
+     
 
     // Creation variables progression
 
@@ -631,7 +631,7 @@ class Jeu extends Phaser.Scene {
 
     // ------------------------------ CRÉATION DU JOUEUR -------------------------------
 
-    this.player = this.physics.add.sprite(config.width / 2 - 200, config.height / 2 + 1000, "player_idle_run_jump"); // default spot cfg.width / 2 - 600, y just config.height / 2
+    this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump"); // other spot spot cfg.width / 2 - 200, y  config.height / 2 + 1000
     this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
     this.player.setScale(2).setDepth(1);
 
