@@ -8,363 +8,66 @@ class Jeu extends Phaser.Scene {
 
   preload() {
 
-    // les preloads sont tous dans accueil.js pour le moment
+    // les preloads sont tous dans preload.js
 
+  }
+
+
+  createAnimationKey(key, spritesheet, firstFrame, lastFrame, frameRate, loop) {
+    this.anims.create({
+      key: key,
+      frames: this.anims.generateFrameNumbers(spritesheet, {
+        start: firstFrame,
+        end: lastFrame
+      }),
+      frameRate: frameRate,
+      repeat: loop
+    });
   }
 
   createAnimation() {
 
-    // PLAYER //
-    this.anims.create({
-      key: "idle",
-      frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-        start: 0,
-        end: 8
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "walk",
-      frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-        start: 9,
-        end: 16
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "jump",
-      frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-        start: 17,
-        end: 20
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "fall",
-      frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-        start: 20,
-        end: 23
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "attack_1",
-      frames: this.anims.generateFrameNumbers("player_attacks", {
-        start: 0,
-        end: 6
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "attack_2",
-      frames: this.anims.generateFrameNumbers("player_attacks", {
-        start: 7,
-        end: 11
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "attack_3",
-      frames: this.anims.generateFrameNumbers("player_attacks", {
-        start: 12,
-        end: 18
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "attack_4",
-      frames: this.anims.generateFrameNumbers("player_attacks", {
-        start: 19,
-        end: 26
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "throw_attack",
-      frames: this.anims.generateFrameNumbers("player_throw_attack", {
-        start: 0,
-        end: 6
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "dagger_projectile",
-      frames: this.anims.generateFrameNumbers("dagger_throw", {
-        start: 0,
-        end: 0
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "dagger_hit",
-      frames: this.anims.generateFrameNumbers("dagger_throw", {
-        start: 1,
-        end: 3
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "player_hit",
-      frames: this.anims.generateFrameNumbers("player_hit_death", {
-        start: 5,
-        end: 7
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "player_death",
-      frames: this.anims.generateFrameNumbers("player_hit_death", {
-        start: 0,
-        end: 4
-      }),
-      frameRate: 10,
-      repeat: 0
-    });
+    // PLAYER 
+    this.createAnimationKey("idle", "player_idle_run_jump", 0, 8, 10, -1);
+    this.createAnimationKey("walk", "player_idle_run_jump", 9, 16, 10, -1);
+    this.createAnimationKey("jump", "player_idle_run_jump", 17, 20, 10, 0);
+    this.createAnimationKey("fall", "player_idle_run_jump", 20, 23, 10, 0);
+    this.createAnimationKey("attack_1", "player_attacks", 0, 6, 10, 0);
+    this.createAnimationKey("throw_attack", "player_throw_attack", 0, 6, 10, 0);
+    this.createAnimationKey("dagger_projectile", "dagger_throw", 0, 0, 10, 0);
+    this.createAnimationKey("dagger_hit", "dagger_throw", 1, 3, 10, 0);
+    this.createAnimationKey("player_hit", "player_hit_death", 5, 7, 10, 0);
+    this.createAnimationKey("player_death", "player_hit_death", 0, 4, 10, 0);
 
     // BIRD
-    this.anims.create({
-      key: "bird_bg",
-      frames: this.anims.generateFrameNames("bird", {
-        start: 9,
-        end: 11
-      }),
-      frameRate: 8,
-      repeat: -1
-    });
+    this.createAnimationKey("bird_bg", "bird", 9, 11, 8, -1);
 
     // ENEMY 01 - PLANT
-    this.anims.create({
-      key: "enemy01_idle",
-      frames: this.anims.generateFrameNames("enemy01", {
-        start: 0,
-        end: 7
-      }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "enemy01_attack",
-      frames: this.anims.generateFrameNames("enemy01", {
-        start: 8,
-        end: 15
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
-
-
-    this.anims.create({
-      key: "enemy01_hit",
-      frames: this.anims.generateFrameNames("enemy01", {
-        start: 24,
-        end: 26
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "enemy01_death",
-      frames: this.anims.generateFrameNames("destroy_effect", {
-        start: 0,
-        end: 4
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
+    this.createAnimationKey("plant_idle", "enemy01", 0, 7, 8, -1);
+    this.createAnimationKey("plant_attack", "enemy01", 8, 15, 8, 0);
+    this.createAnimationKey("plant_hit", "enemy01", 24, 26, 8, 0);
+    this.createAnimationKey("plant_death", "destroy_effect", 0, 4, 8, 0);
 
     // ENEMY 02 - SORCERER DAGGER
-    this.anims.create({
-      key: "enemy02_idle",
-      frames: this.anims.generateFrameNames("enemy02", {
-        start: 0,
-        end: 4
-      }),
-      frameRate: 6,
-      repeat: -1
-    })
-
-    this.anims.create({
-      key: "enemy02_walk",
-      frames: this.anims.generateFrameNames("enemy02", {
-        start: 5,
-        end: 8
-      }),
-      frameRate: 6,
-      repeat: -1
-    })
-
-    this.anims.create({
-      key: "enemy02_attack",
-      frames: this.anims.generateFrameNames("enemy02", {
-        start: 10,
-        end: 13
-      }),
-      frameRate: 8,
-      repeat: 0
-    })
-
-    this.anims.create({
-      key: "enemy02_hit",
-      frames: this.anims.generateFrameNames("enemy02", {
-        start: 15,
-        end: 18
-      }),
-      frameRate: 8,
-      repeat: 0
-    })
-
-    this.anims.create({
-      key: "enemy02_death",
-      frames: this.anims.generateFrameNames("enemy02", {
-        start: 20,
-        end: 24
-      }),
-      frameRate: 8,
-      repeat: 0
-    })
-
+    this.createAnimationKey("enemy02_idle", "enemy02", 0, 4, 6, -1);
+    this.createAnimationKey("enemy02_walk", "enemy02", 5, 8, 6, -1);
+    this.createAnimationKey("enemy02_attack", "enemy02", 10, 13, 8, 0);
+    this.createAnimationKey("enemy02_hit", "enemy02", 15, 18, 8, 0);
+    this.createAnimationKey("enemy02_death", "enemy02", 20, 24, 8, 0);
 
     // ENEMY 03 - TANK SORCERER - DAGGER
-    this.anims.create({
-      key: "enemy03_idle",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 0,
-        end: 4
-      }),
-      frameRate: 6,
-      repeat: -1
-    })
-
-    this.anims.create({
-      key: "enemy03_walk",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 6,
-        end: 11
-      }),
-      frameRate: 6,
-      repeat: -1
-    })
-
-    this.anims.create({
-      key: "enemy03_attack",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 12,
-        end: 17
-      }),
-      frameRate: 6,
-      repeat: 0
-    })
-
-    this.anims.create({
-      key: "enemy03_hit",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 18,
-        end: 22
-      }),
-      frameRate: 6,
-      repeat: 0
-    })
-
-    this.anims.create({
-      key: "enemy03_death",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 24,
-        end: 29
-      }),
-      frameRate: 6,
-      repeat: 0
-    })
-
-    this.anims.create({
-      key: "enemy03_revive",
-      frames: this.anims.generateFrameNames("enemy03", {
-        start: 29,
-        end: 24
-      }),
-      frameRate: 6,
-      repeat: 0
-    });
-
+    this.createAnimationKey("enemy03_idle", "enemy03", 0, 4, 6, -1);
+    this.createAnimationKey("enemy03_walk", "enemy03", 6, 11, 6, -1);
+    this.createAnimationKey("enemy03_attack", "enemy03", 12, 17, 6, 0);
+    this.createAnimationKey("enemy03_hit", "enemy03", 18, 22, 6, 0);
+    this.createAnimationKey("enemy03_death", "enemy03", 24, 29, 6, 0);
 
     // ENEMY 04 - PLAGUE DOCTOR
-
-    this.anims.create({
-      key: "enemy04_idle",
-      frames: this.anims.generateFrameNames("enemy04", {
-        start: 0,
-        end: 6
-      }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "enemy04_walk",
-      frames: this.anims.generateFrameNames("enemy04", {
-        start: 7,
-        end: 12
-      }),
-      frameRate: 8,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "enemy04_attack",
-      frames: this.anims.generateFrameNames("enemy04", {
-        start: 13,
-        end: 19
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "enemy04_hit",
-      frames: this.anims.generateFrameNames("enemy04", {
-        start: 25,
-        end: 27
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
-
-    this.anims.create({
-      key: "enemy04_death",
-      frames: this.anims.generateFrameNames("destroy_effect", {
-        start: 0,
-        end: 4
-      }),
-      frameRate: 8,
-      repeat: 0
-    });
-
-
+    this.createAnimationKey("enemy04_idle", "enemy04", 0, 6, 8, -1);
+    this.createAnimationKey("enemy04_walk", "enemy04", 7, 12, 8, -1);
+    this.createAnimationKey("enemy04_attack", "enemy04", 13, 19, 8, 0);
+    this.createAnimationKey("enemy04_hit", "enemy04", 25, 27, 8, 0);
+    this.createAnimationKey("enemy04_death", "destroy_effect", 0, 4, 8, 0);
 
   }
 
@@ -384,33 +87,36 @@ class Jeu extends Phaser.Scene {
     this.input.mouse.disableContextMenu();
 
     // Commence le "cutscene" 
-     this.game.cutscenePlayed = false;
-     this.input.keyboard.enabled = false;
-     this.input.mouse.enabled = false;
 
-     this.cameras.main.fadeIn(1000, 0, 0, 0);
+    /*
+    this.game.cutscenePlayed = false;
+    this.input.keyboard.enabled = false;
+    this.input.mouse.enabled = false;
 
-     this.time.delayedCall(1000, () => {
-       if (!this.game.cutscenePlayed) {
-         this.game.cutscenePlayed = true;
-         this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
-         this.cameras.main.once('camerapancomplete', () => {
-           this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
-           this.time.delayedCall(1000, () => {
-             this.cameras.main.pan(0, 0, 3000, 'Linear');
-             this.time.delayedCall(3000, () => {
-               this.input.keyboard.enabled = true;
-               this.input.mouse.enabled = true;
-             });
-           });
-         });
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
 
-       } else {
-         this.input.keyboard.enabled = true;
-         this.input.mouse.enabled = true;
-       }
-     });
-     
+    this.time.delayedCall(1000, () => {
+      if (!this.game.cutscenePlayed) {
+        this.game.cutscenePlayed = true;
+        this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
+        this.cameras.main.once('camerapancomplete', () => {
+          this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
+          this.time.delayedCall(1000, () => {
+            this.cameras.main.pan(50, 250, 3000, 'Linear');
+            this.time.delayedCall(3000, () => {
+              this.input.keyboard.enabled = true;
+              this.input.mouse.enabled = true;
+            });
+          });
+        });
+
+      } else {
+        this.input.keyboard.enabled = true;
+        this.input.mouse.enabled = true;
+      }
+    });
+    */
+
 
     // Creation variables progression
 
@@ -503,22 +209,8 @@ class Jeu extends Phaser.Scene {
       }
     });
 
-    // Sauter et tomber
 
-    this.isFalling = false;
-    this.isJumping = false;
-
-    // Jumpcount
-
-    this.jumpCount = 0;
-    this.jumpKeyReleased = true;
-
-    // Attaque
-
-    this.isAttacking = false;
-    this.isAttackingOrThrowing = false;
-
-    // Joueur
+    // ---------------- Variables Joueur ----------------
 
     this.playerLife = (sauvegarde) ? sauvegarde.nbVie : 6;
     this.maxPlayerLife = 8;
@@ -526,6 +218,22 @@ class Jeu extends Phaser.Scene {
     this.playerIsDead = false;
     this.playerHasLanded = false;
     this.isWalking = false;
+
+    // Variables Sauter et tomber
+
+    this.isFalling = false;
+    this.isJumping = false;
+
+
+    // Variables Jumpcount
+
+    this.jumpCount = 0;
+    this.jumpKeyReleased = true;
+
+    // Variables Attaque
+
+    this.isAttacking = false;
+    this.isAttackingOrThrowing = false;
 
     // ---------------- CRÉATION DES ANIMATIONS SPRITESHEET ----------------
 
@@ -614,7 +322,7 @@ class Jeu extends Phaser.Scene {
 
     // ---------------- CRÉATION DES ENNEMIS ----------------
 
-    this.createEnemy01();
+    this.createPlant01();
 
     this.createEnemy02();
     this.createEnemy02_b();
@@ -623,7 +331,6 @@ class Jeu extends Phaser.Scene {
     this.createEnemy03_b();
 
     this.createEnemy04();
-
 
     // VIE ENNEMIS 
 
@@ -1009,30 +716,28 @@ class Jeu extends Phaser.Scene {
 
   createBirds() {
     this.birds = [];
-
     for (let i = 0; i < 3; i++) {
-      let bird = this.add.sprite(0, Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200), "bird");
-      bird.setDepth(0).setTint(0x808080);
-      bird.anims.play("bird_bg", true);
+      const bird = new Bird(this);
       this.birds.push(bird);
-      this.moveBird(bird);
     }
   }
 
-  createEnemy01() {
-    this.enemy01 = this.physics.add.sprite(config.width / 2 - 100, config.height / 2 + 1000, "enemy01_idle");
-    this.enemy01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
-    this.enemy01.setScale(2).setDepth(1);
-    this.enemy01isHit = false;
-    this.enemy01.hitCooldown = null;
+  createPlant01() {
+    this.plant01 = this.physics.add.sprite(config.width / 2 - 100, config.height / 2 + 1000, "plant_idle");
+    this.plant01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
+    this.plant01.setScale(2).setDepth(1);
+    this.plant01isHit = false;
+    this.plant01.hitCooldown = null;
 
-    this.enemy01.direction = 1;
-    this.enemy01.attackRange = 80;
-    this.enemy01.attackCooldown = 0;
-    this.enemy01.canAttack = true;
+    this.plant01.direction = 1;
+    this.plant01.attackRange = 80;
+    this.plant01.attackCooldown = 0;
+    this.plant01.canAttack = true;
 
-    this.enemy01.anims.play("enemy01_idle", true);
+    this.plant01.anims.play("plant_idle", true);
   }
+
+
 
   createEnemy02() {
     this.enemy02 = this.physics.add.sprite(800, config.height / 2 - 50, "enemy02_idle");
@@ -1146,17 +851,15 @@ class Jeu extends Phaser.Scene {
 
   }
 
-
   createEnemyLife() {
-    this.enemy01Life = 2;
+    this.plant01Life = 2;
     this.enemy02Life = 3;
     this.enemy02_bLife = 3;
     this.enemy03Life = 5;
     this.enemy03_bLife = 9;
     this.enemy04Life = 2;
 
-
-    this.enemies = [this.enemy01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04];
+    this.enemies = [this.plant01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04];
   }
 
   createPlayerHitbox() {
@@ -1177,14 +880,14 @@ class Jeu extends Phaser.Scene {
       this.physics.add.overlap(enemy, this.hitbox, () => {
         this.hitbox.destroy();
         this.hitbox = null;
-
+        //enemy.hit();
         if (enemy) {
           switch (enemy) {
-            case this.enemy01:
-              if (this.enemy01Life > 0) {
-                this.enemy01Life--;
-                this.enemy01isHit = true;
-                this.enemy01.play("enemy01_hit", true);
+            case this.plant01:
+              if (this.plant01Life > 0) {
+                this.plant01Life--;
+                this.plant01isHit = true;
+                this.plant01.play("plant_hit", true);
                 this.hitSound03.play();
               }
               break;
@@ -1336,8 +1039,8 @@ class Jeu extends Phaser.Scene {
       this.handlePlayerMovement();
       this.handlePlayerAnimations();
 
-      if (this.enemy01 && this.enemy01.active) {
-        this.handleEnemy01Behavior();
+      if (this.plant01 && this.plant01.active) {
+        this.handlePlant01Behavior();
       }
       if (this.enemy02 && this.enemy02.active) {
         this.handleEnemy02Behavior();
@@ -1355,119 +1058,105 @@ class Jeu extends Phaser.Scene {
       if (this.enemy04 && this.enemy04.active) {
         this.handleEnemy04Behavior();
       }
-
     }
 
     //console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
     //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
   }
 
-  handleEnemy01Behavior() {
-    if (!this.enemy01 || this.enemy01Life <= 0) return;
+  handlePlant01Behavior() {
+    if (!this.plant01 || this.plant01Life <= 0) return;
 
-    // Check if the enemy is hit and reset states accordingly
-    if (this.enemy01isHit) {
-      this.enemy01.setVelocityX(0);
+    if (this.plant01isHit) {
+      this.plant01.setVelocityX(0);
 
-      // Destroy hitbox if exists
-      if (this.enemy01.hitbox) {
-        this.enemy01.hitbox.destroy();
-        this.enemy01.hitbox = null;
+      if (this.plant01.hitbox) {
+        this.plant01.hitbox.destroy();
+        this.plant01.hitbox = null;
       }
 
-      if (!this.enemy01.hitCooldown) {
-        this.enemy01.hitCooldown = this.time.delayedCall(500, () => {
-          this.enemy01isHit = false;
-          this.enemy01.hitCooldown = null;
-          this.enemy01.canAttack = true;
-          this.enemy01.attackCooldown = 0;
-          if (this.enemy01 && this.enemy01.anims && !this.enemy01.anims.isPlaying) {
-            this.enemy01.anims.play("enemy01_idle", true);
+      if (!this.plant01.hitCooldown) {
+        this.plant01.hitCooldown = this.time.delayedCall(500, () => {
+          this.plant01isHit = false;
+          this.plant01.hitCooldown = null;
+          this.plant01.canAttack = true;
+          this.plant01.attackCooldown = 0;
+          if (this.plant01 && this.plant01.anims && !this.plant01.anims.isPlaying) {
+            this.plant01.anims.play("plant_idle", true);
           }
         });
       }
-      this.enemy01.isAttacking = false;
+      this.plant01.isAttacking = false;
       return;
     }
 
     const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy01.x,
-      this.enemy01.y,
+      this.plant01.x,
+      this.plant01.y,
       this.player.x,
       this.player.y
     );
 
-    // Flip the enemy based on player's position
-    if (this.player.x > this.enemy01.x) {
-      this.enemy01.flipX = true;
+    if (this.player.x > this.plant01.x) {
+      this.plant01.flipX = true;
     } else {
-      this.enemy01.flipX = false;
+      this.plant01.flipX = false;
     }
 
-    // If the player is in attack range, check for attack conditions
-    if (distanceToPlayer < this.enemy01.attackRange) {
-      if (this.enemy01.canAttack && this.enemy01.attackCooldown <= 0 && !this.enemy01.isAttacking) {
-        this.enemy01.isAttacking = true;
-        this.enemy01.canAttack = false;
-        this.enemy01.attackCooldown = 1500;
+    if (distanceToPlayer < this.plant01.attackRange) {
+      if (this.plant01.canAttack && this.plant01.attackCooldown <= 0 && !this.plant01.isAttacking) {
+        this.plant01.isAttacking = true;
+        this.plant01.canAttack = false;
+        this.plant01.attackCooldown = 1500;
 
-        // Play attack animation
-        if (this.enemy01 && this.enemy01.anims) {
-          this.enemy01.anims.play("enemy01_attack", true);
+        if (this.plant01 && this.plant01.anims) {
+          this.plant01.anims.play("plant_attack", true);
         }
 
-        // Create hitbox on attack animation frame 6
-        this.enemy01.on('animationupdate', (animation, frame) => {
-          if (animation.key === "enemy01_attack" && frame.index === 6 && !this.enemy01.hitbox) {
-            this.createEnemyHitboxB(this.enemy01);
+        this.plant01.on('animationupdate', (animation, frame) => {
+          if (animation.key === "plant_attack" && frame.index === 6 && !this.plant01.hitbox) {
+            this.createEnemyHitboxB(this.plant01);
 
-            if (!this.enemy01isHit) {
+            if (!this.plant01isHit) {
               this.hitSound02.play();
             }
           }
         });
 
-        // On animation completion, reset attack state
-        this.enemy01.on('animationcomplete-enemy01_attack', () => {
-          this.enemy01.isAttacking = false;
-          this.enemy01.canAttack = true;
+        this.plant01.on('animationcomplete-plant_attack', () => {
+          this.plant01.isAttacking = false;
+          this.plant01.canAttack = true;
 
-          if (this.enemy01.hitbox) {
-            this.enemy01.hitbox.destroy();
-            this.enemy01.hitbox = null;
+          if (this.plant01.hitbox) {
+            this.plant01.hitbox.destroy();
+            this.plant01.hitbox = null;
           }
 
-          // Reset to idle after attack
-          this.enemy01.anims.play("enemy01_idle", true);
-          this.enemy01.postAttackCooldown = true;
+          this.plant01.anims.play("plant_idle", true);
+          this.plant01.postAttackCooldown = true;
           this.time.delayedCall(600, () => {
-            this.enemy01.postAttackCooldown = false;
+            this.plant01.postAttackCooldown = false;
           });
 
-          // Reset attack cooldown
-          this.enemy01.attackCooldown = 0;
+          this.plant01.attackCooldown = 0;
         });
       } else {
-        // If not attacking, just reset to idle state
-        if (!this.enemy01.isAttacking) {
-          this.enemy01.setVelocityX(0);
-          if (this.enemy01 && this.enemy01.anims && (!this.enemy01.anims.isPlaying || this.enemy01.anims.currentAnim.key !== "enemy01_idle")) {
-            this.enemy01.anims.play("enemy01_idle", true);
+        if (!this.plant01.isAttacking) {
+          this.plant01.setVelocityX(0);
+          if (this.plant01 && this.plant01.anims && (!this.plant01.anims.isPlaying || this.plant01.anims.currentAnim.key !== "plant_idle")) {
+            this.plant01.anims.play("plant_idle", true);
           }
         }
       }
     } else {
-      // If the player is not in range, stop the attack
-      if (!this.enemy01.isAttacking) {
-        this.enemy01.setVelocityX(0);
-        if (this.enemy01 && this.enemy01.anims && (!this.enemy01.anims.isPlaying || this.enemy01.anims.currentAnim.key !== "enemy01_idle")) {
-          this.enemy01.anims.play("enemy01_idle", true);
+      if (!this.plant01.isAttacking) {
+        this.plant01.setVelocityX(0);
+        if (this.plant01 && this.plant01.anims && (!this.plant01.anims.isPlaying || this.plant01.anims.currentAnim.key !== "plant_idle")) {
+          this.plant01.anims.play("plant_idle", true);
         }
       }
     }
   }
-
-
 
   handleEnemy02Behavior() {
     if (this.enemy02Life <= 0 || !this.enemy02) return;
@@ -1742,9 +1431,6 @@ class Jeu extends Phaser.Scene {
             this.enemy02_b.isAttacking = true;
             this.enemy02_b.canAttack = false;
             this.enemy02_b.attackCooldown = 1500;
-
-
-
 
             this.enemy02_b.anims.play("enemy02_attack", true);
 
@@ -2154,11 +1840,6 @@ class Jeu extends Phaser.Scene {
     }
   }
 
-
-
-
-
-
   handleEnemy04Behavior() {
     if (this.enemy04Life <= 0 || !this.enemy04 || !this.enemy04.active) return;
 
@@ -2363,20 +2044,19 @@ class Jeu extends Phaser.Scene {
     }
   }
 
-
   handleEnemyLife() {
-    if (this.enemy01) {
-      if (this.enemy01Life <= 0) {
-        this.enemy01.body.enable = false;
-        this.enemy01.anims.play("enemy01_death");
+    if (this.plant01) {
+      if (this.plant01Life <= 0) {
+        this.plant01.body.enable = false;
+        this.plant01.anims.play("plant_death");
         this.enemyDeathSound.play();
-        this.enemy01.on("animationcomplete", () => {
-          //this.enemy01.destroy();
-          this.enemy01.setActive(false);
-          this.enemy01.setVisible(false);
+        this.plant01.on("animationcomplete", () => {
+          //this.plant01.destroy();
+          this.plant01.setActive(false);
+          this.plant01.setVisible(false);
           this.time.delayedCall(350, () => {
-            this.enemy01.destroy();
-            this.enemy01 = null;
+            this.plant01.destroy();
+            this.plant01 = null;
           });
         });
       }
@@ -2419,7 +2099,6 @@ class Jeu extends Phaser.Scene {
     if (this.enemy03) {
       if (this.enemy03Life <= 0) {
         this.enemy03.body.enable = false;
-        //this.enemy03.disableBody();
         this.enemy03.anims.play("enemy03_death");
         this.enemyDeathSound.play();
         this.enemy03.on("animationcomplete", () => {
@@ -2617,11 +2296,11 @@ class Jeu extends Phaser.Scene {
       this.physics.add.overlap(enemy, this.dagger, (enemy, dagger) => {
         if (enemy) {
           switch (enemy) {
-            case this.enemy01:
-              if (this.enemy01Life > 0) {
-                this.enemy01.play("enemy01_hit", true);
-                this.enemy01Life--;
-                this.enemy01isHit = true;
+            case this.plant01:
+              if (this.plant01Life > 0) {
+                this.plant01.play("plant_hit", true);
+                this.plant01Life--;
+                this.plant01isHit = true;
               }
               break;
             case this.enemy02:
@@ -2678,21 +2357,6 @@ class Jeu extends Phaser.Scene {
     });
   }
 
-  moveBird(bird) {
-    bird.x = -bird.width;
-    bird.scale = Phaser.Math.Between(1, 2);
-    bird.y = Phaser.Math.Between(config.height / 2 - 300, config.height / 2 - 200)
-    this.tweens.add({
-      targets: bird,
-      x: config.width * 2,
-      duration: Phaser.Math.Between(12000, 17000),
-      delay: Phaser.Math.Between(9000, 20000),
-      onComplete: () => {
-        this.moveBird(bird);
-      }
-    });
-  }
-
   handleParallax() {
     const cameraX = this.cameras.main.scrollX;
     this.backgroundParallax.forEach((layer, index) => {
@@ -2713,7 +2377,7 @@ class Jeu extends Phaser.Scene {
   }
 
   handlePlayerMovement() {
-    // Mouvement avec A et D
+    // Mouvement avec A et D (gauche-droite)
     this.player.setVelocityX(0);
     if (this.playerIsDead) return;
     if (this.isAttacking) return;
@@ -2725,6 +2389,7 @@ class Jeu extends Phaser.Scene {
         this.player.flipX = true;
         this.player.setPosition(this.player.body.position.x, this.player.body.position.y + 30);
       }
+
     } else if (this.keys.right.isDown) {
       this.player.body.setVelocityX(280);
       if (this.player.flipX) {
@@ -2732,6 +2397,7 @@ class Jeu extends Phaser.Scene {
         this.player.flipX = false;
         this.player.setPosition(this.player.body.position.x + 45, this.player.body.position.y + 30);
       }
+
     } else {
       this.player.body.setVelocityX(0);
     }
@@ -2752,7 +2418,6 @@ class Jeu extends Phaser.Scene {
     if (!this.player.body.onFloor()) {
       this.playerHasLanded = false;
     }
-
     // Reset le jumpcount
     if (this.player.body.onFloor()) {
       this.jumpCount = 0;
@@ -2769,14 +2434,11 @@ class Jeu extends Phaser.Scene {
         this.isWalking = false;
       }
     }
-
   }
 
   handlePlayerAnimations() {
 
     if (this.isAttackingOrThrowing) return;
-
-    // Animation hit, saut, walk, idle, death
 
     if (this.playerIsHit) {
       this.player.anims.play("player_hit", true);
@@ -2834,6 +2496,7 @@ class Jeu extends Phaser.Scene {
     this.enemies.forEach(enemy => {
       if (enemy && enemy.body) {
         enemy.body.enable = false;
+        enemy.anims.stop();
       }
     });
 

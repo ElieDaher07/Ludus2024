@@ -181,8 +181,7 @@ class Preload extends Phaser.Scene {
 
         this.load.audio("daggerRecuperated", "./assets/audio/sfx/10_UI_Menu_SFX/dagger.mp3");
 
-        // assets/audio/sfx/8_Atk_Magic_SFX/04_Fire_explosion_04_medium.wav
-        // assets/audio/sfx/8_Atk_Magic_SFX/1 _Ice_explosion_01.wav
+        // Preload menu chargement et font, lorsque loadé, start la scène `accueil`
 
         this.load.image("chargementMenu", "./assets/images/ui/chargementMenu.png");
 
@@ -221,7 +220,7 @@ class Preload extends Phaser.Scene {
         this.input.setDefaultCursor('none');
 
         // HUD
-        const hudContainer = this.add.container(0, 0).setDepth(1);
+        let hudContainer = this.add.container(0, 0).setDepth(1);
 
         let chargementMenu = this.add.image(config.width / 2, config.height / 2, "chargementMenu");
 

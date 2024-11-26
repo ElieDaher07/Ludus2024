@@ -12,7 +12,7 @@ const config = {
       gravity: {
         y: 1000
       },
-      fps: 60,
+      fps: 120,
       timeScale: 1,
       checkCollision: {
         up: true,
