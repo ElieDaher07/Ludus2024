@@ -8,308 +8,63 @@ class Jeu2 extends Phaser.Scene {
 
     preload() {}
 
-    createAnimation() {
-
-        // PLAYER //
+    createAnimationKey(key, spritesheet, firstFrame, lastFrame, frameRate, loop) {
         this.anims.create({
-            key: "idle",
-            frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-                start: 0,
-                end: 8
-            }),
-            frameRate: 10,
-            repeat: -1
+          key: key,
+          frames: this.anims.generateFrameNumbers(spritesheet, {
+            start: firstFrame,
+            end: lastFrame
+          }),
+          frameRate: frameRate,
+          repeat: loop
         });
+      }
 
-        this.anims.create({
-            key: "walk",
-            frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-                start: 9,
-                end: 16
-            }),
-            frameRate: 10,
-            repeat: -1
-        });
+      createAnimation() {
 
-        this.anims.create({
-            key: "jump",
-            frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-                start: 17,
-                end: 20
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "fall",
-            frames: this.anims.generateFrameNumbers("player_idle_run_jump", {
-                start: 20,
-                end: 23
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "attack_1",
-            frames: this.anims.generateFrameNumbers("player_attacks", {
-                start: 0,
-                end: 6
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "attack_2",
-            frames: this.anims.generateFrameNumbers("player_attacks", {
-                start: 7,
-                end: 11
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "attack_3",
-            frames: this.anims.generateFrameNumbers("player_attacks", {
-                start: 12,
-                end: 18
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "attack_4",
-            frames: this.anims.generateFrameNumbers("player_attacks", {
-                start: 19,
-                end: 26
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "throw_attack",
-            frames: this.anims.generateFrameNumbers("player_throw_attack", {
-                start: 0,
-                end: 6
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "dagger_projectile",
-            frames: this.anims.generateFrameNumbers("dagger_throw", {
-                start: 0,
-                end: 0
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "dagger_hit",
-            frames: this.anims.generateFrameNumbers("dagger_throw", {
-                start: 1,
-                end: 3
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "player_hit",
-            frames: this.anims.generateFrameNumbers("player_hit_death", {
-                start: 5,
-                end: 7
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "player_death",
-            frames: this.anims.generateFrameNumbers("player_hit_death", {
-                start: 0,
-                end: 4
-            }),
-            frameRate: 10,
-            repeat: 0
-        });
-
+        // PLAYER 
+        this.createAnimationKey("idle", "player_idle_run_jump", 0, 8, 10, -1);
+        this.createAnimationKey("walk", "player_idle_run_jump", 9, 16, 10, -1);
+        this.createAnimationKey("jump", "player_idle_run_jump", 17, 20, 10, 0);
+        this.createAnimationKey("fall", "player_idle_run_jump", 20, 23, 10, 0);
+        this.createAnimationKey("attack_1", "player_attacks", 0, 6, 10, 0);
+        this.createAnimationKey("throw_attack", "player_throw_attack", 0, 6, 10, 0);
+        this.createAnimationKey("dagger_projectile", "dagger_throw", 0, 0, 10, 0);
+        this.createAnimationKey("dagger_hit", "dagger_throw", 1, 3, 10, 0);
+        this.createAnimationKey("player_hit", "player_hit_death", 5, 7, 10, 0);
+        this.createAnimationKey("player_death", "player_hit_death", 0, 4, 10, 0);
+    
         // BIRD
-        this.anims.create({
-            key: "bird_bg",
-            frames: this.anims.generateFrameNames("bird", {
-                start: 9,
-                end: 11
-            }),
-            frameRate: 8,
-            repeat: -1
-        })
-
+        this.createAnimationKey("bird_bg", "bird", 9, 11, 8, -1);
+    
         // ENEMY 01 - PLANT
-        this.anims.create({
-            key: "enemy01_idle",
-            frames: this.anims.generateFrameNames("enemy01", {
-                start: 0,
-                end: 7
-            }),
-            frameRate: 8,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: "enemy01_attack_left",
-            frames: this.anims.generateFrameNames("enemy01", {
-                start: 8,
-                end: 0 // À CHANGER, NE FAIT RIEN EN CE MOMENT
-            }),
-            frameRate: 8,
-            repeat: 0
-        })
-
+        this.createAnimationKey("plant_idle", "enemy01", 0, 7, 8, -1);
+        this.createAnimationKey("plant_attack", "enemy01", 8, 15, 8, 0);
+        this.createAnimationKey("plant_hit", "enemy01", 24, 26, 8, 0);
+        this.createAnimationKey("plant_death", "destroy_effect", 0, 4, 8, 0);
+    
         // ENEMY 02 - SORCERER DAGGER
-        this.anims.create({
-            key: "enemy02_idle",
-            frames: this.anims.generateFrameNames("enemy02", {
-                start: 0,
-                end: 4
-            }),
-            frameRate: 6,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: "enemy02_walk",
-            frames: this.anims.generateFrameNames("enemy02", {
-                start: 5,
-                end: 8
-            }),
-            frameRate: 6,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: "enemy02_attack",
-            frames: this.anims.generateFrameNames("enemy02", {
-                start: 10,
-                end: 13
-            }),
-            frameRate: 8,
-            repeat: 0
-        })
-
-        this.anims.create({
-            key: "enemy02_hit",
-            frames: this.anims.generateFrameNames("enemy02", {
-                start: 15,
-                end: 18
-            }),
-            frameRate: 8,
-            repeat: 0
-        })
-
-        this.anims.create({
-            key: "enemy02_death",
-            frames: this.anims.generateFrameNames("enemy02", {
-                start: 20,
-                end: 24
-            }),
-            frameRate: 8,
-            repeat: 0
-        })
-
-
+        this.createAnimationKey("enemy02_idle", "enemy02", 0, 4, 6, -1);
+        this.createAnimationKey("enemy02_walk", "enemy02", 5, 8, 6, -1);
+        this.createAnimationKey("enemy02_attack", "enemy02", 10, 13, 8, 0);
+        this.createAnimationKey("enemy02_hit", "enemy02", 15, 18, 8, 0);
+        this.createAnimationKey("enemy02_death", "enemy02", 20, 24, 8, 0);
+    
         // ENEMY 03 - TANK SORCERER - DAGGER
-        this.anims.create({
-            key: "enemy03_idle",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 0,
-                end: 4
-            }),
-            frameRate: 6,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: "enemy03_walk",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 6,
-                end: 11
-            }),
-            frameRate: 6,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: "enemy03_attack",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 12,
-                end: 17
-            }),
-            frameRate: 6,
-            repeat: 0
-        })
-
-        this.anims.create({
-            key: "enemy03_hit",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 18,
-                end: 22
-            }),
-            frameRate: 6,
-            repeat: 0
-        })
-
-        this.anims.create({
-            key: "enemy03_death",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 24,
-                end: 29
-            }),
-            frameRate: 6,
-            repeat: 0
-        })
-
-        this.anims.create({
-            key: "enemy03_revive",
-            frames: this.anims.generateFrameNames("enemy03", {
-                start: 29,
-                end: 24
-            }),
-            frameRate: 6,
-            repeat: 0
-        })
-
-
+        this.createAnimationKey("enemy03_idle", "enemy03", 0, 4, 6, -1);
+        this.createAnimationKey("enemy03_walk", "enemy03", 6, 11, 6, -1);
+        this.createAnimationKey("enemy03_attack", "enemy03", 12, 17, 6, 0);
+        this.createAnimationKey("enemy03_hit", "enemy03", 18, 22, 6, 0);
+        this.createAnimationKey("enemy03_death", "enemy03", 24, 29, 6, 0);
+    
         // ENEMY 04 - PLAGUE DOCTOR
-        this.anims.create({
-            key: "enemy04_idle",
-            frames: this.anims.generateFrameNames("enemy04", {
-                start: 0,
-                end: 7
-            }),
-            frameRate: 8,
-            repeat: -1
-        })
-
-        // ENEMY 05 - SCORPION
-        this.anims.create({
-            key: "enemy05_idle",
-            frames: this.anims.generateFrameNames("enemy05", {
-                start: 0,
-                end: 7
-            }),
-            frameRate: 8,
-            repeat: -1
-        })
-
-    }
+        this.createAnimationKey("enemy04_idle", "enemy04", 0, 6, 8, -1);
+        this.createAnimationKey("enemy04_walk", "enemy04", 7, 12, 8, -1);
+        this.createAnimationKey("enemy04_attack", "enemy04", 13, 19, 8, 0);
+        this.createAnimationKey("enemy04_hit", "enemy04", 25, 27, 8, 0);
+        this.createAnimationKey("enemy04_death", "destroy_effect", 0, 4, 8, 0);
+    
+      }
 
     create() {
 
@@ -323,6 +78,40 @@ class Jeu2 extends Phaser.Scene {
             this.diamondCount = sauvegarde.nbDiamant;
             this.playerLife = sauvegarde.nbVie;
         }
+
+        
+    /* Commence le "cutscene" 
+
+
+    this.game.cutscenePlayed = false;
+    this.input.keyboard.enabled = false;
+    this.input.mouse.enabled = false;
+
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
+
+    this.time.delayedCall(1000, () => {
+      if (!this.game.cutscenePlayed) {
+        this.game.cutscenePlayed = true;
+        this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
+        this.cameras.main.once('camerapancomplete', () => {
+          this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
+          this.time.delayedCall(1000, () => {
+            this.cameras.main.pan(50, 250, 3000, 'Linear');
+            this.time.delayedCall(3000, () => {
+              this.input.keyboard.enabled = true;
+              this.input.mouse.enabled = true;
+            });
+          });
+        });
+
+      } else {
+        this.input.keyboard.enabled = true;
+        this.input.mouse.enabled = true;
+      }
+    });
+
+    */
+
 
         // Réinitialization
 
@@ -524,7 +313,7 @@ class Jeu2 extends Phaser.Scene {
         this.createEnemy03_b();
 
         this.createEnemy04();
-        this.createEnemy05();
+  
 
         // VIE ENNEMIS 
 
@@ -1024,14 +813,6 @@ class Jeu2 extends Phaser.Scene {
 
     }
 
-    createEnemy05() {
-        this.enemy05 = this.physics.add.sprite(config.width / 2 - 400, config.height / 2 + 55, "enemy05_idle");
-        this.enemy05.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
-        this.enemy05.setScale(2).setDepth(1);
-        this.enemy05.anims.play("enemy05_idle", true);
-        this.enemy05.setVisible(false).setActive(false);
-        this.enemy05.body.enable = false;
-    }
 
     createEnemyLife() {
         this.enemy01Life = 2;
@@ -1040,9 +821,8 @@ class Jeu2 extends Phaser.Scene {
         this.enemy03Life = 5;
         this.enemy03_bLife = 9;
         this.enemy04Life = 2;
-        this.enemy05Life = 2;
 
-        this.enemies = [this.enemy01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04, this.enemy05];
+        this.enemies = [this.enemy01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04];
     }
 
     createPlayerHitbox() {

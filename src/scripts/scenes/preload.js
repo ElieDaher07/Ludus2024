@@ -111,11 +111,6 @@ class Preload extends Phaser.Scene {
             frameHeight: 64
         });
 
-        this.load.spritesheet("enemy05", "./assets/images/characters/enemy/enemy05_sheet.png", {
-            frameWidth: 64,
-            frameHeight: 64
-        });
-
         // Preload l'élément hud du joueur
 
         this.load.image("hud", "./assets/images/ui/Gui.png");
@@ -135,19 +130,7 @@ class Preload extends Phaser.Scene {
         this.load.audio("gameoverBg", "./assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 32 05.ogg");
         this.load.audio("victoryBg", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 09.ogg")
         // ou assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 30 01.ogg
-
-        // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 30 01.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 28 03.ogg // boss music?
-        // assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 28 02.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 07.ogg
-        //  assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 27.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 28.ogg
-        //  assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 29.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 30.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 14.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 13.ogg
-        // assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 11.ogg
-
+     
         this.load.audio("surpriseSfx", "./assets/audio/music/surpriseA.wav");
 
         this.load.audio("buttonHoverSfx", "./assets/audio/sfx/10_UI_Menu_SFX/001_Hover_01.wav");
@@ -161,8 +144,8 @@ class Preload extends Phaser.Scene {
         this.load.audio("accueilBg03", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 10_03.ogg");
         this.load.audio("accueilBg04", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 10_04.ogg");
         this.load.audio("accueilBg05", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 10_05.ogg");
-
         this.load.audio("jeuBg", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 07.ogg");
+        this.load.audio("jeuBg2", ".assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 14.ogg");
 
         this.load.audio("hitSound01", "./assets/audio/sfx/12_Player_Movement_SFX/61_Hit_03.wav");
         this.load.audio("hitSound02", "./assets/audio/sfx/10_Battle_SFX/03_Claw_03.wav");

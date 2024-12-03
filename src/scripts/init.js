@@ -4,11 +4,11 @@ const config = {
   pixelArt: true,
   width: 1280,
   height: 720,
-  scene: [Preload, Accueil, Jeu, Jeu2, Jeu3, Credits, Victoire, PartieTerminee, Tutoriel, Tutoriel02, Pause, Pause02, Pause03],
+  scene: [Preload, Accueil, Jeu, Jeu2, Credits, Victoire, PartieTerminee, Tutoriel, Tutoriel02, Pause, Pause02],
   physics: {
     default: "arcade",
     arcade: {
-      debug: true, // Debug
+      debug: false, // 
       gravity: {
         y: 1000
       },

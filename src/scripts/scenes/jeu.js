@@ -89,7 +89,7 @@ class Jeu extends Phaser.Scene {
     // Commence le "cutscene" 
 
 
-    /* this.game.cutscenePlayed = false;
+    this.game.cutscenePlayed = false;
     this.input.keyboard.enabled = false;
     this.input.mouse.enabled = false;
 
@@ -115,7 +115,7 @@ class Jeu extends Phaser.Scene {
         this.input.mouse.enabled = true;
       }
     });
-*/
+
 
     // Creation variables progression
 
