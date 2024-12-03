@@ -88,8 +88,8 @@ class Jeu extends Phaser.Scene {
 
     // Commence le "cutscene" 
 
-    /*
-    this.game.cutscenePlayed = false;
+
+    /* this.game.cutscenePlayed = false;
     this.input.keyboard.enabled = false;
     this.input.mouse.enabled = false;
 
@@ -115,8 +115,7 @@ class Jeu extends Phaser.Scene {
         this.input.mouse.enabled = true;
       }
     });
-    */
-
+*/
 
     // Creation variables progression
 
@@ -717,7 +716,8 @@ class Jeu extends Phaser.Scene {
   createBirds() {
     this.birds = [];
     for (let i = 0; i < 3; i++) {
-      const bird = new Bird(this);
+      const delay = i * Phaser.Math.Between(2000, 4000);
+      const bird = new Bird(this, delay);
       this.birds.push(bird);
     }
   }
