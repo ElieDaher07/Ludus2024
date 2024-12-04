@@ -41,7 +41,7 @@ class Pause02 extends Phaser.Scene {
 
         this.input.keyboard.on("keydown-ESC", () => {
             this.unpauseSound.play();
-            this.scene.stop("pause");
+            this.scene.stop("pause02");
             let bgMusic = this.game.registry.get("bgMusic");
             if (bgMusic && !this.game.registry.get("isMuted")) {
                 bgMusic.resume();

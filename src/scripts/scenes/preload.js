@@ -42,15 +42,26 @@ class Preload extends Phaser.Scene {
 
         this.load.image("cursor", "./assets/images/ui/CursorDefault.png");
 
-        // Preload le Tiled map
-        this.load.tilemapTiledJSON("carte_json", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");
+        // Preload les Tiled map
+        this.load.tilemapTiledJSON("carte_rocky", "./assets/images/backgrounds/Rocky_Level/carte_rocky.json");
+        this.load.tilemapTiledJSON("carte_crystal", "./assets/images/backgrounds/Crystal_Level/carte_crystal.json");
 
-        // Preload les 5 images de tilesets utiliser
+        // Preload les images de tilesets utiliser
         this.load.image("background1_tile", "./assets/images/backgrounds/Rocky_Level/background1.png");
         this.load.image("background2_tile", "./assets/images/backgrounds/Rocky_Level/background2.png");
         this.load.image("background3_tile", "./assets/images/backgrounds/Rocky_Level/background3.png");
         this.load.image("background_main", "./assets/images/backgrounds/Rocky_Level/main_lev_build.png");
         this.load.image("background_other", "./assets/images/backgrounds/Rocky_Level/other_lev_build.png");
+
+        this.load.image("crystal_background01_tile", "./assets/images/backgrounds/Crystal_Level/background01.png");
+        this.load.image("crystal_background02_tile", "./assets/images/backgrounds/Crystal_Level/background02.png");
+        this.load.image("crystal_background03_tile", "./assets/images/backgrounds/Crystal_Level/background03.png");
+        this.load.image("crystal_background_main", "./assets/images/backgrounds/Crystal_Level/main_lev_build_1.png");
+        this.load.image("crystal_background_other", "./assets/images/backgrounds/Crystal_Level/main_lev_build_2.png");
+        this.load.image("crystal_background_rocks", "./assets/images/backgrounds/Crystal_Level/rocks.png");
+
+
+
 
         // Preload le joueur spritesheet
 
@@ -91,22 +102,22 @@ class Preload extends Phaser.Scene {
 
         // Preload les ennemis
 
-        this.load.spritesheet("enemy01", "./assets/images/characters/enemy/enemy01_sheet.png", {
+        this.load.spritesheet("enemy_plant", "./assets/images/characters/enemy/enemy_plant.png", {
             frameWidth: 64,
             frameHeight: 64
         });
 
-        this.load.spritesheet("enemy02", "./assets/images/characters/enemy/enemy02_sheet.png", {
+        this.load.spritesheet("enemy_sorcerer", "./assets/images/characters/enemy/enemy_sorcerer.png", {
             frameWidth: 32,
             frameHeight: 32
         });
 
-        this.load.spritesheet("enemy03", "./assets/images/characters/enemy/enemy03_sheet.png", {
+        this.load.spritesheet("enemy_tank", "./assets/images/characters/enemy/enemy_tank.png", {
             frameWidth: 32,
             frameHeight: 32
         });
 
-        this.load.spritesheet("enemy04", "./assets/images/characters/enemy/enemy04_sheet.png", {
+        this.load.spritesheet("enemy_plague", "./assets/images/characters/enemy/enemy_plague.png", {
             frameWidth: 64,
             frameHeight: 64
         });
@@ -129,8 +140,7 @@ class Preload extends Phaser.Scene {
 
         this.load.audio("gameoverBg", "./assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 32 05.ogg");
         this.load.audio("victoryBg", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 09.ogg")
-        // ou assets/audio/music/music-loop-bundle-download_pre2023/Ludum Dare 30 01.ogg
-     
+
         this.load.audio("surpriseSfx", "./assets/audio/music/surpriseA.wav");
 
         this.load.audio("buttonHoverSfx", "./assets/audio/sfx/10_UI_Menu_SFX/001_Hover_01.wav");
@@ -145,7 +155,7 @@ class Preload extends Phaser.Scene {
         this.load.audio("accueilBg04", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 10_04.ogg");
         this.load.audio("accueilBg05", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 10_05.ogg");
         this.load.audio("jeuBg", "./assets/audio/music/music-loop-bundle-download_pre2023/VGMA Challenge 07.ogg");
-        this.load.audio("jeuBg2", ".assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 14.ogg");
+        this.load.audio("jeuBg2", "./assets/audio/music/music-loop-bundle-download_pre2023/Patreon Challenge 14.ogg");
 
         this.load.audio("hitSound01", "./assets/audio/sfx/12_Player_Movement_SFX/61_Hit_03.wav");
         this.load.audio("hitSound02", "./assets/audio/sfx/10_Battle_SFX/03_Claw_03.wav");

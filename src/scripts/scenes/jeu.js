@@ -12,7 +12,6 @@ class Jeu extends Phaser.Scene {
 
   }
 
-
   createAnimationKey(key, spritesheet, firstFrame, lastFrame, frameRate, loop) {
     this.anims.create({
       key: key,
@@ -43,31 +42,31 @@ class Jeu extends Phaser.Scene {
     this.createAnimationKey("bird_bg", "bird", 9, 11, 8, -1);
 
     // ENEMY 01 - PLANT
-    this.createAnimationKey("plant_idle", "enemy01", 0, 7, 8, -1);
-    this.createAnimationKey("plant_attack", "enemy01", 8, 15, 8, 0);
-    this.createAnimationKey("plant_hit", "enemy01", 24, 26, 8, 0);
+    this.createAnimationKey("plant_idle", "enemy_plant", 0, 7, 8, -1);
+    this.createAnimationKey("plant_attack", "enemy_plant", 8, 15, 8, 0);
+    this.createAnimationKey("plant_hit", "enemy_plant", 24, 26, 8, 0);
     this.createAnimationKey("plant_death", "destroy_effect", 0, 4, 8, 0);
 
     // ENEMY 02 - SORCERER DAGGER
-    this.createAnimationKey("enemy02_idle", "enemy02", 0, 4, 6, -1);
-    this.createAnimationKey("enemy02_walk", "enemy02", 5, 8, 6, -1);
-    this.createAnimationKey("enemy02_attack", "enemy02", 10, 13, 8, 0);
-    this.createAnimationKey("enemy02_hit", "enemy02", 15, 18, 8, 0);
-    this.createAnimationKey("enemy02_death", "enemy02", 20, 24, 8, 0);
+    this.createAnimationKey("sorcerer_idle", "enemy_sorcerer", 0, 4, 6, -1);
+    this.createAnimationKey("sorcerer_walk", "enemy_sorcerer", 5, 8, 6, -1);
+    this.createAnimationKey("sorcerer_attack", "enemy_sorcerer", 10, 13, 8, 0);
+    this.createAnimationKey("sorcerer_hit", "enemy_sorcerer", 15, 18, 8, 0);
+    this.createAnimationKey("sorcerer_death", "enemy_sorcerer", 20, 24, 8, 0);
 
     // ENEMY 03 - TANK SORCERER - DAGGER
-    this.createAnimationKey("enemy03_idle", "enemy03", 0, 4, 6, -1);
-    this.createAnimationKey("enemy03_walk", "enemy03", 6, 11, 6, -1);
-    this.createAnimationKey("enemy03_attack", "enemy03", 12, 17, 6, 0);
-    this.createAnimationKey("enemy03_hit", "enemy03", 18, 22, 6, 0);
-    this.createAnimationKey("enemy03_death", "enemy03", 24, 29, 6, 0);
+    this.createAnimationKey("tank_idle", "enemy_tank", 0, 4, 6, -1);
+    this.createAnimationKey("tank_walk", "enemy_tank", 6, 11, 6, -1);
+    this.createAnimationKey("tank_attack", "enemy_tank", 12, 17, 6, 0);
+    this.createAnimationKey("tank_hit", "enemy_tank", 18, 22, 6, 0);
+    this.createAnimationKey("tank_death", "enemy_tank", 24, 29, 6, 0);
 
     // ENEMY 04 - PLAGUE DOCTOR
-    this.createAnimationKey("enemy04_idle", "enemy04", 0, 6, 8, -1);
-    this.createAnimationKey("enemy04_walk", "enemy04", 7, 12, 8, -1);
-    this.createAnimationKey("enemy04_attack", "enemy04", 13, 19, 8, 0);
-    this.createAnimationKey("enemy04_hit", "enemy04", 25, 27, 8, 0);
-    this.createAnimationKey("enemy04_death", "destroy_effect", 0, 4, 8, 0);
+    this.createAnimationKey("plague_idle", "enemy_plague", 0, 6, 8, -1);
+    this.createAnimationKey("plague_walk", "enemy_plague", 7, 12, 8, -1);
+    this.createAnimationKey("plague_attack", "enemy_plague", 13, 19, 8, 0);
+    this.createAnimationKey("plague_hit", "enemy_plague", 25, 27, 8, 0);
+    this.createAnimationKey("plague_death", "destroy_effect", 0, 4, 8, 0);
 
   }
 
@@ -87,7 +86,6 @@ class Jeu extends Phaser.Scene {
     this.input.mouse.disableContextMenu();
 
     // Commence le "cutscene" 
-
 
     this.game.cutscenePlayed = false;
     this.input.keyboard.enabled = false;
@@ -115,7 +113,6 @@ class Jeu extends Phaser.Scene {
         this.input.mouse.enabled = true;
       }
     });
-
 
     // Creation variables progression
 
@@ -241,7 +238,7 @@ class Jeu extends Phaser.Scene {
     // ---------------- CRÉATION DU TILEMAP ----------------
 
     const maCarte = this.make.tilemap({
-      key: "carte_json"
+      key: "carte_rocky"
     });
 
     // ---------------- HUD ----------------
@@ -323,13 +320,13 @@ class Jeu extends Phaser.Scene {
 
     this.createPlant01();
 
-    this.createEnemy02();
-    this.createEnemy02_b();
+    this.createSorcerer01();
+    this.createSorcerer02();
 
-    this.createEnemy03();
-    this.createEnemy03_b();
+    this.createTank01();
+    this.createTank02();
 
-    this.createEnemy04();
+    this.createPlague01();
 
     // VIE ENNEMIS 
 
@@ -550,13 +547,13 @@ class Jeu extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.surpriseHitbox, () => {
       this.surpriseHitbox.destroy();
 
-      if (!this.enemy03_b.active) {
-        this.enemy03_b.setActive(true);
-        this.enemy03_b.setVisible(true);
-        this.enemy03_b.isHit = false;
-        this.enemy03_b.canAttack = true;
-        this.enemy03_b.attackCooldown = 0;
-        this.enemy03_b.anims.play("enemy03_walk", true);
+      if (!this.tank02.active) {
+        this.tank02.setActive(true);
+        this.tank02.setVisible(true);
+        this.tank02.isHit = false;
+        this.tank02.canAttack = true;
+        this.tank02.attackCooldown = 0;
+        this.tank02.anims.play("tank_walk", true);
         this.surpriseSound.play({
           seek: 6
         });
@@ -694,7 +691,7 @@ class Jeu extends Phaser.Scene {
     this.handleHud();
     this.physics.add.overlap(this.player, this.enemies, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      this.handlePlayerIsHit(1);
+      this.handlePlayerIsHit(2);
       //console.log(this.playerLife);
       this.handleHealthPickup();
       this.handleHud();
@@ -737,129 +734,127 @@ class Jeu extends Phaser.Scene {
     this.plant01.anims.play("plant_idle", true);
   }
 
+  createSorcerer01() {
+    this.sorcerer01 = this.physics.add.sprite(800, config.height / 2 - 50, "sorcerer_idle");
+    this.sorcerer01.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.sorcerer01.setScale(3).setDepth(1);
+    this.sorcerer01isHit = false;
+    this.sorcerer01.hitCooldown = null
 
+    this.sorcerer01.speed = 50;
+    this.sorcerer01.direction = 1;
+    this.sorcerer01.initialX = this.sorcerer01.x;
 
-  createEnemy02() {
-    this.enemy02 = this.physics.add.sprite(800, config.height / 2 - 50, "enemy02_idle");
-    this.enemy02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy02.setScale(3).setDepth(1);
-    this.enemy02isHit = false;
-    this.enemy02.hitCooldown = null
-
-    this.enemy02.speed = 50;
-    this.enemy02.direction = 1;
-    this.enemy02.initialX = this.enemy02.x;
-
-    this.enemy02.attackRange = 250;
-    this.enemy02.attackCooldown = 0;
-    this.enemy02.canAttack = true;
-    this.enemy02.patrolTimer = 0;
-    this.enemy02.isPatrolling = true;
-    this.enemy02.patrolLeftLimit = this.enemy02.initialX - 100;
-    this.enemy02.patrolRightLimit = this.enemy02.initialX + 100;
-    this.enemy02.anims.play("enemy02_idle", true);
+    this.sorcerer01.attackRange = 250;
+    this.sorcerer01.attackCooldown = 0;
+    this.sorcerer01.canAttack = true;
+    this.sorcerer01.patrolTimer = 0;
+    this.sorcerer01.isPatrolling = true;
+    this.sorcerer01.patrolLeftLimit = this.sorcerer01.initialX - 100;
+    this.sorcerer01.patrolRightLimit = this.sorcerer01.initialX + 100;
+    this.sorcerer01.anims.play("sorcerer_idle", true);
   }
 
-  createEnemy02_b() {
-    this.enemy02_b = this.physics.add.sprite(2032, 744, "enemy02_idle");
-    this.enemy02_b.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy02_b.setScale(3).setDepth(1);
-    this.enemy02_bisHit = false;
-    this.enemy02_b.hitCooldown = null
+  createSorcerer02() {
+    this.sorcerer02 = this.physics.add.sprite(2032, 744, "sorcerer_idle");
+    this.sorcerer02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.sorcerer02.setScale(3).setDepth(1);
+    this.sorcerer02isHit = false;
+    this.sorcerer02.hitCooldown = null
 
-    this.enemy02_b.speed = 50;
-    this.enemy02_b.direction = 1;
-    this.enemy02_b.initialX = this.enemy02_b.x;
+    this.sorcerer02.speed = 50;
+    this.sorcerer02.direction = 1;
+    this.sorcerer02.initialX = this.sorcerer02.x;
 
-    this.enemy02_b.attackRange = 250;
-    this.enemy02_b.attackCooldown = 0;
-    this.enemy02_b.canAttack = true;
-    this.enemy02_b.patrolTimer = 0;
-    this.enemy02_b.isPatrolling = true;
-    this.enemy02_b.patrolLeftLimit = this.enemy02_b.initialX - 100;
-    this.enemy02_b.patrolRightLimit = this.enemy02_b.initialX + 100;
-    this.enemy02_b.anims.play("enemy02_idle", true);
+    this.sorcerer02.attackRange = 250;
+    this.sorcerer02.attackCooldown = 0;
+    this.sorcerer02.canAttack = true;
+    this.sorcerer02.patrolTimer = 0;
+    this.sorcerer02.isPatrolling = true;
+    this.sorcerer02.patrolLeftLimit = this.sorcerer02.initialX - 100;
+    this.sorcerer02.patrolRightLimit = this.sorcerer02.initialX + 100;
+    this.sorcerer02.anims.play("sorcerer_idle", true);
   }
 
-  createEnemy03() {
-    this.enemy03 = this.physics.add.sprite(1200, config.height / 2 - 50, "enemy03_idle");
-    this.enemy03.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy03.setScale(3).setDepth(1);
-    this.enemy03isHit = false;
-    this.enemy03.hitCooldown = null
+  createTank01() {
+    this.tank01 = this.physics.add.sprite(1200, config.height / 2 - 50, "tank_idle");
+    this.tank01.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.tank01.setScale(3).setDepth(1);
+    this.tank01isHit = false;
+    this.tank01.hitCooldown = null
 
-    this.enemy03.speed = 50;
-    this.enemy03.direction = 1;
-    this.enemy03.initialX = this.enemy03.x;
+    this.tank01.speed = 50;
+    this.tank01.direction = 1;
+    this.tank01.initialX = this.tank01.x;
 
-    this.enemy03.attackRange = 250;
-    this.enemy03.attackCooldown = 0;
-    this.enemy03.canAttack = true;
-    this.enemy03.patrolTimer = 0;
-    this.enemy03.isPatrolling = true;
-    this.enemy03.patrolLeftLimit = this.enemy03.initialX - 100;
-    this.enemy03.patrolRightLimit = this.enemy03.initialX + 100;
-    this.enemy03.anims.play("enemy03_idle", true);
+    this.tank01.attackRange = 250;
+    this.tank01.attackCooldown = 0;
+    this.tank01.canAttack = true;
+    this.tank01.patrolTimer = 0;
+    this.tank01.isPatrolling = true;
+    this.tank01.patrolLeftLimit = this.tank01.initialX - 100;
+    this.tank01.patrolRightLimit = this.tank01.initialX + 100;
+    this.tank01.anims.play("tank_idle", true);
   }
 
-  createEnemy03_b() {
-    this.enemy03_b = this.physics.add.sprite(2430, 1160, "enemy03_idle");
-    this.enemy03_b.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-    this.enemy03_b.setScale(3).setDepth(1);
-    this.enemy03_b.setTint(0xFF6666);
-    this.enemy03_bisHit = false;
-    this.enemy03_b.hitCooldown = null;
+  createTank02() {
+    this.tank02 = this.physics.add.sprite(2430, 1160, "tank_idle");
+    this.tank02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
+    this.tank02.setScale(3).setDepth(1);
+    this.tank02.setTint(0xFF6666);
+    this.tank02isHit = false;
+    this.tank02.hitCooldown = null;
 
-    this.enemy03_b.setActive(false);
-    this.enemy03_b.setVisible(false);
+    this.tank02.setActive(false);
+    this.tank02.setVisible(false);
 
-    this.enemy03_b.speed = 50;
-    this.enemy03_b.direction = -1;
-    this.enemy03_b.initialX = this.enemy03_b.x;
+    this.tank02.speed = 50;
+    this.tank02.direction = -1;
+    this.tank02.initialX = this.tank02.x;
 
-    this.enemy03_b.attackRange = 250;
-    this.enemy03_b.attackCooldown = 0;
-    this.enemy03_b.canAttack = true;
-    this.enemy03_b.patrolTimer = 0;
-    this.enemy03_b.isPatrolling = true;
-    this.enemy03_b.patrolLeftLimit = this.enemy03_b.initialX - 100;
-    this.enemy03_b.patrolRightLimit = this.enemy03_b.initialX + 100;
-    this.enemy03_b.anims.play("enemy03_idle", true);
+    this.tank02.attackRange = 250;
+    this.tank02.attackCooldown = 0;
+    this.tank02.canAttack = true;
+    this.tank02.patrolTimer = 0;
+    this.tank02.isPatrolling = true;
+    this.tank02.patrolLeftLimit = this.tank02.initialX - 100;
+    this.tank02.patrolRightLimit = this.tank02.initialX + 100;
+    this.tank02.anims.play("tank_idle", true);
   }
 
-  createEnemy04() {
+  createPlague01() {
 
-    this.enemy04 = this.physics.add.sprite(config.width / 2 + 100, config.height / 2 + 800, "enemy04_idle");
-    this.enemy04.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
-    this.enemy04.setScale(2).setDepth(1);
-    this.enemy04isHit = false;
-    this.enemy04.hitCooldown = null;
+    this.plague01 = this.physics.add.sprite(config.width / 2 + 100, config.height / 2 + 800, "plague_idle");
+    this.plague01.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
+    this.plague01.setScale(2).setDepth(1);
+    this.plague01isHit = false;
+    this.plague01.hitCooldown = null;
 
-    this.enemy04.speed = 50;
-    this.enemy04.direction = 1;
-    this.enemy04.initialX = this.enemy04.x;
-    this.enemy04.stunned = false;
+    this.plague01.speed = 50;
+    this.plague01.direction = 1;
+    this.plague01.initialX = this.plague01.x;
+    this.plague01.stunned = false;
 
-    this.enemy04.attackRange = 350;
-    this.enemy04.attackCooldown = 0;
-    this.enemy04.canAttack = true;
-    this.enemy04.patrolTimer = 0;
-    this.enemy04.isPatrolling = true;
-    this.enemy04.patrolLeftLimit = this.enemy04.initialX - 100;
-    this.enemy04.patrolRightLimit = this.enemy04.initialX + 100;
-    this.enemy04.anims.play("enemy04_idle", true);
+    this.plague01.attackRange = 350;
+    this.plague01.attackCooldown = 0;
+    this.plague01.canAttack = true;
+    this.plague01.patrolTimer = 0;
+    this.plague01.isPatrolling = true;
+    this.plague01.patrolLeftLimit = this.plague01.initialX - 100;
+    this.plague01.patrolRightLimit = this.plague01.initialX + 100;
+    this.plague01.anims.play("plague_idle", true);
 
   }
 
   createEnemyLife() {
-    this.plant01Life = 2;
-    this.enemy02Life = 3;
-    this.enemy02_bLife = 3;
-    this.enemy03Life = 5;
-    this.enemy03_bLife = 9;
-    this.enemy04Life = 2;
+    this.plant01Life = 6;
+    this.sorcerer01Life = 8;
+    this.sorcerer02Life = 8;
+    this.tank01Life = 10;
+    this.tank02Life = 16;
+    this.plague01Life = 7;
 
-    this.enemies = [this.plant01, this.enemy02, this.enemy02_b, this.enemy03, this.enemy03_b, this.enemy04];
+    this.enemies = [this.plant01, this.sorcerer01, this.sorcerer02, this.tank01, this.tank02, this.plague01];
   }
 
   createPlayerHitbox() {
@@ -885,49 +880,49 @@ class Jeu extends Phaser.Scene {
           switch (enemy) {
             case this.plant01:
               if (this.plant01Life > 0) {
-                this.plant01Life--;
+                this.plant01Life -= 2;
                 this.plant01isHit = true;
                 this.plant01.play("plant_hit", true);
                 this.hitSound03.play();
               }
               break;
-            case this.enemy02:
-              if (this.enemy02Life > 0) {
-                this.enemy02Life--;
-                this.enemy02isHit = true;
-                this.enemy02.play("enemy02_hit", true);
+            case this.sorcerer01:
+              if (this.sorcerer01Life > 0) {
+                this.sorcerer01Life -= 2;
+                this.sorcerer01isHit = true;
+                this.sorcerer01.play("sorcerer_hit", true);
                 this.hitSound03.play();
               }
               break;
-            case this.enemy02_b:
-              if (this.enemy02_bLife > 0) {
-                this.enemy02_bLife--;
-                this.enemy02_bisHit = true;
-                this.enemy02_b.play("enemy02_hit", true);
+            case this.sorcerer02:
+              if (this.sorcerer02Life > 0) {
+                this.sorcerer02Life -= 2;
+                this.sorcerer02isHit = true;
+                this.sorcerer02.play("sorcerer_hit", true);
                 this.hitSound03.play();
               }
               break;
-            case this.enemy03:
-              if (this.enemy03Life > 0) {
-                this.enemy03Life--;
-                this.enemy03isHit = true;
-                this.enemy03.play("enemy03_hit", true);
+            case this.tank01:
+              if (this.tank01Life > 0) {
+                this.tank01Life -= 2;
+                this.tank01isHit = true;
+                this.tank01.play("tank_hit", true);
                 this.hitSound04.play();
               }
               break;
-            case this.enemy03_b:
-              if (this.enemy03_bLife > 0) {
-                this.enemy03_bLife--;
-                this.enemy03_bisHit = true;
-                this.enemy03_b.play("enemy03_hit", true);
+            case this.tank02:
+              if (this.tank02Life > 0) {
+                this.tank02Life -= 2;
+                this.tank02isHit = true;
+                this.tank02.play("tank_hit", true);
                 this.hitSound04.play();
               }
               break;
-            case this.enemy04:
-              if (this.enemy04Life > 0) {
-                this.enemy04Life--;
-                this.enemy04isHit = true
-                this.enemy04.play("enemy04_hit", true);
+            case this.plague01:
+              if (this.plague01Life > 0) {
+                this.plague01Life -= 2;
+                this.plague01isHit = true
+                this.plague01.play("plague_hit", true);
                 this.hitSound03.play();
               }
               break;
@@ -985,7 +980,7 @@ class Jeu extends Phaser.Scene {
 
     this.physics.add.overlap(enemy.hitbox, this.player, () => {
       if (this.player.alpha != 1 || this.playerIsDead) return;
-      this.handlePlayerIsHit(2);
+      this.handlePlayerIsHit(1);
       this.handleHud();
       this.handleHealthPickup();
       this.cameras.main.shake(300, 0.01);
@@ -1033,6 +1028,37 @@ class Jeu extends Phaser.Scene {
     });
   }
 
+  createEnemyHitboxD(enemy) {
+
+    if (enemy.hitbox) return;
+    enemy.hitbox = this.add.zone(
+      enemy.x + (enemy.flipX ? 25 : -25),
+      enemy.y,
+      50,
+      50
+    );
+    this.physics.add.existing(enemy.hitbox);
+    enemy.hitbox.body.setAllowGravity(false);
+    enemy.hitbox.body.setImmovable(true);
+
+    this.physics.add.overlap(enemy.hitbox, this.player, () => {
+      if (this.player.alpha != 1 || this.playerIsDead) return;
+      this.handlePlayerIsHit(3);
+      this.handleHud();
+      this.handleHealthPickup();
+      this.cameras.main.shake(300, 0.01);
+      enemy.hitbox.destroy();
+      enemy.hitbox = null;
+    });
+
+    this.time.delayedCall(500, () => {
+      if (enemy.hitbox) {
+        enemy.hitbox.destroy();
+        enemy.hitbox = null;
+      }
+    });
+  }
+
   update() {
     if (!this.playerIsDead) {
       this.handleParallax();
@@ -1042,21 +1068,21 @@ class Jeu extends Phaser.Scene {
       if (this.plant01 && this.plant01.active) {
         this.handlePlant01Behavior();
       }
-      if (this.enemy02 && this.enemy02.active) {
-        this.handleEnemy02Behavior();
+      if (this.sorcerer01 && this.sorcerer01.active) {
+        this.handleSorcerer01Behavior();
       }
-      if (this.enemy02_b && this.enemy02_b.active) {
-        this.handleEnemy02_bBehavior();
+      if (this.sorcerer02 && this.sorcerer02.active) {
+        this.handleSorcerer02Behavior();
       }
-      if (this.enemy03 && this.enemy03.active) {
-        this.handleEnemy03Behavior();
+      if (this.tank01 && this.tank01.active) {
+        this.handleTank01Behavior();
       }
-      if (this.enemy03_b && this.enemy03_b.active) {
-        this.handleEnemy03_bBehavior();
+      if (this.tank02 && this.tank02.active) {
+        this.handleTank02Behavior();
       }
 
-      if (this.enemy04 && this.enemy04.active) {
-        this.handleEnemy04Behavior();
+      if (this.plague01 && this.plague01.active) {
+        this.handlePlague01Behavior();
       }
     }
 
@@ -1158,886 +1184,886 @@ class Jeu extends Phaser.Scene {
     }
   }
 
-  handleEnemy02Behavior() {
-    if (this.enemy02Life <= 0 || !this.enemy02) return;
+  handleSorcerer01Behavior() {
+    if (this.sorcerer01Life <= 0 || !this.sorcerer01) return;
 
-    if (this.enemy02) {
+    if (this.sorcerer01) {
 
       const maxChaseDistance = 500;
 
-      if (this.enemy02isHit) {
-        this.enemy02.setVelocityX(0);
+      if (this.sorcerer01isHit) {
+        this.sorcerer01.setVelocityX(0);
 
-        if (this.enemy02.hitbox) {
-          this.enemy02.hitbox.destroy();
-          this.enemy02.hitbox = null;
+        if (this.sorcerer01.hitbox) {
+          this.sorcerer01.hitbox.destroy();
+          this.sorcerer01.hitbox = null;
         }
 
-        if (!this.enemy02.hitCooldown) {
-          this.enemy02.hitCooldown = this.time.delayedCall(500, () => {
-            this.enemy02isHit = false;
-            this.enemy02.hitCooldown = null;
-            this.enemy02.isPatrolling = true;
-            this.enemy02.canAttack = true;
-            this.enemy02.attackCooldown = 0;
-            if (!this.enemy02.anims.isPlaying) {
-              this.enemy02.anims.play("enemy02_idle", true);
+        if (!this.sorcerer01.hitCooldown) {
+          this.sorcerer01.hitCooldown = this.time.delayedCall(500, () => {
+            this.sorcerer01isHit = false;
+            this.sorcerer01.hitCooldown = null;
+            this.sorcerer01.isPatrolling = true;
+            this.sorcerer01.canAttack = true;
+            this.sorcerer01.attackCooldown = 0;
+            if (!this.sorcerer01.anims.isPlaying) {
+              this.sorcerer01.anims.play("sorcerer_idle", true);
             }
           });
         }
-        this.enemy02.isAttacking = false;
+        this.sorcerer01.isAttacking = false;
         return;
       }
 
       const distanceToPlayer = Phaser.Math.Distance.Between(
-        this.enemy02.x,
-        this.enemy02.y,
+        this.sorcerer01.x,
+        this.sorcerer01.y,
         this.player.x,
         this.player.y
       );
 
       const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-        this.enemy02.x,
-        this.enemy02.y,
-        this.enemy02.initialX,
-        this.enemy02.y
+        this.sorcerer01.x,
+        this.sorcerer01.y,
+        this.sorcerer01.initialX,
+        this.sorcerer01.y
       );
 
-      const patrolLeftLimit = this.enemy02.initialX - 100;
-      const patrolRightLimit = this.enemy02.initialX + 100;
+      const patrolLeftLimit = this.sorcerer01.initialX - 100;
+      const patrolRightLimit = this.sorcerer01.initialX + 100;
       const chaseSpeedMultiplier = 2;
 
-      if (this.enemy02.isAttacking || this.enemy02.postAttackCooldown) {
-        this.enemy02.setVelocityX(0);
+      if (this.sorcerer01.isAttacking || this.sorcerer01.postAttackCooldown) {
+        this.sorcerer01.setVelocityX(0);
         return;
       }
 
       if (distanceFromOriginalSpot > maxChaseDistance) {
-        this.enemy02.initialX = this.enemy02.x;
-        this.enemy02.patrolLeftLimit = this.enemy02.initialX - 100;
-        this.enemy02.patrolRightLimit = this.enemy02.initialX + 100;
+        this.sorcerer01.initialX = this.sorcerer01.x;
+        this.sorcerer01.patrolLeftLimit = this.sorcerer01.initialX - 100;
+        this.sorcerer01.patrolRightLimit = this.sorcerer01.initialX + 100;
 
-        this.enemy02.isPatrolling = true;
-        this.enemy02.direction = (this.enemy02.x > this.enemy02.initialX) ? -1 : 1;
-        this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
+        this.sorcerer01.isPatrolling = true;
+        this.sorcerer01.direction = (this.sorcerer01.x > this.sorcerer01.initialX) ? -1 : 1;
+        this.sorcerer01.setVelocityX(this.sorcerer01.speed * this.sorcerer01.direction);
         return;
       }
 
-      if (this.enemy02.isAttacking) {
-        this.enemy02.setVelocityX(0);
+      if (this.sorcerer01.isAttacking) {
+        this.sorcerer01.setVelocityX(0);
         return;
       }
 
-      if (this.enemy02.postAttackCooldown) {
+      if (this.sorcerer01.postAttackCooldown) {
         return;
       }
 
-      if (distanceToPlayer < this.enemy02.attackRange) {
-        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02.x) ||
-          (!this.player.flipX && this.player.x < this.enemy02.x);
+      if (distanceToPlayer < this.sorcerer01.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.sorcerer01.x) ||
+          (!this.player.flipX && this.player.x < this.sorcerer01.x);
 
         const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
 
         if (distanceToPlayer > minimumAttackDistance) {
-          if (this.player.x < this.enemy02.x) {
-            this.enemy02.setVelocityX(-this.enemy02.speed * chaseSpeedMultiplier);
-            this.enemy02.direction = -1;
+          if (this.player.x < this.sorcerer01.x) {
+            this.sorcerer01.setVelocityX(-this.sorcerer01.speed * chaseSpeedMultiplier);
+            this.sorcerer01.direction = -1;
           } else {
-            this.enemy02.setVelocityX(this.enemy02.speed * chaseSpeedMultiplier);
-            this.enemy02.direction = 1;
+            this.sorcerer01.setVelocityX(this.sorcerer01.speed * chaseSpeedMultiplier);
+            this.sorcerer01.direction = 1;
           }
-          this.enemy02.anims.play("enemy02_walk", true);
+          this.sorcerer01.anims.play("sorcerer_walk", true);
         } else {
-          this.enemy02.setVelocityX(0);
-          if (this.enemy02.canAttack && this.enemy02.attackCooldown <= 0) {
-            this.enemy02.isAttacking = true;
-            this.enemy02.canAttack = false;
-            this.enemy02.attackCooldown = 1500;
+          this.sorcerer01.setVelocityX(0);
+          if (this.sorcerer01.canAttack && this.sorcerer01.attackCooldown <= 0) {
+            this.sorcerer01.isAttacking = true;
+            this.sorcerer01.canAttack = false;
+            this.sorcerer01.attackCooldown = 1500;
 
 
-            this.enemy02.anims.play("enemy02_attack", true);
+            this.sorcerer01.anims.play("sorcerer_attack", true);
 
-            this.enemy02.on('animationupdate', (animation, frame) => {
-              if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02.hitbox) {
+            this.sorcerer01.on('animationupdate', (animation, frame) => {
+              if (animation.key === "sorcerer_attack" && frame.index === 2 && !this.sorcerer01.hitbox) {
 
-                if (!this.enemy02isHit) {
+                if (!this.sorcerer01isHit) {
                   this.hitSound02.play();
 
-                  this.createEnemyHitbox(this.enemy02);
+                  this.createEnemyHitbox(this.sorcerer01);
                 }
               }
             });
 
-            this.enemy02.on('animationcomplete-enemy02_attack', () => {
-              this.enemy02.isAttacking = false;
-              this.enemy02.canAttack = true;
+            this.sorcerer01.on('animationcomplete-sorcerer_attack', () => {
+              this.sorcerer01.isAttacking = false;
+              this.sorcerer01.canAttack = true;
 
-              if (this.enemy02.hitbox) {
-                this.enemy02.hitbox.destroy();
-                this.enemy02.hitbox = null;
+              if (this.sorcerer01.hitbox) {
+                this.sorcerer01.hitbox.destroy();
+                this.sorcerer01.hitbox = null;
               }
 
-              this.enemy02.anims.play("enemy02_idle", true);
-              this.enemy02.postAttackCooldown = true;
+              this.sorcerer01.anims.play("sorcerer_idle", true);
+              this.sorcerer01.postAttackCooldown = true;
 
               this.time.delayedCall(600, () => {
-                this.enemy02.postAttackCooldown = false;
+                this.sorcerer01.postAttackCooldown = false;
                 const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                  this.enemy02.x,
-                  this.enemy02.y,
+                  this.sorcerer01.x,
+                  this.sorcerer01.y,
                   this.player.x,
                   this.player.y
                 );
-                if (currentDistanceToPlayer <= this.enemy02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                  this.enemy02.anims.play("enemy02_attack", true);
-                } else if (currentDistanceToPlayer < this.enemy02.attackRange) {
-                  this.enemy02.anims.play("enemy02_walk", true);
+                if (currentDistanceToPlayer <= this.sorcerer01.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.sorcerer01.anims.play("sorcerer_attack", true);
+                } else if (currentDistanceToPlayer < this.sorcerer01.attackRange) {
+                  this.sorcerer01.anims.play("sorcerer_walk", true);
                 } else {
-                  this.enemy02.anims.play("enemy02_idle", true);
+                  this.sorcerer01.anims.play("sorcerer_idle", true);
                 }
-                this.enemy02.attackCooldown = 0;
+                this.sorcerer01.attackCooldown = 0;
               });
             });
           } else {
-            if (!this.enemy02.anims.isPlaying) {
-              this.enemy02.anims.play("enemy02_idle", true);
+            if (!this.sorcerer01.anims.isPlaying) {
+              this.sorcerer01.anims.play("sorcerer_idle", true);
             }
           }
         }
       } else {
-        if (this.enemy02.body.onFloor()) {
-          if (this.enemy02.isPatrolling) {
-            if (this.enemy02.x <= patrolLeftLimit) {
-              this.enemy02.direction = 1;
-              this.enemy02.setVelocityX(this.enemy02.speed);
-            } else if (this.enemy02.x >= patrolRightLimit) {
-              this.enemy02.direction = -1;
-              this.enemy02.setVelocityX(-this.enemy02.speed);
+        if (this.sorcerer01.body.onFloor()) {
+          if (this.sorcerer01.isPatrolling) {
+            if (this.sorcerer01.x <= patrolLeftLimit) {
+              this.sorcerer01.direction = 1;
+              this.sorcerer01.setVelocityX(this.sorcerer01.speed);
+            } else if (this.sorcerer01.x >= patrolRightLimit) {
+              this.sorcerer01.direction = -1;
+              this.sorcerer01.setVelocityX(-this.sorcerer01.speed);
             } else {
-              this.enemy02.setVelocityX(this.enemy02.speed * this.enemy02.direction);
+              this.sorcerer01.setVelocityX(this.sorcerer01.speed * this.sorcerer01.direction);
             }
-            if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_walk") {
-              this.enemy02.anims.play("enemy02_walk", true);
+            if (!this.sorcerer01.anims.isPlaying || this.sorcerer01.anims.currentAnim.key !== "sorcerer_walk") {
+              this.sorcerer01.anims.play("sorcerer_walk", true);
             }
           } else {
-            this.enemy02.setVelocityX(0);
-            if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_idle") {
-              this.enemy02.anims.play("enemy02_idle", true);
+            this.sorcerer01.setVelocityX(0);
+            if (!this.sorcerer01.anims.isPlaying || this.sorcerer01.anims.currentAnim.key !== "sorcerer_idle") {
+              this.sorcerer01.anims.play("sorcerer_idle", true);
             }
           }
         } else {
-          this.enemy02.setVelocityX(0);
-          if (!this.enemy02.anims.isPlaying || this.enemy02.anims.currentAnim.key !== "enemy02_idle") {
-            this.enemy02.anims.play("enemy02_idle", true);
+          this.sorcerer01.setVelocityX(0);
+          if (!this.sorcerer01.anims.isPlaying || this.sorcerer01.anims.currentAnim.key !== "sorcerer_idle") {
+            this.sorcerer01.anims.play("sorcerer_idle", true);
           }
         }
       }
-      this.enemy02.flipX = this.enemy02.direction === 1;
+      this.sorcerer01.flipX = this.sorcerer01.direction === 1;
     }
   }
 
-  handleEnemy02_bBehavior() {
-    if (this.enemy02_bLife <= 0 || !this.enemy02_b) return;
+  handleSorcerer02Behavior() {
+    if (this.sorcerer02Life <= 0 || !this.sorcerer02) return;
 
-    if (this.enemy02_b) {
+    if (this.sorcerer02) {
 
       const maxChaseDistance = 500;
 
-      if (this.enemy02_bisHit) {
-        this.enemy02_b.setVelocityX(0);
+      if (this.sorcerer02isHit) {
+        this.sorcerer02.setVelocityX(0);
 
-        if (this.enemy02_b.hitbox) {
-          this.enemy02_b.hitbox.destroy();
-          this.enemy02_b.hitbox = null;
+        if (this.sorcerer02.hitbox) {
+          this.sorcerer02.hitbox.destroy();
+          this.sorcerer02.hitbox = null;
         }
 
-        if (!this.enemy02_b.hitCooldown) {
-          this.enemy02_b.hitCooldown = this.time.delayedCall(500, () => {
-            this.enemy02_bisHit = false;
-            this.enemy02_b.hitCooldown = null;
-            this.enemy02_b.isPatrolling = true;
-            this.enemy02_b.canAttack = true;
-            this.enemy02_b.attackCooldown = 0;
-            if (!this.enemy02_b.anims.isPlaying) {
-              this.enemy02_b.anims.play("enemy02_idle", true);
+        if (!this.sorcerer02.hitCooldown) {
+          this.sorcerer02.hitCooldown = this.time.delayedCall(500, () => {
+            this.sorcerer02isHit = false;
+            this.sorcerer02.hitCooldown = null;
+            this.sorcerer02.isPatrolling = true;
+            this.sorcerer02.canAttack = true;
+            this.sorcerer02.attackCooldown = 0;
+            if (!this.sorcerer02.anims.isPlaying) {
+              this.sorcerer02.anims.play("sorcerer_idle", true);
             }
           });
         }
-        this.enemy02_b.isAttacking = false;
+        this.sorcerer02.isAttacking = false;
         return;
       }
 
       const distanceToPlayer = Phaser.Math.Distance.Between(
-        this.enemy02_b.x,
-        this.enemy02_b.y,
+        this.sorcerer02.x,
+        this.sorcerer02.y,
         this.player.x,
         this.player.y
       );
 
       const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-        this.enemy02_b.x,
-        this.enemy02_b.y,
-        this.enemy02_b.initialX,
-        this.enemy02_b.y
+        this.sorcerer02.x,
+        this.sorcerer02.y,
+        this.sorcerer02.initialX,
+        this.sorcerer02.y
       );
 
-      const patrolLeftLimit = this.enemy02_b.initialX - 100;
-      const patrolRightLimit = this.enemy02_b.initialX + 100;
+      const patrolLeftLimit = this.sorcerer02.initialX - 100;
+      const patrolRightLimit = this.sorcerer02.initialX + 100;
       const chaseSpeedMultiplier = 2;
 
-      if (this.enemy02_b.isAttacking || this.enemy02_b.postAttackCooldown) {
-        this.enemy02_b.setVelocityX(0);
+      if (this.sorcerer02.isAttacking || this.sorcerer02.postAttackCooldown) {
+        this.sorcerer02.setVelocityX(0);
         return;
       }
 
       if (distanceFromOriginalSpot > maxChaseDistance) {
-        this.enemy02_b.initialX = this.enemy02_b.x;
-        this.enemy02_b.patrolLeftLimit = this.enemy02_b.initialX - 100;
-        this.enemy02_b.patrolRightLimit = this.enemy02_b.initialX + 100;
+        this.sorcerer02.initialX = this.sorcerer02.x;
+        this.sorcerer02.patrolLeftLimit = this.sorcerer02.initialX - 100;
+        this.sorcerer02.patrolRightLimit = this.sorcerer02.initialX + 100;
 
-        this.enemy02_b.isPatrolling = true;
-        this.enemy02_b.direction = (this.enemy02_b.x > this.enemy02_b.initialX) ? -1 : 1;
-        this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
+        this.sorcerer02.isPatrolling = true;
+        this.sorcerer02.direction = (this.sorcerer02.x > this.sorcerer02.initialX) ? -1 : 1;
+        this.sorcerer02.setVelocityX(this.sorcerer02.speed * this.sorcerer02.direction);
         return;
       }
 
-      if (this.enemy02_b.isAttacking) {
-        this.enemy02_b.setVelocityX(0);
+      if (this.sorcerer02.isAttacking) {
+        this.sorcerer02.setVelocityX(0);
         return;
       }
 
-      if (this.enemy02_b.postAttackCooldown) {
+      if (this.sorcerer02.postAttackCooldown) {
         return;
       }
 
-      if (distanceToPlayer < this.enemy02_b.attackRange) {
-        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy02_b.x) ||
-          (!this.player.flipX && this.player.x < this.enemy02_b.x);
+      if (distanceToPlayer < this.sorcerer02.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.sorcerer02.x) ||
+          (!this.player.flipX && this.player.x < this.sorcerer02.x);
 
         const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
 
         if (distanceToPlayer > minimumAttackDistance) {
-          if (this.player.x < this.enemy02_b.x) {
-            this.enemy02_b.setVelocityX(-this.enemy02_b.speed * chaseSpeedMultiplier);
-            this.enemy02_b.direction = -1;
+          if (this.player.x < this.sorcerer02.x) {
+            this.sorcerer02.setVelocityX(-this.sorcerer02.speed * chaseSpeedMultiplier);
+            this.sorcerer02.direction = -1;
           } else {
-            this.enemy02_b.setVelocityX(this.enemy02_b.speed * chaseSpeedMultiplier);
-            this.enemy02_b.direction = 1;
+            this.sorcerer02.setVelocityX(this.sorcerer02.speed * chaseSpeedMultiplier);
+            this.sorcerer02.direction = 1;
           }
-          this.enemy02_b.anims.play("enemy02_walk", true);
+          this.sorcerer02.anims.play("sorcerer_walk", true);
         } else {
-          this.enemy02_b.setVelocityX(0);
-          if (this.enemy02_b.canAttack && this.enemy02_b.attackCooldown <= 0) {
-            this.enemy02_b.isAttacking = true;
-            this.enemy02_b.canAttack = false;
-            this.enemy02_b.attackCooldown = 1500;
+          this.sorcerer02.setVelocityX(0);
+          if (this.sorcerer02.canAttack && this.sorcerer02.attackCooldown <= 0) {
+            this.sorcerer02.isAttacking = true;
+            this.sorcerer02.canAttack = false;
+            this.sorcerer02.attackCooldown = 1500;
 
-            this.enemy02_b.anims.play("enemy02_attack", true);
+            this.sorcerer02.anims.play("sorcerer_attack", true);
 
-            this.enemy02_b.on('animationupdate', (animation, frame) => {
-              if (animation.key === "enemy02_attack" && frame.index === 2 && !this.enemy02_b.hitbox) {
-                if (!this.enemy02_bisHit) {
+            this.sorcerer02.on('animationupdate', (animation, frame) => {
+              if (animation.key === "sorcerer_attack" && frame.index === 2 && !this.sorcerer02.hitbox) {
+                if (!this.sorcerer02isHit) {
                   this.hitSound02.play();
-                  this.createEnemyHitbox(this.enemy02_b);
+                  this.createEnemyHitbox(this.sorcerer02);
                 }
 
               }
             });
 
-            this.enemy02_b.on('animationcomplete-enemy02_attack', () => {
-              this.enemy02_b.isAttacking = false;
-              this.enemy02_b.canAttack = true;
+            this.sorcerer02.on('animationcomplete-sorcerer_attack', () => {
+              this.sorcerer02.isAttacking = false;
+              this.sorcerer02.canAttack = true;
 
-              if (this.enemy02_b.hitbox) {
-                this.enemy02_b.hitbox.destroy();
-                this.enemy02_b.hitbox = null;
+              if (this.sorcerer02.hitbox) {
+                this.sorcerer02.hitbox.destroy();
+                this.sorcerer02.hitbox = null;
               }
 
-              this.enemy02_b.anims.play("enemy02_idle", true);
-              this.enemy02_b.postAttackCooldown = true;
+              this.sorcerer02.anims.play("sorcerer_idle", true);
+              this.sorcerer02.postAttackCooldown = true;
 
               this.time.delayedCall(600, () => {
-                this.enemy02_b.postAttackCooldown = false;
+                this.sorcerer02.postAttackCooldown = false;
                 const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                  this.enemy02_b.x,
-                  this.enemy02_b.y,
+                  this.sorcerer02.x,
+                  this.sorcerer02.y,
                   this.player.x,
                   this.player.y
                 );
-                if (currentDistanceToPlayer <= this.enemy02_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                  this.enemy02_b.anims.play("enemy02_attack", true);
-                } else if (currentDistanceToPlayer < this.enemy02_b.attackRange) {
-                  this.enemy02_b.anims.play("enemy02_walk", true);
+                if (currentDistanceToPlayer <= this.sorcerer02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.sorcerer02.anims.play("sorcerer_attack", true);
+                } else if (currentDistanceToPlayer < this.sorcerer02.attackRange) {
+                  this.sorcerer02.anims.play("sorcerer_walk", true);
                 } else {
-                  this.enemy02_b.anims.play("enemy02_idle", true);
+                  this.sorcerer02.anims.play("sorcerer_idle", true);
                 }
-                this.enemy02_b.attackCooldown = 0;
+                this.sorcerer02.attackCooldown = 0;
               });
             });
 
           } else {
-            if (!this.enemy02_b.anims.isPlaying) {
-              this.enemy02_b.anims.play("enemy02_idle", true);
+            if (!this.sorcerer02.anims.isPlaying) {
+              this.sorcerer02.anims.play("sorcerer_idle", true);
             }
           }
         }
       } else {
-        if (this.enemy02_b.body.onFloor()) {
-          if (this.enemy02_b.isPatrolling) {
-            if (this.enemy02_b.x <= patrolLeftLimit) {
-              this.enemy02_b.direction = 1;
-              this.enemy02_b.setVelocityX(this.enemy02_b.speed);
-            } else if (this.enemy02_b.x >= patrolRightLimit) {
-              this.enemy02_b.direction = -1;
-              this.enemy02_b.setVelocityX(-this.enemy02_b.speed);
+        if (this.sorcerer02.body.onFloor()) {
+          if (this.sorcerer02.isPatrolling) {
+            if (this.sorcerer02.x <= patrolLeftLimit) {
+              this.sorcerer02.direction = 1;
+              this.sorcerer02.setVelocityX(this.sorcerer02.speed);
+            } else if (this.sorcerer02.x >= patrolRightLimit) {
+              this.sorcerer02.direction = -1;
+              this.sorcerer02.setVelocityX(-this.sorcerer02.speed);
             } else {
-              this.enemy02_b.setVelocityX(this.enemy02_b.speed * this.enemy02_b.direction);
+              this.sorcerer02.setVelocityX(this.sorcerer02.speed * this.sorcerer02.direction);
             }
-            if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_walk") {
-              this.enemy02_b.anims.play("enemy02_walk", true);
+            if (!this.sorcerer02.anims.isPlaying || this.sorcerer02.anims.currentAnim.key !== "sorcerer_walk") {
+              this.sorcerer02.anims.play("sorcerer_walk", true);
             }
           } else {
-            this.enemy02_b.setVelocityX(0);
-            if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_idle") {
-              this.enemy02_b.anims.play("enemy02_idle", true);
+            this.sorcerer02.setVelocityX(0);
+            if (!this.sorcerer02.anims.isPlaying || this.sorcerer02.anims.currentAnim.key !== "sorcerer_idle") {
+              this.sorcerer02.anims.play("sorcerer_idle", true);
             }
           }
         } else {
-          this.enemy02_b.setVelocityX(0);
-          if (!this.enemy02_b.anims.isPlaying || this.enemy02_b.anims.currentAnim.key !== "enemy02_idle") {
-            this.enemy02_b.anims.play("enemy02_idle", true);
+          this.sorcerer02.setVelocityX(0);
+          if (!this.sorcerer02.anims.isPlaying || this.sorcerer02.anims.currentAnim.key !== "sorcerer_idle") {
+            this.sorcerer02.anims.play("sorcerer_idle", true);
           }
         }
       }
-      this.enemy02_b.flipX = this.enemy02_b.direction === 1;
+      this.sorcerer02.flipX = this.sorcerer02.direction === 1;
     }
   }
 
-  handleEnemy03Behavior() {
-    if (this.enemy03Life <= 0 || !this.enemy03) return;
+  handleTank01Behavior() {
+    if (this.tank01Life <= 0 || !this.tank01) return;
 
-    if (this.enemy03) {
+    if (this.tank01) {
       const maxChaseDistance = 350;
 
-      if (this.enemy03isHit) {
-        this.enemy03.setVelocityX(0);
+      if (this.tank01isHit) {
+        this.tank01.setVelocityX(0);
 
-        if (this.enemy03.hitbox) {
-          this.enemy03.hitbox.destroy();
-          this.enemy03.hitbox = null;
+        if (this.tank01.hitbox) {
+          this.tank01.hitbox.destroy();
+          this.tank01.hitbox = null;
         }
 
-        if (!this.enemy03.hitCooldown) {
-          this.enemy03.hitCooldown = this.time.delayedCall(1000, () => {
-            this.enemy03isHit = false;
-            this.enemy03.hitCooldown = null;
-            this.enemy03.isPatrolling = true;
-            this.enemy03.canAttack = true;
-            this.enemy03.attackCooldown = 0;
-            if (!this.enemy03.anims.isPlaying) {
-              this.enemy03.anims.play("enemy03_idle", true);
+        if (!this.tank01.hitCooldown) {
+          this.tank01.hitCooldown = this.time.delayedCall(1000, () => {
+            this.tank01isHit = false;
+            this.tank01.hitCooldown = null;
+            this.tank01.isPatrolling = true;
+            this.tank01.canAttack = true;
+            this.tank01.attackCooldown = 0;
+            if (!this.tank01.anims.isPlaying) {
+              this.tank01.anims.play("tank_idle", true);
             }
           });
         }
-        this.enemy03.isAttacking = false;
+        this.tank01.isAttacking = false;
         return;
       }
 
       const distanceToPlayer = Phaser.Math.Distance.Between(
-        this.enemy03.x,
-        this.enemy03.y,
+        this.tank01.x,
+        this.tank01.y,
         this.player.x,
         this.player.y
       );
 
       const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-        this.enemy03.x,
-        this.enemy03.y,
-        this.enemy03.initialX,
-        this.enemy03.y
+        this.tank01.x,
+        this.tank01.y,
+        this.tank01.initialX,
+        this.tank01.y
       );
 
-      const patrolLeftLimit = this.enemy03.initialX - 100;
-      const patrolRightLimit = this.enemy03.initialX + 100;
+      const patrolLeftLimit = this.tank01.initialX - 100;
+      const patrolRightLimit = this.tank01.initialX + 100;
       const chaseSpeedMultiplier = 2;
 
-      if (this.enemy03.isAttacking || this.enemy03.postAttackCooldown) {
-        this.enemy03.setVelocityX(0);
+      if (this.tank01.isAttacking || this.tank01.postAttackCooldown) {
+        this.tank01.setVelocityX(0);
         return;
       }
 
       if (distanceFromOriginalSpot > maxChaseDistance) {
-        this.enemy03.initialX = this.enemy03.x;
-        this.enemy03.patrolLeftLimit = this.enemy03.initialX - 100;
-        this.enemy03.patrolRightLimit = this.enemy03.initialX + 100;
+        this.tank01.initialX = this.tank01.x;
+        this.tank01.patrolLeftLimit = this.tank01.initialX - 100;
+        this.tank01.patrolRightLimit = this.tank01.initialX + 100;
 
-        this.enemy03.isPatrolling = true;
-        this.enemy03.direction = (this.enemy03.x > this.enemy03.initialX) ? -1 : 1;
+        this.tank01.isPatrolling = true;
+        this.tank01.direction = (this.tank01.x > this.tank01.initialX) ? -1 : 1;
 
-        this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
+        this.tank01.setVelocityX(this.tank01.speed * this.tank01.direction);
 
         return;
       }
 
-      if (this.enemy03.isAttacking) {
-        this.enemy03.setVelocityX(0);
+      if (this.tank01.isAttacking) {
+        this.tank01.setVelocityX(0);
         return;
       }
 
-      if (this.enemy03.postAttackCooldown) {
+      if (this.tank01.postAttackCooldown) {
         return;
       }
 
-      if (distanceToPlayer < this.enemy03.attackRange) {
-        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03.x) ||
-          (!this.player.flipX && this.player.x < this.enemy03.x);
+      if (distanceToPlayer < this.tank01.attackRange) {
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.tank01.x) ||
+          (!this.player.flipX && this.player.x < this.tank01.x);
 
         const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
 
         if (distanceToPlayer > minimumAttackDistance) {
-          if (this.player.x < this.enemy03.x) {
-            this.enemy03.setVelocityX(-this.enemy03.speed * chaseSpeedMultiplier);
-            this.enemy03.direction = -1;
+          if (this.player.x < this.tank01.x) {
+            this.tank01.setVelocityX(-this.tank01.speed * chaseSpeedMultiplier);
+            this.tank01.direction = -1;
           } else {
-            this.enemy03.setVelocityX(this.enemy03.speed * chaseSpeedMultiplier);
-            this.enemy03.direction = 1;
+            this.tank01.setVelocityX(this.tank01.speed * chaseSpeedMultiplier);
+            this.tank01.direction = 1;
           }
-          this.enemy03.anims.play("enemy03_walk", true);
+          this.tank01.anims.play("tank_walk", true);
         } else {
-          this.enemy03.setVelocityX(0);
-          if (this.enemy03.canAttack && this.enemy03.attackCooldown <= 0) {
-            this.enemy03.isAttacking = true;
-            this.enemy03.canAttack = false;
-            this.enemy03.attackCooldown = 1500;
+          this.tank01.setVelocityX(0);
+          if (this.tank01.canAttack && this.tank01.attackCooldown <= 0) {
+            this.tank01.isAttacking = true;
+            this.tank01.canAttack = false;
+            this.tank01.attackCooldown = 1500;
 
-            this.enemy03.anims.play("enemy03_attack", true);
-            this.enemy03.on('animationupdate', (animation, frame) => {
-              if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03.hitbox) {
+            this.tank01.anims.play("tank_attack", true);
+            this.tank01.on('animationupdate', (animation, frame) => {
+              if (animation.key === "tank_attack" && frame.index === 2 && !this.tank01.hitbox) {
                 this.time.delayedCall(490, () => {
-                  if (!this.enemy03isHit) {
+                  if (!this.tank01isHit) {
                     this.hitSound02.play();
-                    this.createEnemyHitbox(this.enemy03);
+                    this.createEnemyHitbox(this.tank01);
                   }
                 });
               }
             });
 
-            this.enemy03.on('animationcomplete-enemy03_attack', () => {
-              this.enemy03.isAttacking = false;
-              this.enemy03.canAttack = true;
-              if (this.enemy03.hitbox) {
-                this.enemy03.hitbox.destroy();
-                this.enemy03.hitbox = null;
+            this.tank01.on('animationcomplete-tank_attack', () => {
+              this.tank01.isAttacking = false;
+              this.tank01.canAttack = true;
+              if (this.tank01.hitbox) {
+                this.tank01.hitbox.destroy();
+                this.tank01.hitbox = null;
               }
 
-              this.enemy03.anims.play("enemy03_idle", true);
-              this.enemy03.postAttackCooldown = true;
+              this.tank01.anims.play("tank_idle", true);
+              this.tank01.postAttackCooldown = true;
 
               this.time.delayedCall(600, () => {
-                this.enemy03.postAttackCooldown = false;
+                this.tank01.postAttackCooldown = false;
                 const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                  this.enemy03.x,
-                  this.enemy03.y,
+                  this.tank01.x,
+                  this.tank01.y,
                   this.player.x,
                   this.player.y
                 );
-                if (currentDistanceToPlayer <= this.enemy03.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                  this.enemy03.anims.play("enemy03_attack", true);
-                } else if (currentDistanceToPlayer < this.enemy03.attackRange) {
-                  this.enemy03.anims.play("enemy03_walk", true);
+                if (currentDistanceToPlayer <= this.tank01.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.tank01.anims.play("tank_attack", true);
+                } else if (currentDistanceToPlayer < this.tank01.attackRange) {
+                  this.tank01.anims.play("tank_walk", true);
                 } else {
-                  this.enemy03.anims.play("enemy03_idle", true);
+                  this.tank01.anims.play("tank_idle", true);
                 }
-                this.enemy03.attackCooldown = 0;
+                this.tank01.attackCooldown = 0;
               });
             });
           } else {
-            if (!this.enemy03.anims.isPlaying) {
-              this.enemy03.anims.play("enemy03_idle", true);
+            if (!this.tank01.anims.isPlaying) {
+              this.tank01.anims.play("tank_idle", true);
             }
           }
         }
       } else {
-        if (this.enemy03.body.onFloor()) {
-          if (this.enemy03.isPatrolling) {
-            if (this.enemy03.x <= patrolLeftLimit) {
-              this.enemy03.direction = 1;
-              this.enemy03.setVelocityX(this.enemy03.speed);
-            } else if (this.enemy03.x >= patrolRightLimit) {
-              this.enemy03.direction = -1;
-              this.enemy03.setVelocityX(-this.enemy03.speed);
+        if (this.tank01.body.onFloor()) {
+          if (this.tank01.isPatrolling) {
+            if (this.tank01.x <= patrolLeftLimit) {
+              this.tank01.direction = 1;
+              this.tank01.setVelocityX(this.tank01.speed);
+            } else if (this.tank01.x >= patrolRightLimit) {
+              this.tank01.direction = -1;
+              this.tank01.setVelocityX(-this.tank01.speed);
             } else {
-              this.enemy03.setVelocityX(this.enemy03.speed * this.enemy03.direction);
+              this.tank01.setVelocityX(this.tank01.speed * this.tank01.direction);
             }
-            if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_walk") {
-              this.enemy03.anims.play("enemy03_walk", true);
+            if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_walk") {
+              this.tank01.anims.play("tank_walk", true);
             }
           } else {
-            this.enemy03.setVelocityX(0);
-            if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_idle") {
-              this.enemy03.anims.play("enemy03_idle", true);
+            this.tank01.setVelocityX(0);
+            if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_idle") {
+              this.tank01.anims.play("tank_idle", true);
             }
           }
         } else {
-          this.enemy03.setVelocityX(0);
-          if (!this.enemy03.anims.isPlaying || this.enemy03.anims.currentAnim.key !== "enemy03_idle") {
-            this.enemy03.anims.play("enemy03_idle", true);
+          this.tank01.setVelocityX(0);
+          if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_idle") {
+            this.tank01.anims.play("tank_idle", true);
           }
         }
       }
-      this.enemy03.flipX = this.enemy03.direction === 1;
+      this.tank01.flipX = this.tank01.direction === 1;
     }
   }
 
-  handleEnemy03_bBehavior() {
-    if (this.enemy03_bLife <= 0 || !this.enemy03_b || !this.enemy03_b.active) return;
+  handleTank02Behavior() {
+    if (this.tank02Life <= 0 || !this.tank02 || !this.tank02.active) return;
 
-    if (this.enemy03_b.active) {
+    if (this.tank02.active) {
 
-      if (this.enemy03_bisHit) {
-        this.enemy03_b.setVelocityX(0);
+      if (this.tank02isHit) {
+        this.tank02.setVelocityX(0);
 
-        if (this.enemy03_b.hitbox) {
-          this.enemy03_b.hitbox.destroy();
-          this.enemy03_b.hitbox = null;
+        if (this.tank02.hitbox) {
+          this.tank02.hitbox.destroy();
+          this.tank02.hitbox = null;
         }
 
-        if (!this.enemy03_b.hitCooldown) {
-          this.enemy03_b.hitCooldown = this.time.delayedCall(1000, () => {
-            this.enemy03_bisHit = false;
-            this.enemy03_b.hitCooldown = null;
-            this.enemy03_b.canAttack = true;
-            this.enemy03_b.attackCooldown = 0;
-            if (!this.enemy03_b.anims.isPlaying) {
-              this.enemy03_b.anims.play("enemy03_idle", true);
+        if (!this.tank02.hitCooldown) {
+          this.tank02.hitCooldown = this.time.delayedCall(1000, () => {
+            this.tank02isHit = false;
+            this.tank02.hitCooldown = null;
+            this.tank02.canAttack = true;
+            this.tank02.attackCooldown = 0;
+            if (!this.tank02.anims.isPlaying) {
+              this.tank02.anims.play("tank_idle", true);
             }
           });
         }
-        this.enemy03_b.isAttacking = false;
+        this.tank02.isAttacking = false;
         return;
       }
 
       const distanceToPlayer = Phaser.Math.Distance.Between(
-        this.enemy03_b.x,
-        this.enemy03_b.y,
+        this.tank02.x,
+        this.tank02.y,
         this.player.x,
         this.player.y
       );
 
       const chaseDistance = 600;
 
-      if (this.enemy03_b.isAttacking || this.enemy03_b.postAttackCooldown) {
-        this.enemy03_b.setVelocityX(0);
+      if (this.tank02.isAttacking || this.tank02.postAttackCooldown) {
+        this.tank02.setVelocityX(0);
         return;
       }
 
       if (distanceToPlayer < chaseDistance) {
-        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy03_b.x) ||
-          (!this.player.flipX && this.player.x < this.enemy03_b.x);
+        const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.tank02.x) ||
+          (!this.player.flipX && this.player.x < this.tank02.x);
 
         const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
 
         if (distanceToPlayer > minimumAttackDistance) {
-          if (this.player.x < this.enemy03_b.x) {
-            this.enemy03_b.setVelocityX(-this.enemy03_b.speed * 2.8);
-            this.enemy03_b.direction = -1;
+          if (this.player.x < this.tank02.x) {
+            this.tank02.setVelocityX(-this.tank02.speed * 2.8);
+            this.tank02.direction = -1;
           } else {
-            this.enemy03_b.setVelocityX(this.enemy03_b.speed * 2.8);
-            this.enemy03_b.direction = 1;
+            this.tank02.setVelocityX(this.tank02.speed * 2.8);
+            this.tank02.direction = 1;
           }
-          this.enemy03_b.anims.play("enemy03_walk", true);
+          this.tank02.anims.play("tank_walk", true);
         } else {
-          this.enemy03_b.setVelocityX(0);
-          if (this.enemy03_b.canAttack && this.enemy03_b.attackCooldown <= 0) {
-            this.enemy03_b.isAttacking = true;
-            this.enemy03_b.canAttack = false;
-            this.enemy03_b.attackCooldown = 1500;
+          this.tank02.setVelocityX(0);
+          if (this.tank02.canAttack && this.tank02.attackCooldown <= 0) {
+            this.tank02.isAttacking = true;
+            this.tank02.canAttack = false;
+            this.tank02.attackCooldown = 1500;
 
 
-            this.enemy03_b.anims.play("enemy03_attack", true);
+            this.tank02.anims.play("tank_attack", true);
 
-            this.enemy03_b.on('animationupdate', (animation, frame) => {
-              if (animation.key === "enemy03_attack" && frame.index === 2 && !this.enemy03_b.hitbox) {
+            this.tank02.on('animationupdate', (animation, frame) => {
+              if (animation.key === "tank_attack" && frame.index === 2 && !this.tank02.hitbox) {
 
                 this.time.delayedCall(490, () => {
-                  if (!this.enemy03_bisHit) {
+                  if (!this.tank02isHit) {
                     this.hitSound02.play();
-                    this.createEnemyHitbox(this.enemy03_b);
+                    this.createEnemyHitboxD(this.tank02);
                   }
                 });
               }
             });
 
-            this.enemy03_b.on('animationcomplete-enemy03_attack', () => {
-              this.enemy03_b.isAttacking = false;
-              this.enemy03_b.canAttack = true;
+            this.tank02.on('animationcomplete-tank_attack', () => {
+              this.tank02.isAttacking = false;
+              this.tank02.canAttack = true;
 
-              if (this.enemy03_b.hitbox) {
-                this.enemy03_b.hitbox.destroy();
-                this.enemy03_b.hitbox = null;
+              if (this.tank02.hitbox) {
+                this.tank02.hitbox.destroy();
+                this.tank02.hitbox = null;
               }
 
-              this.enemy03_b.anims.play("enemy03_idle", true);
-              this.enemy03_b.postAttackCooldown = true;
+              this.tank02.anims.play("tank_idle", true);
+              this.tank02.postAttackCooldown = true;
 
               this.time.delayedCall(600, () => {
-                this.enemy03_b.postAttackCooldown = false;
+                this.tank02.postAttackCooldown = false;
                 const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                  this.enemy03_b.x,
-                  this.enemy03_b.y,
+                  this.tank02.x,
+                  this.tank02.y,
                   this.player.x,
                   this.player.y
                 );
-                if (currentDistanceToPlayer <= this.enemy03_b.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                  this.enemy03_b.anims.play("enemy03_attack", true);
-                } else if (currentDistanceToPlayer < this.enemy03_b.attackRange) {
-                  this.enemy03_b.anims.play("enemy03_walk", true);
+                if (currentDistanceToPlayer <= this.tank02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                  this.tank02.anims.play("tank_attack", true);
+                } else if (currentDistanceToPlayer < this.tank02.attackRange) {
+                  this.tank02.anims.play("tank_walk", true);
                 } else {
-                  this.enemy03_b.anims.play("enemy03_idle", true);
+                  this.tank02.anims.play("tank_idle", true);
                 }
-                this.enemy03_b.attackCooldown = 0;
+                this.tank02.attackCooldown = 0;
               });
             });
           } else {
-            if (!this.enemy03_b.anims.isPlaying) {
-              this.enemy03_b.anims.play("enemy03_idle", true);
+            if (!this.tank02.anims.isPlaying) {
+              this.tank02.anims.play("tank_idle", true);
             }
           }
         }
       } else {
-        if (this.enemy03_b.body.onFloor()) {
-          if (this.enemy03_b.isPatrolling) {
-            const patrolLeftLimit = this.enemy03_b.initialX - 100;
-            const patrolRightLimit = this.enemy03_b.initialX + 100;
+        if (this.tank02.body.onFloor()) {
+          if (this.tank02.isPatrolling) {
+            const patrolLeftLimit = this.tank02.initialX - 100;
+            const patrolRightLimit = this.tank02.initialX + 100;
 
-            if (this.enemy03_b.x <= patrolLeftLimit) {
-              this.enemy03_b.direction = 1;
-              this.enemy03_b.setVelocityX(this.enemy03_b.speed);
-            } else if (this.enemy03_b.x >= patrolRightLimit) {
-              this.enemy03_b.direction = -1;
-              this.enemy03_b.setVelocityX(-this.enemy03_b.speed);
+            if (this.tank02.x <= patrolLeftLimit) {
+              this.tank02.direction = 1;
+              this.tank02.setVelocityX(this.tank02.speed);
+            } else if (this.tank02.x >= patrolRightLimit) {
+              this.tank02.direction = -1;
+              this.tank02.setVelocityX(-this.tank02.speed);
             } else {
-              this.enemy03_b.setVelocityX(this.enemy03_b.speed * this.enemy03_b.direction);
+              this.tank02.setVelocityX(this.tank02.speed * this.tank02.direction);
             }
-            if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_walk") {
-              this.enemy03_b.anims.play("enemy03_walk", true);
+            if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_walk") {
+              this.tank02.anims.play("tank_walk", true);
             }
           } else {
-            this.enemy03_b.setVelocityX(0);
-            if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
-              this.enemy03_b.anims.play("enemy03_idle", true);
+            this.tank02.setVelocityX(0);
+            if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_idle") {
+              this.tank02.anims.play("tank_idle", true);
             }
           }
         } else {
-          this.enemy03_b.setVelocityX(0);
-          if (!this.enemy03_b.anims.isPlaying || this.enemy03_b.anims.currentAnim.key !== "enemy03_idle") {
-            this.enemy03_b.anims.play("enemy03_idle", true);
+          this.tank02.setVelocityX(0);
+          if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_idle") {
+            this.tank02.anims.play("tank_idle", true);
           }
         }
       }
 
-      this.enemy03_b.flipX = this.enemy03_b.direction === 1;
+      this.tank02.flipX = this.tank02.direction === 1;
     }
   }
 
-  handleEnemy04Behavior() {
-    if (this.enemy04Life <= 0 || !this.enemy04 || !this.enemy04.active) return;
+  handlePlague01Behavior() {
+    if (this.plague01Life <= 0 || !this.plague01 || !this.plague01.active) return;
 
     const maxChaseDistance = 500;
-    const patrolLeftLimit = this.enemy04.initialX - 100;
-    const patrolRightLimit = this.enemy04.initialX + 100;
+    const patrolLeftLimit = this.plague01.initialX - 100;
+    const patrolRightLimit = this.plague01.initialX + 100;
 
-    if (this.enemy04isHit) {
-      this.enemy04.setVelocityX(0);
+    if (this.plague01isHit) {
+      this.plague01.setVelocityX(0);
 
-      if (this.enemy04.hitbox) {
-        this.enemy04.hitbox.destroy();
-        this.enemy04.hitbox = null;
+      if (this.plague01.hitbox) {
+        this.plague01.hitbox.destroy();
+        this.plague01.hitbox = null;
       }
 
-      if (!this.enemy04.hitCooldown) {
-        this.enemy04.hitCooldown = this.time.delayedCall(1000, () => {
-          this.enemy04isHit = false;
-          this.enemy04.hitCooldown = null;
-          this.enemy04.canAttack = true;
-          this.enemy04.attackCooldown = 0;
-          this.enemy04.anims.play("enemy04_idle", true);
-          this.enemy04.isPatrolling = true;
+      if (!this.plague01.hitCooldown) {
+        this.plague01.hitCooldown = this.time.delayedCall(1000, () => {
+          this.plague01isHit = false;
+          this.plague01.hitCooldown = null;
+          this.plague01.canAttack = true;
+          this.plague01.attackCooldown = 0;
+          this.plague01.anims.play("plague_idle", true);
+          this.plague01.isPatrolling = true;
         });
       }
 
-      this.enemy04.isAttacking = false;
-      this.enemy04.anims.play("enemy04_hit", true);
-      this.enemy04.anims.currentAnim.loop = false;
+      this.plague01.isAttacking = false;
+      this.plague01.anims.play("plague_hit", true);
+      this.plague01.anims.currentAnim.loop = false;
 
-      this.enemy04.on('animationcomplete-enemy04_hit', () => {
-        this.enemy04.anims.play("enemy04_idle", true);
-        this.enemy04.isPatrolling = true;
+      this.plague01.on('animationcomplete-plague_hit', () => {
+        this.plague01.anims.play("plague_idle", true);
+        this.plague01.isPatrolling = true;
       });
 
       return;
     }
 
     const distanceToPlayer = Phaser.Math.Distance.Between(
-      this.enemy04.x,
-      this.enemy04.y,
+      this.plague01.x,
+      this.plague01.y,
       this.player.x,
       this.player.y
     );
 
     const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-      this.enemy04.x,
-      this.enemy04.y,
-      this.enemy04.initialX,
-      this.enemy04.y
+      this.plague01.x,
+      this.plague01.y,
+      this.plague01.initialX,
+      this.plague01.y
     );
 
     const chaseSpeedMultiplier = 2;
 
-    if (this.enemy04.isAttacking || this.enemy04.postAttackCooldown) {
-      this.enemy04.setVelocityX(0);
+    if (this.plague01.isAttacking || this.plague01.postAttackCooldown) {
+      this.plague01.setVelocityX(0);
       return;
     }
 
 
     if (distanceFromOriginalSpot > maxChaseDistance) {
-      this.enemy04.initialX = this.enemy04.x;
-      this.enemy04.patrolLeftLimit = this.enemy04.initialX - 100;
-      this.enemy04.patrolRightLimit = this.enemy04.initialX + 100;
+      this.plague01.initialX = this.plague01.x;
+      this.plague01.patrolLeftLimit = this.plague01.initialX - 100;
+      this.plague01.patrolRightLimit = this.plague01.initialX + 100;
 
-      this.enemy04.isPatrolling = true;
-      this.enemy04.direction = (this.enemy04.x > this.enemy04.initialX) ? -1 : 1;
-      this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
+      this.plague01.isPatrolling = true;
+      this.plague01.direction = (this.plague01.x > this.plague01.initialX) ? -1 : 1;
+      this.plague01.setVelocityX(this.plague01.speed * this.plague01.direction);
 
 
-      if (this.enemy04.direction === -1 && !this.enemy04.flipX) {
-        this.enemy04.flipX = true;
-        this.enemy04.setOrigin(1, 0.5);
-        this.enemy04.setOffset(40, 20);
-      } else if (this.enemy04.direction === 1 && this.enemy04.flipX) {
-        this.enemy04.flipX = false;
-        this.enemy04.setOrigin(0.5, 0.5);
-        this.enemy04.setOffset(10, 20);
+      if (this.plague01.direction === -1 && !this.plague01.flipX) {
+        this.plague01.flipX = true;
+        this.plague01.setOrigin(1, 0.5);
+        this.plague01.setOffset(40, 20);
+      } else if (this.plague01.direction === 1 && this.plague01.flipX) {
+        this.plague01.flipX = false;
+        this.plague01.setOrigin(0.5, 0.5);
+        this.plague01.setOffset(10, 20);
       }
       return;
     }
 
-    if (distanceToPlayer < this.enemy04.attackRange) {
-      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.enemy04.x) ||
-        (!this.player.flipX && this.player.x < this.enemy04.x);
+    if (distanceToPlayer < this.plague01.attackRange) {
+      const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.plague01.x) ||
+        (!this.player.flipX && this.player.x < this.plague01.x);
 
-      const minimumAttackDistance = this.enemy04.flipX ? (isPlayerFacingEnemy ? 95 : 135) : (isPlayerFacingEnemy ? 55 : 85);
+      const minimumAttackDistance = this.plague01.flipX ? (isPlayerFacingEnemy ? 95 : 135) : (isPlayerFacingEnemy ? 55 : 85);
 
       if (distanceToPlayer > minimumAttackDistance) {
-        if (this.player.x < this.enemy04.x) {
-          this.enemy04.setVelocityX(-this.enemy04.speed * chaseSpeedMultiplier);
-          this.enemy04.direction = -1;
-          if (!this.enemy04.flipX) {
-            this.enemy04.flipX = true;
-            this.enemy04.setOrigin(1, 0.5);
-            this.enemy04.setOffset(40, 20);
+        if (this.player.x < this.plague01.x) {
+          this.plague01.setVelocityX(-this.plague01.speed * chaseSpeedMultiplier);
+          this.plague01.direction = -1;
+          if (!this.plague01.flipX) {
+            this.plague01.flipX = true;
+            this.plague01.setOrigin(1, 0.5);
+            this.plague01.setOffset(40, 20);
           }
         } else {
-          this.enemy04.setVelocityX(this.enemy04.speed * chaseSpeedMultiplier);
-          this.enemy04.direction = 1;
-          if (this.enemy04.flipX) {
-            this.enemy04.flipX = false;
-            this.enemy04.setOrigin(0.5, 0.5);
-            this.enemy04.setOffset(10, 20);
+          this.plague01.setVelocityX(this.plague01.speed * chaseSpeedMultiplier);
+          this.plague01.direction = 1;
+          if (this.plague01.flipX) {
+            this.plague01.flipX = false;
+            this.plague01.setOrigin(0.5, 0.5);
+            this.plague01.setOffset(10, 20);
           }
         }
-        this.enemy04.anims.play("enemy04_walk", true);
+        this.plague01.anims.play("plague_walk", true);
       } else {
-        this.enemy04.setVelocityX(0);
-        if (this.enemy04.canAttack && this.enemy04.attackCooldown <= 0) {
-          this.enemy04.isAttacking = true;
-          this.enemy04.canAttack = false;
-          this.enemy04.attackCooldown = 1500;
+        this.plague01.setVelocityX(0);
+        if (this.plague01.canAttack && this.plague01.attackCooldown <= 0) {
+          this.plague01.isAttacking = true;
+          this.plague01.canAttack = false;
+          this.plague01.attackCooldown = 1500;
 
 
-          this.enemy04.anims.play("enemy04_attack", true);
+          this.plague01.anims.play("plague_attack", true);
 
-          this.enemy04.on('animationupdate', (animation, frame) => {
-            if (animation.key === "enemy04_attack" && frame.index === 2 && !this.enemy04.hitbox) {
-              this.createEnemyHitboxC(this.enemy04);
+          this.plague01.on('animationupdate', (animation, frame) => {
+            if (animation.key === "plague_attack" && frame.index === 2 && !this.plague01.hitbox) {
+              this.createEnemyHitboxC(this.plague01);
 
-              if (!this.enemy04isHit) {
+              if (!this.plague01isHit) {
                 this.hitSound02.play();
               }
             }
           });
 
-          this.enemy04.on('animationcomplete-enemy04_attack', () => {
-            this.enemy04.isAttacking = false;
-            this.enemy04.canAttack = true;
+          this.plague01.on('animationcomplete-plague_attack', () => {
+            this.plague01.isAttacking = false;
+            this.plague01.canAttack = true;
 
-            if (this.enemy04.hitbox) {
-              this.enemy04.hitbox.destroy();
-              this.enemy04.hitbox = null;
+            if (this.plague01.hitbox) {
+              this.plague01.hitbox.destroy();
+              this.plague01.hitbox = null;
             }
 
-            this.enemy04.anims.play("enemy04_idle", true);
-            this.enemy04.postAttackCooldown = true;
+            this.plague01.anims.play("plague_idle", true);
+            this.plague01.postAttackCooldown = true;
 
             this.time.delayedCall(600, () => {
-              this.enemy04.postAttackCooldown = false;
+              this.plague01.postAttackCooldown = false;
               const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                this.enemy04.x,
-                this.enemy04.y,
+                this.plague01.x,
+                this.plague01.y,
                 this.player.x,
                 this.player.y
               );
-              if (currentDistanceToPlayer <= this.enemy04.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                if (this.player.x < this.enemy04.x && !this.enemy04.flipX) {
-                  this.enemy04.flipX = true;
-                  this.enemy04.setOrigin(1, 0.5);
-                  this.enemy04.setOffset(40, 20);
-                } else if (this.player.x > this.enemy04.x && this.enemy04.flipX) {
-                  this.enemy04.flipX = false;
-                  this.enemy04.setOrigin(0.5, 0.5);
-                  this.enemy04.setOffset(10, 20);
+              if (currentDistanceToPlayer <= this.plague01.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                if (this.player.x < this.plague01.x && !this.plague01.flipX) {
+                  this.plague01.flipX = true;
+                  this.plague01.setOrigin(1, 0.5);
+                  this.plague01.setOffset(40, 20);
+                } else if (this.player.x > this.plague01.x && this.plague01.flipX) {
+                  this.plague01.flipX = false;
+                  this.plague01.setOrigin(0.5, 0.5);
+                  this.plague01.setOffset(10, 20);
                 }
-                this.enemy04.anims.play("enemy04_attack", true);
+                this.plague01.anims.play("plague_attack", true);
 
-              } else if (currentDistanceToPlayer < this.enemy04.attackRange) {
-                this.enemy04.anims.play("enemy04_walk", true);
+              } else if (currentDistanceToPlayer < this.plague01.attackRange) {
+                this.plague01.anims.play("plague_walk", true);
               } else {
-                this.enemy04.anims.play("enemy04_idle", true);
+                this.plague01.anims.play("plague_idle", true);
               }
-              this.enemy04.attackCooldown = 0;
+              this.plague01.attackCooldown = 0;
             });
           });
         } else {
-          if (!this.enemy04.anims.isPlaying) {
-            this.enemy04.anims.play("enemy04_idle", true);
+          if (!this.plague01.anims.isPlaying) {
+            this.plague01.anims.play("plague_idle", true);
           }
         }
       }
     } else {
-      if (this.enemy04.body.onFloor()) {
-        if (this.enemy04.isPatrolling) {
-          if (this.enemy04.x <= patrolLeftLimit) {
-            this.enemy04.direction = 1;
-            this.enemy04.setVelocityX(this.enemy04.speed);
-            if (this.enemy04.flipX) {
-              this.enemy04.flipX = false;
-              this.enemy04.setOrigin(0.5, 0.5);
-              this.enemy04.setOffset(10, 20);
+      if (this.plague01.body.onFloor()) {
+        if (this.plague01.isPatrolling) {
+          if (this.plague01.x <= patrolLeftLimit) {
+            this.plague01.direction = 1;
+            this.plague01.setVelocityX(this.plague01.speed);
+            if (this.plague01.flipX) {
+              this.plague01.flipX = false;
+              this.plague01.setOrigin(0.5, 0.5);
+              this.plague01.setOffset(10, 20);
             }
-          } else if (this.enemy04.x >= patrolRightLimit) {
-            this.enemy04.direction = -1;
-            this.enemy04.setVelocityX(-this.enemy04.speed);
-            if (!this.enemy04.flipX) {
-              this.enemy04.flipX = true;
-              this.enemy04.setOrigin(1, 0.5);
-              this.enemy04.setOffset(40, 20);
+          } else if (this.plague01.x >= patrolRightLimit) {
+            this.plague01.direction = -1;
+            this.plague01.setVelocityX(-this.plague01.speed);
+            if (!this.plague01.flipX) {
+              this.plague01.flipX = true;
+              this.plague01.setOrigin(1, 0.5);
+              this.plague01.setOffset(40, 20);
             }
           } else {
-            this.enemy04.setVelocityX(this.enemy04.speed * this.enemy04.direction);
+            this.plague01.setVelocityX(this.plague01.speed * this.plague01.direction);
           }
 
-          if (!this.enemy04.anims.isPlaying || this.enemy04.anims.currentAnim.key !== "enemy04_walk") {
-            this.enemy04.anims.play("enemy04_walk", true);
+          if (!this.plague01.anims.isPlaying || this.plague01.anims.currentAnim.key !== "plague_walk") {
+            this.plague01.anims.play("plague_walk", true);
           }
         }
       }
@@ -2062,62 +2088,62 @@ class Jeu extends Phaser.Scene {
       }
     }
 
-    if (this.enemy02) {
-      if (this.enemy02Life <= 0) {
-        this.enemy02.body.enable = false;
-        this.enemy02.anims.play("enemy02_death");
+    if (this.sorcerer01) {
+      if (this.sorcerer01Life <= 0) {
+        this.sorcerer01.body.enable = false;
+        this.sorcerer01.anims.play("sorcerer_death");
         this.enemyDeathSound.play();
-        this.enemy02.on("animationcomplete", () => {
-          //this.enemy02.destroy();
-          this.enemy02.setActive(false);
-          this.enemy02.setVisible(false);
+        this.sorcerer01.on("animationcomplete", () => {
+          //this.sorcerer01.destroy();
+          this.sorcerer01.setActive(false);
+          this.sorcerer01.setVisible(false);
           this.time.delayedCall(350, () => {
-            this.enemy02.destroy();
-            this.enemy02 = null;
+            this.sorcerer01.destroy();
+            this.sorcerer01 = null;
           });
         });
       }
     }
 
-    if (this.enemy02_b) {
-      if (this.enemy02_bLife <= 0) {
-        this.enemy02_b.body.enable = false;
-        this.enemy02_b.anims.play("enemy02_death");
+    if (this.sorcerer02) {
+      if (this.sorcerer02Life <= 0) {
+        this.sorcerer02.body.enable = false;
+        this.sorcerer02.anims.play("sorcerer_death");
         this.enemyDeathSound.play();
-        this.enemy02_b.on("animationcomplete", () => {
-          //this.enemy02_b.destroy();
-          this.enemy02_b.setActive(false);
-          this.enemy02_b.setVisible(false);
+        this.sorcerer02.on("animationcomplete", () => {
+          //this.sorcerer02.destroy();
+          this.sorcerer02.setActive(false);
+          this.sorcerer02.setVisible(false);
           this.time.delayedCall(350, () => {
-            this.enemy02_b.destroy();
-            this.enemy02_b = null;
+            this.sorcerer02.destroy();
+            this.sorcerer02 = null;
           });
         });
       }
     }
 
-    if (this.enemy03) {
-      if (this.enemy03Life <= 0) {
-        this.enemy03.body.enable = false;
-        this.enemy03.anims.play("enemy03_death");
+    if (this.tank01) {
+      if (this.tank01Life <= 0) {
+        this.tank01.body.enable = false;
+        this.tank01.anims.play("tank_death");
         this.enemyDeathSound.play();
-        this.enemy03.on("animationcomplete", () => {
-          //this.enemy03.destroy();
-          this.enemy03.setActive(false);
-          this.enemy03.setVisible(false);
+        this.tank01.on("animationcomplete", () => {
+          //this.tank01.destroy();
+          this.tank01.setActive(false);
+          this.tank01.setVisible(false);
           this.time.delayedCall(350, () => {
-            this.enemy03.destroy();
-            this.enemy03 = null;
+            this.tank01.destroy();
+            this.tank01 = null;
           });
         });
       }
     }
 
-    if (this.enemy03_b) {
-      if (this.enemy03_bLife <= 0) {
-        this.enemy03_b.body.enable = false;
+    if (this.tank02) {
+      if (this.tank02Life <= 0) {
+        this.tank02.body.enable = false;
         this.cameras.main.flash(550);
-        this.enemy03_b.anims.play("enemy03_death");
+        this.tank02.anims.play("tank_death");
         this.enemyDeathSound.play();
         this.surpriseSound.stop();
         this.time.delayedCall(2050, () => {
@@ -2125,40 +2151,40 @@ class Jeu extends Phaser.Scene {
             this.bgMusic.play();
           }
         });
-        this.enemy03_b.on("animationcomplete", () => {
-          //this.enemy03_b.destroy();
-          this.enemy03_b.setActive(false);
-          this.enemy03_b.setVisible(false);
+        this.tank02.on("animationcomplete", () => {
+          //this.tank02.destroy();
+          this.tank02.setActive(false);
+          this.tank02.setVisible(false);
           this.time.delayedCall(350, () => {
-            this.enemy03_b.destroy();
-            this.enemy03_b = null;
+            this.tank02.destroy();
+            this.tank02 = null;
           });
 
         });
       }
     }
 
-    if (this.enemy04) {
-      if (this.enemy04Life <= 0) {
-        this.enemy04.body.enable = false;
-        if (!this.enemy04.flipX) {
-          this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x - 25, this.enemy04.y);
-          this.enemy04.setOrigin(0.5, 0.5);
-          this.enemy04.setOffset(10, 20);
-        } else if (this.enemy04.flipX) {
-          this.enemy04.anims.play("enemy04_death").setPosition(this.enemy04.x + 40, this.enemy04.y);
-          this.enemy04.setPosition(this.enemy04.x, this.enemy04.y)
-          this.enemy04.setOrigin(1, 0.5);
-          this.enemy04.setOffset(40, 20);
+    if (this.plague01) {
+      if (this.plague01Life <= 0) {
+        this.plague01.body.enable = false;
+        if (!this.plague01.flipX) {
+          this.plague01.anims.play("plague_death").setPosition(this.plague01.x - 25, this.plague01.y);
+          this.plague01.setOrigin(0.5, 0.5);
+          this.plague01.setOffset(10, 20);
+        } else if (this.plague01.flipX) {
+          this.plague01.anims.play("plague_death").setPosition(this.plague01.x + 40, this.plague01.y);
+          this.plague01.setPosition(this.plague01.x, this.plague01.y)
+          this.plague01.setOrigin(1, 0.5);
+          this.plague01.setOffset(40, 20);
         }
         this.enemyDeathSound.play();
         this.time.delayedCall(200, () => {
-          this.enemy04.setActive(false);
-          this.enemy04.setVisible(false);
+          this.plague01.setActive(false);
+          this.plague01.setVisible(false);
         })
         this.time.delayedCall(350, () => {
-          this.enemy04.destroy();
-          this.enemy04 = null;
+          this.plague01.destroy();
+          this.plague01 = null;
         });
       }
     }
@@ -2303,39 +2329,39 @@ class Jeu extends Phaser.Scene {
                 this.plant01isHit = true;
               }
               break;
-            case this.enemy02:
-              if (this.enemy02Life > 0) {
-                this.enemy02.play("enemy02_hit", true);
-                this.enemy02Life--;
-                this.enemy02isHit = true;
+            case this.sorcerer01:
+              if (this.sorcerer01Life > 0) {
+                this.sorcerer01.play("sorcerer_hit", true);
+                this.sorcerer01Life--;
+                this.sorcerer01isHit = true;
               }
               break;
-            case this.enemy02_b:
-              if (this.enemy02_bLife > 0) {
-                this.enemy02_b.play("enemy02_hit", true);
-                this.enemy02_bLife--;
-                this.enemy02_bisHit = true;
+            case this.sorcerer02:
+              if (this.sorcerer02Life > 0) {
+                this.sorcerer02.play("sorcerer_hit", true);
+                this.sorcerer02Life--;
+                this.sorcerer02isHit = true;
               }
               break;
-            case this.enemy03:
-              if (this.enemy03Life > 0) {
-                this.enemy03Life--;
-                this.enemy03.play("enemy03_hit", true);
-                this.enemy03isHit = true;
+            case this.tank01:
+              if (this.tank01Life > 0) {
+                this.tank01Life--;
+                this.tank01.play("tank_hit", true);
+                this.tank01isHit = true;
               }
               break;
-            case this.enemy03_b:
-              if (this.enemy03_bLife > 0) {
-                this.enemy03_bLife--;
-                this.enemy03_b.play("enemy03_hit", true);
-                this.enemy03_bisHit = true;
+            case this.tank02:
+              if (this.tank02Life > 0) {
+                this.tank02Life--;
+                this.tank02.play("tank_hit", true);
+                this.tank02isHit = true;
               }
               break;
-            case this.enemy04:
-              if (this.enemy04Life > 0) {
-                this.enemy04Life--;
-                this.enemy04.play("enemy04_hit", true);
-                this.enemy04isHit = true;
+            case this.plague01:
+              if (this.plague01Life > 0) {
+                this.plague01Life--;
+                this.plague01.play("plague_hit", true);
+                this.plague01isHit = true;
               }
               break;
           }

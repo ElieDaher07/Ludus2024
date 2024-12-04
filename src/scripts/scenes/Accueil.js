@@ -176,7 +176,7 @@ class Accueil extends Phaser.Scene {
       this.cameras.main.fadeOut(1000, 0, 0, 0);
       this.time.delayedCall(1000, () => {
         isMenuMusicPlaying = false;
-        this.scene.start(niveau);
+        this.scene.start("jeu2" /*niveau*/ );
       });
     });
 

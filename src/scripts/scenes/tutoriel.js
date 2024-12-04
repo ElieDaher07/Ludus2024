@@ -6,7 +6,7 @@ class Tutoriel extends Phaser.Scene {
   }
 
   preload() {
-    // les preloads sont tous dans accueil.js pour le moment
+
   }
 
   create() {
