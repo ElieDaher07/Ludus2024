@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "map_crystal.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,11 +13,11 @@
             "scaleInEditor": 1
         },
         "map_crystal.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 8,
+            "scale": 0.75,
+            "selectedLayer": 12,
             "viewCenter": {
-                "x": 201.33333333333331,
-                "y": 308.6666666666667
+                "x": 889.3333333333333,
+                "y": 237.33333333333337
             }
         },
         "map_crystal.tmx#background01": {
