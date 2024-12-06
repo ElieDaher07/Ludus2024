@@ -54,14 +54,7 @@ class Jeu2 extends Phaser.Scene {
         this.createAnimationKey("sorcerer_hit", "enemy_sorcerer", 15, 18, 8, 0);
         this.createAnimationKey("sorcerer_death", "enemy_sorcerer", 20, 24, 8, 0);
 
-        // ENEMY 03 - TANK SORCERER - DAGGER
-        this.createAnimationKey("tank_idle", "enemy_tank", 0, 4, 6, -1);
-        this.createAnimationKey("tank_walk", "enemy_tank", 6, 11, 6, -1);
-        this.createAnimationKey("tank_attack", "enemy_tank", 12, 17, 6, 0);
-        this.createAnimationKey("tank_hit", "enemy_tank", 18, 22, 6, 0);
-        this.createAnimationKey("tank_death", "enemy_tank", 24, 29, 6, 0);
-
-        // ENEMY 04 - PLAGUE DOCTOR
+        // ENEMY 03 - PLAGUE DOCTOR
         this.createAnimationKey("plague_idle", "enemy_plague", 0, 6, 8, -1);
         this.createAnimationKey("plague_walk", "enemy_plague", 7, 12, 8, -1);
         this.createAnimationKey("plague_attack", "enemy_plague", 13, 19, 8, 0);
@@ -73,6 +66,7 @@ class Jeu2 extends Phaser.Scene {
     create() {
 
         niveau = "jeu2";
+        checkpoint = 1;
 
         const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
@@ -85,7 +79,7 @@ class Jeu2 extends Phaser.Scene {
 
         this.input.mouse.disableContextMenu();
 
-        /* Commence le "cutscene" 
+        // Commence le "cutscene" 
 
         this.game.cutscenePlayed = false;
         this.input.keyboard.enabled = false;
@@ -96,11 +90,11 @@ class Jeu2 extends Phaser.Scene {
         this.time.delayedCall(1000, () => {
             if (!this.game.cutscenePlayed) {
                 this.game.cutscenePlayed = true;
-                this.cameras.main.pan(2664, 1160, 3000, 'Linear', true);
+                this.cameras.main.pan(2600, 150, 3000, 'Linear', true);
                 this.cameras.main.once('camerapancomplete', () => {
-                    this.cameras.main.pan(2664, 1160, 1000, 'Linear', true);
+                    this.cameras.main.pan(2500, 168, 1000, 'Linear', true);
                     this.time.delayedCall(1000, () => {
-                        this.cameras.main.pan(50, 250, 3000, 'Linear');
+                        this.cameras.main.pan(this.player.x, this.player.y, 3000, 'Linear');
                         this.time.delayedCall(3000, () => {
                             this.input.keyboard.enabled = true;
                             this.input.mouse.enabled = true;
@@ -114,25 +108,23 @@ class Jeu2 extends Phaser.Scene {
             }
         });
 
-        */
-
         // Creation variables progression
 
-        this.diamondCount = (sauvegarde) ? sauvegarde.nbDiamant : 0;
+        this.diamondCount = 4;
         this.diamondMessageCooldown = false;
         this.sceneTransitionInProgress = false;
 
-        this.exitHitbox = this.add.rectangle(2664, 1160, 250, 250, 0x000000, 0).setOrigin(0.5);
+        this.exitHitbox = this.add.rectangle(2650, 168, 250, 250, 0x000000, 0).setOrigin(0.5);
         this.physics.add.existing(this.exitHitbox);
         this.exitHitbox.body.setAllowGravity(false);
         this.exitHitbox.body.setImmovable(true);
 
-        this.surpriseHitbox = this.add.rectangle(2041, 1160, 100, 200, 0x000000, 0).setOrigin(0.5);
-        this.physics.add.existing(this.surpriseHitbox);
-        this.surpriseHitbox.body.setAllowGravity(false);
-        this.surpriseHitbox.body.setImmovable(true);
-
         // Creation Sons
+
+        this.dialogueSound = this.sound.add('playerdialogue', {
+            loop: true,
+            volume: 0.15
+        });
 
         this.bgMusic = this.sound.add("jeuBg2", {
             loop: true
@@ -172,12 +164,6 @@ class Jeu2 extends Phaser.Scene {
             detune: -1200,
         });
 
-        this.surpriseSound = this.sound.add("surpriseSfx", {
-            loop: true,
-            volume: 0.53,
-            rate: 3.7,
-            detune: -2800
-        })
 
         this.playerDeathSound = this.sound.add("playerDeathSound");
         this.itemPickupSound = this.sound.add("itemPickupSound");
@@ -193,7 +179,6 @@ class Jeu2 extends Phaser.Scene {
             if (!this.isPaused) {
                 this.pauseSound.play();
                 this.scene.launch("pause02");
-                this.surpriseSound.pause();
                 this.bgMusic.pause();
                 this.scene.pause();
                 this.isPaused = true;
@@ -201,7 +186,6 @@ class Jeu2 extends Phaser.Scene {
                 this.unpauseSound.play();
                 this.scene.stop("pause02");
                 this.bgMusic.resume();
-                this.surpriseSound.resume();
                 this.scene.resume();
                 this.isPaused = false;
             }
@@ -253,19 +237,22 @@ class Jeu2 extends Phaser.Scene {
         this.healthHud = this.add.image(config.width / 2, config.height / 2, "health");
         this.noDaggerHud = this.add.image(config.width / 2, config.height / 2, "noDagger");
         this.yesDaggerHud = this.add.image(config.width / 2 + 100, config.height / 2, "yesDagger")
-        this.textCountNeeded = this.add.text(135, 35, " /4", {
+        this.textCountNeeded = this.add.text(128, 35, " /10", {
             fontFamily: '"Press Start 2P"',
             fontSize: "25px",
             fill: "#ffffff",
             resolution: 3
         });
 
-        this.textCounter = this.add.text(135, 35, "0", {
+        this.textCounter = this.add.text(128, 35, "4", {
             fontFamily: '"Press Start 2P"',
             fontSize: "25px",
             fill: "#ffffff",
             resolution: 3
         });
+
+
+
 
         this.healthHud.setOrigin(0, 0);
         this.healthHud.setScale(5);
@@ -303,36 +290,37 @@ class Jeu2 extends Phaser.Scene {
         // (Non collision)
 
         const background_sky = maCarte.createLayer("background_sky", [background01], 0, 0);
-        const background_sky_front01 = maCarte.createLayer("background_sky_front01", [background02], 0, 0);
-        const background_sky_front02 = maCarte.createLayer("background_sky_front02", [background03], 0, 0)
-        const background_behind01 = maCarte.createLayer("background_behind01", [main_lev_build_2], 0, 0);
-        const background_behind02 = maCarte.createLayer("background_behind02", [main_lev_build_2], 0, 0);
-        const background_behind03 = maCarte.createLayer("background_behind03", [rocks], 0, 0);
-        const background_trees = maCarte.createLayer("background_trees", [main_lev_build_1], 0, 0);
-        const background_front01 = maCarte.createLayer("background_front01", [main_lev_build_1], 0, 0);
+        const background_sky_front01 = maCarte.createLayer("background_sky_front01", [background02], 0, 0).setDepth(1);
+        const background_sky_front02 = maCarte.createLayer("background_sky_front02", [background03], 0, 0).setDepth(1);
+        const background_behind01 = maCarte.createLayer("background_behind01", [main_lev_build_2], 0, 0).setDepth(1);
+        const background_behind02 = maCarte.createLayer("background_behind02", [main_lev_build_2], 0, 0).setDepth(1);
+        const background_behind03 = maCarte.createLayer("background_behind03", [rocks], 0, 0).setDepth(1);
+        const background_trees = maCarte.createLayer("background_trees", [main_lev_build_1], 0, 0).setDepth(1);
+        const background_front01 = maCarte.createLayer("background_front01", [main_lev_build_1], 0, 0).setDepth(1);
 
 
-        // this.backgroundParallax = [background_sky, background_sky_front01, background_sky_front02, background_behind01, background_behind02, background_behind03];
+        this.backgroundParallax = [background_sky, background_sky_front01, background_sky_front02, background_behind01, background_behind02];
 
         // (Avec collision)
 
-        const collisionLayer01 = maCarte.createLayer("background_main01", [main_lev_build_1], 0, 0);
-        const collisionLayer02 = maCarte.createLayer("background_main02", [main_lev_build_1], 0, 0);
-        const collisionLayer03 = maCarte.createLayer("background_main03", [main_lev_build_1], 0, 0);
-        const collisionLayer04 = maCarte.createLayer("background_main04", [main_lev_build_1], 0, 0);
-        const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build_1], 0, 0); // Pour blesser le joueur
+        const collisionLayer01 = maCarte.createLayer("background_main01", [main_lev_build_1], 0, 0).setDepth(1);
+        const collisionLayer02 = maCarte.createLayer("background_main02", [main_lev_build_1], 0, 0).setDepth(1);
+        const collisionLayer03 = maCarte.createLayer("background_main03", [main_lev_build_1], 0, 0).setDepth(1);
+        const collisionLayer04 = maCarte.createLayer("background_main04", [main_lev_build_1], 0, 0).setDepth(1);
+        const collisionDanger = maCarte.createLayer("background_danger", [main_lev_build_1], 0, 0).setDepth(5); // Pour blesser le joueur
 
         // ---------------- CRÉATION DES ENNEMIS ----------------
 
         this.createPlant01();
+        this.createPlant02();
+        this.createPlant03();
+        this.createPlant04();
 
         this.createSorcerer01();
         this.createSorcerer02();
 
-        this.createTank01();
-        this.createTank02();
-
         this.createPlague01();
+        this.createPlague02();
 
         // VIE ENNEMIS 
 
@@ -340,7 +328,7 @@ class Jeu2 extends Phaser.Scene {
 
         // ------------------------------ CRÉATION DU JOUEUR -------------------------------
 
-        this.player = this.physics.add.sprite(config.width / 2 - 600, config.height / 2, "player_idle_run_jump"); // other spot spot cfg.width / 2 - 200, y  config.height / 2 + 1000
+        this.player = this.physics.add.sprite(2650, 168, "player_idle_run_jump"); // 81, 1160,
         this.player.body.setBounce(0).setSize(20, 40).setOffset(10, 20).setCollideWorldBounds(true);
         this.player.setScale(2).setDepth(1);
 
@@ -496,10 +484,6 @@ class Jeu2 extends Phaser.Scene {
 
         this.createExitOverlap();
 
-        // COLLISION SURPRISE
-
-        this.createSurpriseOverlap();
-
         // ----------------  RESCALE DE LA MAP (* 2) ---------------- 
 
         // (Alternative pour ne pas faire un zoom avec la caméra et que tout marche correctement)
@@ -517,9 +501,6 @@ class Jeu2 extends Phaser.Scene {
         collisionLayer03.setScale(2);
         collisionLayer04.setScale(2);
         collisionDanger.setScale(2);
-
-
-
 
         // ---------------- CAMÉRA ---------------- 
 
@@ -546,50 +527,38 @@ class Jeu2 extends Phaser.Scene {
     }
 
     createDiamonds() {
-        this.diamond01 = this.physics.add.image(139, 1030, "diamond01").setScale(2);
+        this.diamond01 = this.physics.add.image(2422, 732, "diamond01").setScale(2);
         this.diamond01.body.allowGravity = false;
 
-        this.diamond02 = this.physics.add.image(2337, 1190, "diamond01").setScale(2);
+        this.diamond02 = this.physics.add.image(2403, 1052, "diamond01").setScale(2);
         this.diamond02.body.allowGravity = false;
 
-        this.diamond03 = this.physics.add.image(700, 774, "diamond01").setScale(2);
+        this.diamond03 = this.physics.add.image(151, 476, "diamond01").setScale(2);
         this.diamond03.body.allowGravity = false;
 
-        this.diamond04 = this.physics.add.image(250, config.height / 2 + 100, "diamond01").setScale(2);
+        this.diamond04 = this.physics.add.image(2351, 508, "diamond01").setScale(2);
         this.diamond04.body.allowGravity = false;
+
+        this.diamond05 = this.physics.add.image(116, 796, "diamond01").setScale(2);
+        this.diamond05.body.allowGravity = false;
+
+        this.diamond06 = this.physics.add.image(743, 1340, "diamond01").setScale(2);
+        this.diamond06.body.allowGravity = false;
 
         this.createHoverAnimation(this.diamond01);
         this.createHoverAnimation(this.diamond02);
         this.createHoverAnimation(this.diamond03);
         this.createHoverAnimation(this.diamond04);
+        this.createHoverAnimation(this.diamond05);
+        this.createHoverAnimation(this.diamond06);
 
-        this.diamonds = [this.diamond01, this.diamond02, this.diamond03, this.diamond04];
+        this.diamonds = [this.diamond01, this.diamond02, this.diamond03, this.diamond04, this.diamond05, this.diamond06];
         this.handleDiamondPickup(this.diamonds);
-    }
-
-    createSurpriseOverlap() {
-        this.physics.add.overlap(this.player, this.surpriseHitbox, () => {
-            this.surpriseHitbox.destroy();
-
-            if (!this.tank02.active) {
-                this.tank02.setActive(true);
-                this.tank02.setVisible(true);
-                this.tank02.isHit = false;
-                this.tank02.canAttack = true;
-                this.tank02.attackCooldown = 0;
-                this.tank02.anims.play("tank_walk", true);
-                this.surpriseSound.play({
-                    seek: 6
-                });
-                this.bgMusic.stop();
-
-            }
-        });
     }
 
     createExitOverlap() {
         this.physics.add.overlap(this.player, this.exitHitbox, () => {
-            if (this.diamondCount >= 4 && !this.sceneTransitionInProgress) {
+            if (this.diamondCount >= 10 && !this.sceneTransitionInProgress) {
 
                 this.sceneTransitionInProgress = true;
                 this.input.keyboard.enabled = false;
@@ -608,21 +577,22 @@ class Jeu2 extends Phaser.Scene {
                             nbDiamant: this.diamondCount,
                             nbVie: this.playerLife,
                             checkpoint: checkpoint,
-                            // positionX: this.player.x,
-                            // positionY: this.player.y,
+
                         }
                         localStorage.setItem(`sauvegardeJeu`, JSON.stringify(sauvegarde));
                     });
-                    /* if (sauvegarde) {
-                       this.player.x = sauvegarde.positionX;
-                       this.player.y = sauvegarde.positionY;
-                     } */
 
                     this.scene.start("victoire");
                 });
-            } else if (!this.diamondMessageCooldown && this.diamondCount < 4) {
-                this.showPlayerDialogue("Je ne devrais pas partir avant d'avoir tous les diamants.");
+            } else if (!this.diamondMessageCooldown && this.diamondCount < 10) {
+                this.showPlayerDialogue("Regarde moi qui essaie de partir avant d'avoir complété mon objectif...");
                 this.diamondMessageCooldown = true;
+
+                this.dialogueSound.play();
+
+                this.time.delayedCall(1850, () => {
+                    this.dialogueSound.stop();
+                });
             }
         });
     }
@@ -637,12 +607,15 @@ class Jeu2 extends Phaser.Scene {
                 diamond.destroy();
                 this.itemPickupSound.play();
 
-                if (this.diamondCount === 1) {
-                    this.showPlayerDialogue("Je devrais ramasser tous les diamants que je peux trouver");
-                }
+                if (this.diamondCount === 10) {
+                    this.textCounter.setX(118);
+                    this.textCountNeeded.setX(143);
+                    this.dialogueSound.play();
 
-                if (this.diamondCount === 4) {
-                    this.showPlayerDialogue("Maintenant, je peux partir d'ici!");
+
+                    this.time.delayedCall(1650, () => {
+                        this.dialogueSound.stop();
+                    });
                 }
             });
         });
@@ -654,43 +627,80 @@ class Jeu2 extends Phaser.Scene {
 
         this.diamondMessageCooldown = true;
 
-        const text = this.add.text(this.player.x, this.player.y - 50, message, {
-            fontSize: '16px',
-            fill: '#ffffff',
+        const text = this.add.text(this.cameras.main.width / 2, 50, '', {
+            fontFamily: '"Press Start 2P"',
+            fontSize: '10px',
+            fill: '#006f57',
+            resolution: 20,
+            wordWrap: {
+                width: 280,
+                useAdvancedWrap: true
+            }
         }).setOrigin(0.5).setDepth(1);
+
+
+        let index = 0;
+
+        const typeNextLetter = () => {
+            if (index < message.length) {
+                text.setText(message.substring(0, index + 1));
+                index++;
+            } else {
+                this.time.delayedCall(750, () => {
+                    text.destroy();
+                    this.diamondMessageCooldown = false;
+                });
+            }
+        };
+
+        this.time.addEvent({
+            delay: 30,
+            callback: typeNextLetter,
+            repeat: message.length - 1
+        });
 
         this.time.addEvent({
             delay: 10,
             callback: () => {
-                text.setPosition(this.player.x, this.player.y - 50);
+                text.setPosition(this.player.x + 10, this.player.y - 50);
             },
             repeat: -1
         });
 
-        this.time.delayedCall(3800, () => {
+        this.time.delayedCall(4500, () => {
             text.destroy();
             this.diamondMessageCooldown = false;
         });
     }
 
     createHearts() {
-        this.heart01 = this.physics.add.image(444, 390, "heart01");
+        this.heart01 = this.physics.add.image(307, 92, "heart01").setScale(2);
         this.heart01.body.allowGravity = false;
 
-        this.heart02 = this.physics.add.image(2000, 774, "heart01");
+        this.heart02 = this.physics.add.image(1744, 380, "heart01").setScale(2);
         this.heart02.body.allowGravity = false;
 
-        this.heart03 = this.physics.add.image(210, 1382, "heart01");
+        this.heart03 = this.physics.add.image(1695, 380, "heart01").setScale(2);
         this.heart03.body.allowGravity = false;
 
-        this.heart04 = this.physics.add.image(320, 774, "heart01");
+        this.heart04 = this.physics.add.image(1420, 124, "heart01").setScale(2);
         this.heart04.body.allowGravity = false;
 
-        this.heart05 = this.physics.add.image(1907, 326, "heart01");
+        this.heart05 = this.physics.add.image(696, 2016, "heart01").setScale(2);
         this.heart05.body.allowGravity = false;
 
-        this.heart06 = this.physics.add.image(1387, 1382, "heart01");
+        this.heart06 = this.physics.add.image(1345, 636, "heart01").setScale(2);
         this.heart06.body.allowGravity = false;
+
+        this.heart07 = this.physics.add.image(1823, 923, "heart01").setScale(2);
+        this.heart07.body.allowGravity = false;
+
+        this.heart08 = this.physics.add.image(2303, 1052, "heart01").setScale(2);
+        this.heart08.body.allowGravity = false;
+
+        this.heart09 = this.physics.add.image(1373, 1372, "heart01").setScale(2);
+        this.heart09.body.allowGravity = false;
+
 
         this.createHoverAnimation(this.heart01);
         this.createHoverAnimation(this.heart02);
@@ -698,15 +708,11 @@ class Jeu2 extends Phaser.Scene {
         this.createHoverAnimation(this.heart04);
         this.createHoverAnimation(this.heart05);
         this.createHoverAnimation(this.heart06);
+        this.createHoverAnimation(this.heart07);
+        this.createHoverAnimation(this.heart08);
+        this.createHoverAnimation(this.heart09);
 
-        this.heart01.setScale(2);
-        this.heart02.setScale(2)
-        this.heart03.setScale(2)
-        this.heart04.setScale(2)
-        this.heart05.setScale(2)
-        this.heart06.setScale(2)
-
-        this.hearts = [this.heart01, this.heart02, this.heart03, this.heart04, this.heart05, this.heart06];
+        this.hearts = [this.heart01, this.heart02, this.heart03, this.heart04, this.heart05, this.heart06, this.heart07, this.heart08, this.heart09];
         this.handleHealthPickup(this.hearts);
 
     }
@@ -716,7 +722,6 @@ class Jeu2 extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.enemies, () => {
             if (this.player.alpha != 1 || this.playerIsDead) return;
             this.handlePlayerIsHit(2);
-            //console.log(this.playerLife);
             this.handleHealthPickup();
             this.handleHud();
             this.cameras.main.shake(200, 0.01);
@@ -738,13 +743,14 @@ class Jeu2 extends Phaser.Scene {
         this.birds = [];
         for (let i = 0; i < 3; i++) {
             const delay = i * Phaser.Math.Between(2000, 4000);
-            const bird = new Bird(this, delay);
+            const targetY = Phaser.Math.Between(config.height / 2 - 370, config.height / 2 + 70);
+            const bird = new Bird(this, delay, targetY);
             this.birds.push(bird);
         }
     }
 
     createPlant01() {
-        this.plant01 = this.physics.add.sprite(config.width / 2 - 100, config.height / 2 + 1000, "plant_idle");
+        this.plant01 = this.physics.add.sprite(830, 136, "plant_idle");
         this.plant01.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
         this.plant01.setScale(2).setDepth(1);
         this.plant01isHit = false;
@@ -758,8 +764,60 @@ class Jeu2 extends Phaser.Scene {
         this.plant01.anims.play("plant_idle", true);
     }
 
+    createPlant02() {
+        this.plant02 = this.physics.add.sprite(195, 456, "plant_idle");
+        this.plant02.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
+        this.plant02.setScale(2).setDepth(1);
+        this.plant02isHit = false;
+        this.plant02.hitCooldown = null;
+
+        this.plant02.direction = 1;
+        this.plant02.attackRange = 80;
+        this.plant02.attackCooldown = 0;
+        this.plant02.canAttack = true;
+
+        this.plant02.anims.play("plant_idle", true);
+
+
+        this.plant02.setTint(0x00FF00);
+    }
+
+    createPlant03() {
+        this.plant03 = this.physics.add.sprite(2024, 1192, "plant_idle");
+        this.plant03.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
+        this.plant03.setScale(2).setDepth(1);
+        this.plant03isHit = false;
+        this.plant03.hitCooldown = null;
+
+        this.plant03.direction = 1;
+        this.plant03.attackRange = 80;
+        this.plant03.attackCooldown = 0;
+        this.plant03.canAttack = true;
+
+        this.plant03.anims.play("plant_idle", true);
+
+        this.plant03.setTint(0xFF4500);
+    }
+
+    createPlant04() {
+        this.plant04 = this.physics.add.sprite(1738, 360, "plant_idle");
+        this.plant04.body.setBounce(0).setSize(20, 0).setOffset(20, 30).setCollideWorldBounds(true);
+        this.plant04.setScale(2).setDepth(1);
+        this.plant04isHit = false;
+        this.plant04.hitCooldown = null;
+
+        this.plant04.direction = 1;
+        this.plant04.attackRange = 80;
+        this.plant04.attackCooldown = 0;
+        this.plant04.canAttack = true;
+
+        this.plant04.anims.play("plant_idle", true);
+
+        this.plant04.setTint(0x800080);
+    }
+
     createSorcerer01() {
-        this.sorcerer01 = this.physics.add.sprite(800, config.height / 2 - 50, "sorcerer_idle");
+        this.sorcerer01 = this.physics.add.sprite(2279, 488, "sorcerer_idle");
         this.sorcerer01.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
         this.sorcerer01.setScale(3).setDepth(1);
         this.sorcerer01isHit = false;
@@ -780,11 +838,13 @@ class Jeu2 extends Phaser.Scene {
     }
 
     createSorcerer02() {
-        this.sorcerer02 = this.physics.add.sprite(2032, 744, "sorcerer_idle");
+        this.sorcerer02 = this.physics.add.sprite(1097, 1096, "sorcerer_idle");
         this.sorcerer02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
         this.sorcerer02.setScale(3).setDepth(1);
         this.sorcerer02isHit = false;
         this.sorcerer02.hitCooldown = null
+
+        this.sorcerer02.setTint(0x66FF66);
 
         this.sorcerer02.speed = 50;
         this.sorcerer02.direction = 1;
@@ -800,55 +860,9 @@ class Jeu2 extends Phaser.Scene {
         this.sorcerer02.anims.play("sorcerer_idle", true);
     }
 
-    createTank01() {
-        this.tank01 = this.physics.add.sprite(1200, config.height / 2 - 50, "tank_idle");
-        this.tank01.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-        this.tank01.setScale(3).setDepth(1);
-        this.tank01isHit = false;
-        this.tank01.hitCooldown = null
-
-        this.tank01.speed = 50;
-        this.tank01.direction = 1;
-        this.tank01.initialX = this.tank01.x;
-
-        this.tank01.attackRange = 250;
-        this.tank01.attackCooldown = 0;
-        this.tank01.canAttack = true;
-        this.tank01.patrolTimer = 0;
-        this.tank01.isPatrolling = true;
-        this.tank01.patrolLeftLimit = this.tank01.initialX - 100;
-        this.tank01.patrolRightLimit = this.tank01.initialX + 100;
-        this.tank01.anims.play("tank_idle", true);
-    }
-
-    createTank02() {
-        this.tank02 = this.physics.add.sprite(2430, 1160, "tank_idle");
-        this.tank02.body.setBounce(0).setSize(13, 22).setOffset(10, 10).setCollideWorldBounds(true);
-        this.tank02.setScale(3).setDepth(1);
-        this.tank02.setTint(0xFF6666);
-        this.tank02isHit = false;
-        this.tank02.hitCooldown = null;
-
-        this.tank02.setActive(false);
-        this.tank02.setVisible(false);
-
-        this.tank02.speed = 50;
-        this.tank02.direction = -1;
-        this.tank02.initialX = this.tank02.x;
-
-        this.tank02.attackRange = 250;
-        this.tank02.attackCooldown = 0;
-        this.tank02.canAttack = true;
-        this.tank02.patrolTimer = 0;
-        this.tank02.isPatrolling = true;
-        this.tank02.patrolLeftLimit = this.tank02.initialX - 100;
-        this.tank02.patrolRightLimit = this.tank02.initialX + 100;
-        this.tank02.anims.play("tank_idle", true);
-    }
-
     createPlague01() {
 
-        this.plague01 = this.physics.add.sprite(config.width / 2 + 100, config.height / 2 + 800, "plague_idle");
+        this.plague01 = this.physics.add.sprite(1425, 104, "plague_idle");
         this.plague01.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
         this.plague01.setScale(2).setDepth(1);
         this.plague01isHit = false;
@@ -870,15 +884,43 @@ class Jeu2 extends Phaser.Scene {
 
     }
 
-    createEnemyLife() {
-        this.plant01Life = 6;
-        this.sorcerer01Life = 8;
-        this.sorcerer02Life = 8;
-        this.tank01Life = 10;
-        this.tank02Life = 16;
-        this.plague01Life = 7;
+    createPlague02() {
 
-        this.enemies = [this.plant01, this.sorcerer01, this.sorcerer02, this.tank01, this.tank02, this.plague01];
+        this.plague02 = this.physics.add.sprite(1150, 242, "plague_idle");
+        this.plague02.body.setBounce(0).setSize(20, 44).setOffset(10, 20).setCollideWorldBounds(true);
+        this.plague02.setScale(2).setDepth(1);
+        this.plague02isHit = false;
+        this.plague02.hitCooldown = null;
+
+        this.plague02.setTint(0x006400);
+
+        this.plague02.speed = 50;
+        this.plague02.direction = 1;
+        this.plague02.initialX = this.plague02.x;
+        this.plague02.stunned = false;
+
+        this.plague02.attackRange = 350;
+        this.plague02.attackCooldown = 0;
+        this.plague02.canAttack = true;
+        this.plague02.patrolTimer = 0;
+        this.plague02.isPatrolling = true;
+        this.plague02.patrolLeftLimit = this.plague02.initialX - 100;
+        this.plague02.patrolRightLimit = this.plague02.initialX + 100;
+        this.plague02.anims.play("plague_idle", true);
+
+    }
+
+    createEnemyLife() {
+        this.plant01Life = 5;
+        this.plant02Life = 5;
+        this.plant03Life = 5;
+        this.plant04Life = 5;
+        this.sorcerer01Life = 7;
+        this.sorcerer02Life = 7;
+        this.plague01Life = 7;
+        this.plague02Life = 10;
+
+        this.enemies = [this.plant01, this.plant02, this.plant03, this.plant04, this.sorcerer01, this.sorcerer02, this.plague01, this.plague02];
     }
 
     createPlayerHitbox() {
@@ -910,6 +952,30 @@ class Jeu2 extends Phaser.Scene {
                                 this.hitSound03.play();
                             }
                             break;
+                        case this.plant02:
+                            if (this.plant02Life > 0) {
+                                this.plant02Life -= 2;
+                                this.plant02isHit = true;
+                                this.plant02.play("plant_hit", true);
+                                this.hitSound03.play();
+                            }
+                            break;
+                        case this.plant03:
+                            if (this.plant03Life > 0) {
+                                this.plant03Life -= 2;
+                                this.plant03isHit = true;
+                                this.plant03.play("plant_hit", true);
+                                this.hitSound03.play();
+                            }
+                            break;
+                        case this.plant04:
+                            if (this.plant04Life > 0) {
+                                this.plant04Life -= 2;
+                                this.plant04isHit = true;
+                                this.plant04.play("plant_hit", true);
+                                this.hitSound03.play();
+                            }
+                            break;
                         case this.sorcerer01:
                             if (this.sorcerer01Life > 0) {
                                 this.sorcerer01Life -= 2;
@@ -926,27 +992,19 @@ class Jeu2 extends Phaser.Scene {
                                 this.hitSound03.play();
                             }
                             break;
-                        case this.tank01:
-                            if (this.tank01Life > 0) {
-                                this.tank01Life -= 2;
-                                this.tank01isHit = true;
-                                this.tank01.play("tank_hit", true);
-                                this.hitSound04.play();
-                            }
-                            break;
-                        case this.tank02:
-                            if (this.tank02Life > 0) {
-                                this.tank02Life -= 2;
-                                this.tank02isHit = true;
-                                this.tank02.play("tank_hit", true);
-                                this.hitSound04.play();
-                            }
-                            break;
                         case this.plague01:
                             if (this.plague01Life > 0) {
                                 this.plague01Life -= 2;
                                 this.plague01isHit = true
                                 this.plague01.play("plague_hit", true);
+                                this.hitSound03.play();
+                            }
+                            break;
+                        case this.plague02:
+                            if (this.plague02Life > 0) {
+                                this.plague02Life -= 2;
+                                this.plague02isHit = true
+                                this.plague02.play("plague_hit", true);
                                 this.hitSound03.play();
                             }
                             break;
@@ -1052,45 +1110,24 @@ class Jeu2 extends Phaser.Scene {
         });
     }
 
-    createEnemyHitboxD(enemy) {
-
-        if (enemy.hitbox) return;
-        enemy.hitbox = this.add.zone(
-            enemy.x + (enemy.flipX ? 25 : -25),
-            enemy.y,
-            50,
-            50
-        );
-        this.physics.add.existing(enemy.hitbox);
-        enemy.hitbox.body.setAllowGravity(false);
-        enemy.hitbox.body.setImmovable(true);
-
-        this.physics.add.overlap(enemy.hitbox, this.player, () => {
-            if (this.player.alpha != 1 || this.playerIsDead) return;
-            this.handlePlayerIsHit(3);
-            this.handleHud();
-            this.handleHealthPickup();
-            this.cameras.main.shake(300, 0.01);
-            enemy.hitbox.destroy();
-            enemy.hitbox = null;
-        });
-
-        this.time.delayedCall(500, () => {
-            if (enemy.hitbox) {
-                enemy.hitbox.destroy();
-                enemy.hitbox = null;
-            }
-        });
-    }
 
     update() {
         if (!this.playerIsDead) {
-            //this.handleParallax();
+            this.handleParallax();
             this.handlePlayerMovement();
             this.handlePlayerAnimations();
 
             if (this.plant01 && this.plant01.active) {
                 this.handlePlant01Behavior();
+            }
+            if (this.plant02 && this.plant02.active) {
+                this.handlePlant02Behavior();
+            }
+            if (this.plant03 && this.plant03.active) {
+                this.handlePlant03Behavior();
+            }
+            if (this.plant04 && this.plant04.active) {
+                this.handlePlant04Behavior();
             }
             if (this.sorcerer01 && this.sorcerer01.active) {
                 this.handleSorcerer01Behavior();
@@ -1098,21 +1135,16 @@ class Jeu2 extends Phaser.Scene {
             if (this.sorcerer02 && this.sorcerer02.active) {
                 this.handleSorcerer02Behavior();
             }
-            if (this.tank01 && this.tank01.active) {
-                this.handleTank01Behavior();
-            }
-            if (this.tank02 && this.tank02.active) {
-                this.handleTank02Behavior();
-            }
-
             if (this.plague01 && this.plague01.active) {
                 this.handlePlague01Behavior();
             }
+            if (this.plague02 && this.plague02.active) {
+                this.handlePlague02Behavior();
+            }
         }
 
-        //console.log(`Player Position - x: ${this.player.x}, y: ${this.player.y}`);
-        //console.log(`Player Life Initialized: ${this.playerLife}, Max Life: ${this.maxPlayerLife}`);
     }
+
 
     handlePlant01Behavior() {
         if (!this.plant01 || this.plant01Life <= 0) return;
@@ -1203,6 +1235,288 @@ class Jeu2 extends Phaser.Scene {
                 this.plant01.setVelocityX(0);
                 if (this.plant01 && this.plant01.anims && (!this.plant01.anims.isPlaying || this.plant01.anims.currentAnim.key !== "plant_idle")) {
                     this.plant01.anims.play("plant_idle", true);
+                }
+            }
+        }
+    }
+
+    handlePlant02Behavior() {
+        if (!this.plant02 || this.plant02Life <= 0) return;
+
+        if (this.plant02isHit) {
+            this.plant02.setVelocityX(0);
+
+            if (this.plant02.hitbox) {
+                this.plant02.hitbox.destroy();
+                this.plant02.hitbox = null;
+            }
+
+            if (!this.plant02.hitCooldown) {
+                this.plant02.hitCooldown = this.time.delayedCall(500, () => {
+                    this.plant02isHit = false;
+                    this.plant02.hitCooldown = null;
+                    this.plant02.canAttack = true;
+                    this.plant02.attackCooldown = 0;
+                    if (this.plant02 && this.plant02.anims && !this.plant02.anims.isPlaying) {
+                        this.plant02.anims.play("plant_idle", true);
+                    }
+                });
+            }
+            this.plant02.isAttacking = false;
+            return;
+        }
+
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            this.plant02.x,
+            this.plant02.y,
+            this.player.x,
+            this.player.y
+        );
+
+        if (this.player.x > this.plant02.x) {
+            this.plant02.flipX = true;
+        } else {
+            this.plant02.flipX = false;
+        }
+
+        if (distanceToPlayer < this.plant02.attackRange) {
+            if (this.plant02.canAttack && this.plant02.attackCooldown <= 0 && !this.plant02.isAttacking) {
+                this.plant02.isAttacking = true;
+                this.plant02.canAttack = false;
+                this.plant02.attackCooldown = 1500;
+
+                if (this.plant02 && this.plant02.anims) {
+                    this.plant02.anims.play("plant_attack", true);
+                }
+
+                this.plant02.on('animationupdate', (animation, frame) => {
+                    if (animation.key === "plant_attack" && frame.index === 6 && !this.plant02.hitbox) {
+                        this.createEnemyHitboxB(this.plant02);
+
+                        if (!this.plant02isHit) {
+                            this.hitSound02.play();
+                        }
+                    }
+                });
+
+                this.plant02.on('animationcomplete-plant_attack', () => {
+                    this.plant02.isAttacking = false;
+                    this.plant02.canAttack = true;
+
+                    if (this.plant02.hitbox) {
+                        this.plant02.hitbox.destroy();
+                        this.plant02.hitbox = null;
+                    }
+
+                    this.plant02.anims.play("plant_idle", true);
+                    this.plant02.postAttackCooldown = true;
+                    this.time.delayedCall(600, () => {
+                        this.plant02.postAttackCooldown = false;
+                    });
+
+                    this.plant02.attackCooldown = 0;
+                });
+            } else {
+                if (!this.plant02.isAttacking) {
+                    this.plant02.setVelocityX(0);
+                    if (this.plant02 && this.plant02.anims && (!this.plant02.anims.isPlaying || this.plant02.anims.currentAnim.key !== "plant_idle")) {
+                        this.plant02.anims.play("plant_idle", true);
+                    }
+                }
+            }
+        } else {
+            if (!this.plant02.isAttacking) {
+                this.plant02.setVelocityX(0);
+                if (this.plant02 && this.plant02.anims && (!this.plant02.anims.isPlaying || this.plant02.anims.currentAnim.key !== "plant_idle")) {
+                    this.plant02.anims.play("plant_idle", true);
+                }
+            }
+        }
+    }
+
+    handlePlant03Behavior() {
+        if (!this.plant03 || this.plant03Life <= 0) return;
+
+        if (this.plant03isHit) {
+            this.plant03.setVelocityX(0);
+
+            if (this.plant03.hitbox) {
+                this.plant03.hitbox.destroy();
+                this.plant03.hitbox = null;
+            }
+
+            if (!this.plant03.hitCooldown) {
+                this.plant03.hitCooldown = this.time.delayedCall(500, () => {
+                    this.plant03isHit = false;
+                    this.plant03.hitCooldown = null;
+                    this.plant03.canAttack = true;
+                    this.plant03.attackCooldown = 0;
+                    if (this.plant03 && this.plant03.anims && !this.plant03.anims.isPlaying) {
+                        this.plant03.anims.play("plant_idle", true);
+                    }
+                });
+            }
+            this.plant03.isAttacking = false;
+            return;
+        }
+
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            this.plant03.x,
+            this.plant03.y,
+            this.player.x,
+            this.player.y
+        );
+
+        if (this.player.x > this.plant03.x) {
+            this.plant03.flipX = true;
+        } else {
+            this.plant03.flipX = false;
+        }
+
+        if (distanceToPlayer < this.plant03.attackRange) {
+            if (this.plant03.canAttack && this.plant03.attackCooldown <= 0 && !this.plant03.isAttacking) {
+                this.plant03.isAttacking = true;
+                this.plant03.canAttack = false;
+                this.plant03.attackCooldown = 1500;
+
+                if (this.plant03 && this.plant03.anims) {
+                    this.plant03.anims.play("plant_attack", true);
+                }
+
+                this.plant03.on('animationupdate', (animation, frame) => {
+                    if (animation.key === "plant_attack" && frame.index === 6 && !this.plant03.hitbox) {
+                        this.createEnemyHitboxB(this.plant03);
+
+                        if (!this.plant03isHit) {
+                            this.hitSound02.play();
+                        }
+                    }
+                });
+
+                this.plant03.on('animationcomplete-plant_attack', () => {
+                    this.plant03.isAttacking = false;
+                    this.plant03.canAttack = true;
+
+                    if (this.plant03.hitbox) {
+                        this.plant03.hitbox.destroy();
+                        this.plant03.hitbox = null;
+                    }
+
+                    this.plant03.anims.play("plant_idle", true);
+                    this.plant03.postAttackCooldown = true;
+                    this.time.delayedCall(600, () => {
+                        this.plant03.postAttackCooldown = false;
+                    });
+
+                    this.plant03.attackCooldown = 0;
+                });
+            } else {
+                if (!this.plant03.isAttacking) {
+                    this.plant03.setVelocityX(0);
+                    if (this.plant03 && this.plant03.anims && (!this.plant03.anims.isPlaying || this.plant03.anims.currentAnim.key !== "plant_idle")) {
+                        this.plant03.anims.play("plant_idle", true);
+                    }
+                }
+            }
+        } else {
+            if (!this.plant03.isAttacking) {
+                this.plant03.setVelocityX(0);
+                if (this.plant03 && this.plant03.anims && (!this.plant03.anims.isPlaying || this.plant03.anims.currentAnim.key !== "plant_idle")) {
+                    this.plant03.anims.play("plant_idle", true);
+                }
+            }
+        }
+    }
+
+    handlePlant04Behavior() {
+        if (!this.plant04 || this.plant04Life <= 0) return;
+
+        if (this.plant04isHit) {
+            this.plant04.setVelocityX(0);
+
+            if (this.plant04.hitbox) {
+                this.plant04.hitbox.destroy();
+                this.plant04.hitbox = null;
+            }
+
+            if (!this.plant04.hitCooldown) {
+                this.plant04.hitCooldown = this.time.delayedCall(500, () => {
+                    this.plant04isHit = false;
+                    this.plant04.hitCooldown = null;
+                    this.plant04.canAttack = true;
+                    this.plant04.attackCooldown = 0;
+                    if (this.plant04 && this.plant04.anims && !this.plant04.anims.isPlaying) {
+                        this.plant04.anims.play("plant_idle", true);
+                    }
+                });
+            }
+            this.plant04.isAttacking = false;
+            return;
+        }
+
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            this.plant04.x,
+            this.plant04.y,
+            this.player.x,
+            this.player.y
+        );
+
+        if (this.player.x > this.plant04.x) {
+            this.plant04.flipX = true;
+        } else {
+            this.plant04.flipX = false;
+        }
+
+        if (distanceToPlayer < this.plant04.attackRange) {
+            if (this.plant04.canAttack && this.plant04.attackCooldown <= 0 && !this.plant04.isAttacking) {
+                this.plant04.isAttacking = true;
+                this.plant04.canAttack = false;
+                this.plant04.attackCooldown = 1500;
+
+                if (this.plant04 && this.plant04.anims) {
+                    this.plant04.anims.play("plant_attack", true);
+                }
+
+                this.plant04.on('animationupdate', (animation, frame) => {
+                    if (animation.key === "plant_attack" && frame.index === 6 && !this.plant04.hitbox) {
+                        this.createEnemyHitboxB(this.plant04);
+
+                        if (!this.plant04isHit) {
+                            this.hitSound02.play();
+                        }
+                    }
+                });
+
+                this.plant04.on('animationcomplete-plant_attack', () => {
+                    this.plant04.isAttacking = false;
+                    this.plant04.canAttack = true;
+
+                    if (this.plant04.hitbox) {
+                        this.plant04.hitbox.destroy();
+                        this.plant04.hitbox = null;
+                    }
+
+                    this.plant04.anims.play("plant_idle", true);
+                    this.plant04.postAttackCooldown = true;
+                    this.time.delayedCall(600, () => {
+                        this.plant04.postAttackCooldown = false;
+                    });
+
+                    this.plant04.attackCooldown = 0;
+                });
+            } else {
+                if (!this.plant04.isAttacking) {
+                    this.plant04.setVelocityX(0);
+                    if (this.plant04 && this.plant04.anims && (!this.plant04.anims.isPlaying || this.plant04.anims.currentAnim.key !== "plant_idle")) {
+                        this.plant04.anims.play("plant_idle", true);
+                    }
+                }
+            }
+        } else {
+            if (!this.plant04.isAttacking) {
+                this.plant04.setVelocityX(0);
+                if (this.plant04 && this.plant04.anims && (!this.plant04.anims.isPlaying || this.plant04.anims.currentAnim.key !== "plant_idle")) {
+                    this.plant04.anims.play("plant_idle", true);
                 }
             }
         }
@@ -1563,333 +1877,6 @@ class Jeu2 extends Phaser.Scene {
         }
     }
 
-    handleTank01Behavior() {
-        if (this.tank01Life <= 0 || !this.tank01) return;
-
-        if (this.tank01) {
-            const maxChaseDistance = 350;
-
-            if (this.tank01isHit) {
-                this.tank01.setVelocityX(0);
-
-                if (this.tank01.hitbox) {
-                    this.tank01.hitbox.destroy();
-                    this.tank01.hitbox = null;
-                }
-
-                if (!this.tank01.hitCooldown) {
-                    this.tank01.hitCooldown = this.time.delayedCall(1000, () => {
-                        this.tank01isHit = false;
-                        this.tank01.hitCooldown = null;
-                        this.tank01.isPatrolling = true;
-                        this.tank01.canAttack = true;
-                        this.tank01.attackCooldown = 0;
-                        if (!this.tank01.anims.isPlaying) {
-                            this.tank01.anims.play("tank_idle", true);
-                        }
-                    });
-                }
-                this.tank01.isAttacking = false;
-                return;
-            }
-
-            const distanceToPlayer = Phaser.Math.Distance.Between(
-                this.tank01.x,
-                this.tank01.y,
-                this.player.x,
-                this.player.y
-            );
-
-            const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
-                this.tank01.x,
-                this.tank01.y,
-                this.tank01.initialX,
-                this.tank01.y
-            );
-
-            const patrolLeftLimit = this.tank01.initialX - 100;
-            const patrolRightLimit = this.tank01.initialX + 100;
-            const chaseSpeedMultiplier = 2;
-
-            if (this.tank01.isAttacking || this.tank01.postAttackCooldown) {
-                this.tank01.setVelocityX(0);
-                return;
-            }
-
-            if (distanceFromOriginalSpot > maxChaseDistance) {
-                this.tank01.initialX = this.tank01.x;
-                this.tank01.patrolLeftLimit = this.tank01.initialX - 100;
-                this.tank01.patrolRightLimit = this.tank01.initialX + 100;
-
-                this.tank01.isPatrolling = true;
-                this.tank01.direction = (this.tank01.x > this.tank01.initialX) ? -1 : 1;
-
-                this.tank01.setVelocityX(this.tank01.speed * this.tank01.direction);
-
-                return;
-            }
-
-            if (this.tank01.isAttacking) {
-                this.tank01.setVelocityX(0);
-                return;
-            }
-
-            if (this.tank01.postAttackCooldown) {
-                return;
-            }
-
-            if (distanceToPlayer < this.tank01.attackRange) {
-                const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.tank01.x) ||
-                    (!this.player.flipX && this.player.x < this.tank01.x);
-
-                const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-                if (distanceToPlayer > minimumAttackDistance) {
-                    if (this.player.x < this.tank01.x) {
-                        this.tank01.setVelocityX(-this.tank01.speed * chaseSpeedMultiplier);
-                        this.tank01.direction = -1;
-                    } else {
-                        this.tank01.setVelocityX(this.tank01.speed * chaseSpeedMultiplier);
-                        this.tank01.direction = 1;
-                    }
-                    this.tank01.anims.play("tank_walk", true);
-                } else {
-                    this.tank01.setVelocityX(0);
-                    if (this.tank01.canAttack && this.tank01.attackCooldown <= 0) {
-                        this.tank01.isAttacking = true;
-                        this.tank01.canAttack = false;
-                        this.tank01.attackCooldown = 1500;
-
-                        this.tank01.anims.play("tank_attack", true);
-                        this.tank01.on('animationupdate', (animation, frame) => {
-                            if (animation.key === "tank_attack" && frame.index === 2 && !this.tank01.hitbox) {
-                                this.time.delayedCall(490, () => {
-                                    if (!this.tank01isHit) {
-                                        this.hitSound02.play();
-                                        this.createEnemyHitbox(this.tank01);
-                                    }
-                                });
-                            }
-                        });
-
-                        this.tank01.on('animationcomplete-tank_attack', () => {
-                            this.tank01.isAttacking = false;
-                            this.tank01.canAttack = true;
-                            if (this.tank01.hitbox) {
-                                this.tank01.hitbox.destroy();
-                                this.tank01.hitbox = null;
-                            }
-
-                            this.tank01.anims.play("tank_idle", true);
-                            this.tank01.postAttackCooldown = true;
-
-                            this.time.delayedCall(600, () => {
-                                this.tank01.postAttackCooldown = false;
-                                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                                    this.tank01.x,
-                                    this.tank01.y,
-                                    this.player.x,
-                                    this.player.y
-                                );
-                                if (currentDistanceToPlayer <= this.tank01.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                                    this.tank01.anims.play("tank_attack", true);
-                                } else if (currentDistanceToPlayer < this.tank01.attackRange) {
-                                    this.tank01.anims.play("tank_walk", true);
-                                } else {
-                                    this.tank01.anims.play("tank_idle", true);
-                                }
-                                this.tank01.attackCooldown = 0;
-                            });
-                        });
-                    } else {
-                        if (!this.tank01.anims.isPlaying) {
-                            this.tank01.anims.play("tank_idle", true);
-                        }
-                    }
-                }
-            } else {
-                if (this.tank01.body.onFloor()) {
-                    if (this.tank01.isPatrolling) {
-                        if (this.tank01.x <= patrolLeftLimit) {
-                            this.tank01.direction = 1;
-                            this.tank01.setVelocityX(this.tank01.speed);
-                        } else if (this.tank01.x >= patrolRightLimit) {
-                            this.tank01.direction = -1;
-                            this.tank01.setVelocityX(-this.tank01.speed);
-                        } else {
-                            this.tank01.setVelocityX(this.tank01.speed * this.tank01.direction);
-                        }
-                        if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_walk") {
-                            this.tank01.anims.play("tank_walk", true);
-                        }
-                    } else {
-                        this.tank01.setVelocityX(0);
-                        if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_idle") {
-                            this.tank01.anims.play("tank_idle", true);
-                        }
-                    }
-                } else {
-                    this.tank01.setVelocityX(0);
-                    if (!this.tank01.anims.isPlaying || this.tank01.anims.currentAnim.key !== "tank_idle") {
-                        this.tank01.anims.play("tank_idle", true);
-                    }
-                }
-            }
-            this.tank01.flipX = this.tank01.direction === 1;
-        }
-    }
-
-    handleTank02Behavior() {
-        if (this.tank02Life <= 0 || !this.tank02 || !this.tank02.active) return;
-
-        if (this.tank02.active) {
-
-            if (this.tank02isHit) {
-                this.tank02.setVelocityX(0);
-
-                if (this.tank02.hitbox) {
-                    this.tank02.hitbox.destroy();
-                    this.tank02.hitbox = null;
-                }
-
-                if (!this.tank02.hitCooldown) {
-                    this.tank02.hitCooldown = this.time.delayedCall(1000, () => {
-                        this.tank02isHit = false;
-                        this.tank02.hitCooldown = null;
-                        this.tank02.canAttack = true;
-                        this.tank02.attackCooldown = 0;
-                        if (!this.tank02.anims.isPlaying) {
-                            this.tank02.anims.play("tank_idle", true);
-                        }
-                    });
-                }
-                this.tank02.isAttacking = false;
-                return;
-            }
-
-            const distanceToPlayer = Phaser.Math.Distance.Between(
-                this.tank02.x,
-                this.tank02.y,
-                this.player.x,
-                this.player.y
-            );
-
-            const chaseDistance = 600;
-
-            if (this.tank02.isAttacking || this.tank02.postAttackCooldown) {
-                this.tank02.setVelocityX(0);
-                return;
-            }
-
-            if (distanceToPlayer < chaseDistance) {
-                const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.tank02.x) ||
-                    (!this.player.flipX && this.player.x < this.tank02.x);
-
-                const minimumAttackDistance = isPlayerFacingEnemy ? 45 : 85;
-
-                if (distanceToPlayer > minimumAttackDistance) {
-                    if (this.player.x < this.tank02.x) {
-                        this.tank02.setVelocityX(-this.tank02.speed * 2.8);
-                        this.tank02.direction = -1;
-                    } else {
-                        this.tank02.setVelocityX(this.tank02.speed * 2.8);
-                        this.tank02.direction = 1;
-                    }
-                    this.tank02.anims.play("tank_walk", true);
-                } else {
-                    this.tank02.setVelocityX(0);
-                    if (this.tank02.canAttack && this.tank02.attackCooldown <= 0) {
-                        this.tank02.isAttacking = true;
-                        this.tank02.canAttack = false;
-                        this.tank02.attackCooldown = 1500;
-
-
-                        this.tank02.anims.play("tank_attack", true);
-
-                        this.tank02.on('animationupdate', (animation, frame) => {
-                            if (animation.key === "tank_attack" && frame.index === 2 && !this.tank02.hitbox) {
-
-                                this.time.delayedCall(490, () => {
-                                    if (!this.tank02isHit) {
-                                        this.hitSound02.play();
-                                        this.createEnemyHitboxD(this.tank02);
-                                    }
-                                });
-                            }
-                        });
-
-                        this.tank02.on('animationcomplete-tank_attack', () => {
-                            this.tank02.isAttacking = false;
-                            this.tank02.canAttack = true;
-
-                            if (this.tank02.hitbox) {
-                                this.tank02.hitbox.destroy();
-                                this.tank02.hitbox = null;
-                            }
-
-                            this.tank02.anims.play("tank_idle", true);
-                            this.tank02.postAttackCooldown = true;
-
-                            this.time.delayedCall(600, () => {
-                                this.tank02.postAttackCooldown = false;
-                                const currentDistanceToPlayer = Phaser.Math.Distance.Between(
-                                    this.tank02.x,
-                                    this.tank02.y,
-                                    this.player.x,
-                                    this.player.y
-                                );
-                                if (currentDistanceToPlayer <= this.tank02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
-                                    this.tank02.anims.play("tank_attack", true);
-                                } else if (currentDistanceToPlayer < this.tank02.attackRange) {
-                                    this.tank02.anims.play("tank_walk", true);
-                                } else {
-                                    this.tank02.anims.play("tank_idle", true);
-                                }
-                                this.tank02.attackCooldown = 0;
-                            });
-                        });
-                    } else {
-                        if (!this.tank02.anims.isPlaying) {
-                            this.tank02.anims.play("tank_idle", true);
-                        }
-                    }
-                }
-            } else {
-                if (this.tank02.body.onFloor()) {
-                    if (this.tank02.isPatrolling) {
-                        const patrolLeftLimit = this.tank02.initialX - 100;
-                        const patrolRightLimit = this.tank02.initialX + 100;
-
-                        if (this.tank02.x <= patrolLeftLimit) {
-                            this.tank02.direction = 1;
-                            this.tank02.setVelocityX(this.tank02.speed);
-                        } else if (this.tank02.x >= patrolRightLimit) {
-                            this.tank02.direction = -1;
-                            this.tank02.setVelocityX(-this.tank02.speed);
-                        } else {
-                            this.tank02.setVelocityX(this.tank02.speed * this.tank02.direction);
-                        }
-                        if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_walk") {
-                            this.tank02.anims.play("tank_walk", true);
-                        }
-                    } else {
-                        this.tank02.setVelocityX(0);
-                        if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_idle") {
-                            this.tank02.anims.play("tank_idle", true);
-                        }
-                    }
-                } else {
-                    this.tank02.setVelocityX(0);
-                    if (!this.tank02.anims.isPlaying || this.tank02.anims.currentAnim.key !== "tank_idle") {
-                        this.tank02.anims.play("tank_idle", true);
-                    }
-                }
-            }
-
-            this.tank02.flipX = this.tank02.direction === 1;
-        }
-    }
-
     handlePlague01Behavior() {
         if (this.plague01Life <= 0 || !this.plague01 || !this.plague01.active) return;
 
@@ -2094,6 +2081,208 @@ class Jeu2 extends Phaser.Scene {
         }
     }
 
+    handlePlague02Behavior() {
+        if (this.plague02Life <= 0 || !this.plague02 || !this.plague02.active) return;
+
+        const maxChaseDistance = 500;
+        const patrolLeftLimit = this.plague02.initialX - 100;
+        const patrolRightLimit = this.plague02.initialX + 100;
+
+        if (this.plague02isHit) {
+            this.plague02.setVelocityX(0);
+
+            if (this.plague02.hitbox) {
+                this.plague02.hitbox.destroy();
+                this.plague02.hitbox = null;
+            }
+
+            if (!this.plague02.hitCooldown) {
+                this.plague02.hitCooldown = this.time.delayedCall(1000, () => {
+                    this.plague02isHit = false;
+                    this.plague02.hitCooldown = null;
+                    this.plague02.canAttack = true;
+                    this.plague02.attackCooldown = 0;
+                    this.plague02.anims.play("plague_idle", true);
+                    this.plague02.isPatrolling = true;
+                });
+            }
+
+            this.plague02.isAttacking = false;
+            this.plague02.anims.play("plague_hit", true);
+            this.plague02.anims.currentAnim.loop = false;
+
+            this.plague02.on('animationcomplete-plague_hit', () => {
+                this.plague02.anims.play("plague_idle", true);
+                this.plague02.isPatrolling = true;
+            });
+
+            return;
+        }
+
+        const distanceToPlayer = Phaser.Math.Distance.Between(
+            this.plague02.x,
+            this.plague02.y,
+            this.player.x,
+            this.player.y
+        );
+
+        const distanceFromOriginalSpot = Phaser.Math.Distance.Between(
+            this.plague02.x,
+            this.plague02.y,
+            this.plague02.initialX,
+            this.plague02.y
+        );
+
+        const chaseSpeedMultiplier = 2;
+
+        if (this.plague02.isAttacking || this.plague02.postAttackCooldown) {
+            this.plague02.setVelocityX(0);
+            return;
+        }
+
+        if (distanceFromOriginalSpot > maxChaseDistance) {
+            this.plague02.initialX = this.plague02.x;
+            this.plague02.patrolLeftLimit = this.plague02.initialX - 100;
+            this.plague02.patrolRightLimit = this.plague02.initialX + 100;
+
+            this.plague02.isPatrolling = true;
+            this.plague02.direction = (this.plague02.x > this.plague02.initialX) ? -1 : 1;
+            this.plague02.setVelocityX(this.plague02.speed * this.plague02.direction);
+
+            if (this.plague02.direction === -1 && !this.plague02.flipX) {
+                this.plague02.flipX = true;
+                this.plague02.setOrigin(1, 0.5);
+                this.plague02.setOffset(40, 20);
+            } else if (this.plague02.direction === 1 && this.plague02.flipX) {
+                this.plague02.flipX = false;
+                this.plague02.setOrigin(0.5, 0.5);
+                this.plague02.setOffset(10, 20);
+            }
+            return;
+        }
+
+        if (distanceToPlayer < this.plague02.attackRange) {
+            const isPlayerFacingEnemy = (this.player.flipX && this.player.x > this.plague02.x) ||
+                (!this.player.flipX && this.player.x < this.plague02.x);
+
+            const minimumAttackDistance = this.plague02.flipX ? (isPlayerFacingEnemy ? 95 : 135) : (isPlayerFacingEnemy ? 55 : 85);
+
+            if (distanceToPlayer > minimumAttackDistance) {
+                if (this.player.x < this.plague02.x) {
+                    this.plague02.setVelocityX(-this.plague02.speed * chaseSpeedMultiplier);
+                    this.plague02.direction = -1;
+                    if (!this.plague02.flipX) {
+                        this.plague02.flipX = true;
+                        this.plague02.setOrigin(1, 0.5);
+                        this.plague02.setOffset(40, 20);
+                    }
+                } else {
+                    this.plague02.setVelocityX(this.plague02.speed * chaseSpeedMultiplier);
+                    this.plague02.direction = 1;
+                    if (this.plague02.flipX) {
+                        this.plague02.flipX = false;
+                        this.plague02.setOrigin(0.5, 0.5);
+                        this.plague02.setOffset(10, 20);
+                    }
+                }
+                this.plague02.anims.play("plague_walk", true);
+            } else {
+                this.plague02.setVelocityX(0);
+                if (this.plague02.canAttack && this.plague02.attackCooldown <= 0) {
+                    this.plague02.isAttacking = true;
+                    this.plague02.canAttack = false;
+                    this.plague02.attackCooldown = 1500;
+
+                    this.plague02.anims.play("plague_attack", true);
+
+                    this.plague02.on('animationupdate', (animation, frame) => {
+                        if (animation.key === "plague_attack" && frame.index === 2 && !this.plague02.hitbox) {
+                            this.createEnemyHitboxC(this.plague02);
+
+                            if (!this.plague02isHit) {
+                                this.hitSound02.play();
+                            }
+                        }
+                    });
+
+                    this.plague02.on('animationcomplete-plague_attack', () => {
+                        this.plague02.isAttacking = false;
+                        this.plague02.canAttack = true;
+
+                        if (this.plague02.hitbox) {
+                            this.plague02.hitbox.destroy();
+                            this.plague02.hitbox = null;
+                        }
+
+                        this.plague02.anims.play("plague_idle", true);
+                        this.plague02.postAttackCooldown = true;
+
+                        this.time.delayedCall(600, () => {
+                            this.plague02.postAttackCooldown = false;
+                            const currentDistanceToPlayer = Phaser.Math.Distance.Between(
+                                this.plague02.x,
+                                this.plague02.y,
+                                this.player.x,
+                                this.player.y
+                            );
+                            if (currentDistanceToPlayer <= this.plague02.attackRange && currentDistanceToPlayer <= minimumAttackDistance) {
+                                if (this.player.x < this.plague02.x && !this.plague02.flipX) {
+                                    this.plague02.flipX = true;
+                                    this.plague02.setOrigin(1, 0.5);
+                                    this.plague02.setOffset(40, 20);
+                                } else if (this.player.x > this.plague02.x && this.plague02.flipX) {
+                                    this.plague02.flipX = false;
+                                    this.plague02.setOrigin(0.5, 0.5);
+                                    this.plague02.setOffset(10, 20);
+                                }
+                                this.plague02.anims.play("plague_attack", true);
+
+                            } else if (currentDistanceToPlayer < this.plague02.attackRange) {
+                                this.plague02.anims.play("plague_walk", true);
+                            } else {
+                                this.plague02.anims.play("plague_idle", true);
+                            }
+                            this.plague02.attackCooldown = 0;
+                        });
+                    });
+                } else {
+                    if (!this.plague02.anims.isPlaying) {
+                        this.plague02.anims.play("plague_idle", true);
+                    }
+                }
+            }
+        } else {
+            if (this.plague02.body.onFloor()) {
+                if (this.plague02.isPatrolling) {
+                    if (this.plague02.x <= patrolLeftLimit) {
+                        this.plague02.direction = 1;
+                        this.plague02.setVelocityX(this.plague02.speed);
+                        if (this.plague02.flipX) {
+                            this.plague02.flipX = false;
+                            this.plague02.setOrigin(0.5, 0.5);
+                            this.plague02.setOffset(10, 20);
+                        }
+                    } else if (this.plague02.x >= patrolRightLimit) {
+                        this.plague02.direction = -1;
+                        this.plague02.setVelocityX(-this.plague02.speed);
+                        if (!this.plague02.flipX) {
+                            this.plague02.flipX = true;
+                            this.plague02.setOrigin(1, 0.5);
+                            this.plague02.setOffset(40, 20);
+                        }
+                    } else {
+                        this.plague02.setVelocityX(this.plague02.speed * this.plague02.direction);
+                    }
+
+                    if (!this.plague02.anims.isPlaying || this.plague02.anims.currentAnim.key !== "plague_walk") {
+                        this.plague02.anims.play("plague_walk", true);
+                    }
+                }
+            }
+        }
+    }
+
+
     handleEnemyLife() {
         if (this.plant01) {
             if (this.plant01Life <= 0) {
@@ -2107,6 +2296,54 @@ class Jeu2 extends Phaser.Scene {
                     this.time.delayedCall(350, () => {
                         this.plant01.destroy();
                         this.plant01 = null;
+                    });
+                });
+            }
+        }
+
+        if (this.plant02) {
+            if (this.plant02Life <= 0) {
+                this.plant02.body.enable = false;
+                this.plant02.anims.play("plant_death");
+                this.enemyDeathSound.play();
+                this.plant02.on("animationcomplete", () => {
+                    this.plant02.setActive(false);
+                    this.plant02.setVisible(false);
+                    this.time.delayedCall(350, () => {
+                        this.plant02.destroy();
+                        this.plant02 = null;
+                    });
+                });
+            }
+        }
+
+        if (this.plant03) {
+            if (this.plant03Life <= 0) {
+                this.plant03.body.enable = false;
+                this.plant03.anims.play("plant_death");
+                this.enemyDeathSound.play();
+                this.plant03.on("animationcomplete", () => {
+                    this.plant03.setActive(false);
+                    this.plant03.setVisible(false);
+                    this.time.delayedCall(350, () => {
+                        this.plant03.destroy();
+                        this.plant03 = null;
+                    });
+                });
+            }
+        }
+
+        if (this.plant04) {
+            if (this.plant04Life <= 0) {
+                this.plant04.body.enable = false;
+                this.plant04.anims.play("plant_death");
+                this.enemyDeathSound.play();
+                this.plant04.on("animationcomplete", () => {
+                    this.plant04.setActive(false);
+                    this.plant04.setVisible(false);
+                    this.time.delayedCall(350, () => {
+                        this.plant04.destroy();
+                        this.plant04 = null;
                     });
                 });
             }
@@ -2135,7 +2372,6 @@ class Jeu2 extends Phaser.Scene {
                 this.sorcerer02.anims.play("sorcerer_death");
                 this.enemyDeathSound.play();
                 this.sorcerer02.on("animationcomplete", () => {
-                    //this.sorcerer02.destroy();
                     this.sorcerer02.setActive(false);
                     this.sorcerer02.setVisible(false);
                     this.time.delayedCall(350, () => {
@@ -2146,51 +2382,10 @@ class Jeu2 extends Phaser.Scene {
             }
         }
 
-        if (this.tank01) {
-            if (this.tank01Life <= 0) {
-                this.tank01.body.enable = false;
-                this.tank01.anims.play("tank_death");
-                this.enemyDeathSound.play();
-                this.tank01.on("animationcomplete", () => {
-                    //this.tank01.destroy();
-                    this.tank01.setActive(false);
-                    this.tank01.setVisible(false);
-                    this.time.delayedCall(350, () => {
-                        this.tank01.destroy();
-                        this.tank01 = null;
-                    });
-                });
-            }
-        }
-
-        if (this.tank02) {
-            if (this.tank02Life <= 0) {
-                this.tank02.body.enable = false;
-                this.cameras.main.flash(550);
-                this.tank02.anims.play("tank_death");
-                this.enemyDeathSound.play();
-                this.surpriseSound.stop();
-                this.time.delayedCall(2050, () => {
-                    if (!this.musicIsMuted) {
-                        this.bgMusic.play();
-                    }
-                });
-                this.tank02.on("animationcomplete", () => {
-                    //this.tank02.destroy();
-                    this.tank02.setActive(false);
-                    this.tank02.setVisible(false);
-                    this.time.delayedCall(350, () => {
-                        this.tank02.destroy();
-                        this.tank02 = null;
-                    });
-
-                });
-            }
-        }
 
         if (this.plague01) {
             if (this.plague01Life <= 0) {
-                this.plague01.body.enable = false;
+
                 if (!this.plague01.flipX) {
                     this.plague01.anims.play("plague_death").setPosition(this.plague01.x - 25, this.plague01.y);
                     this.plague01.setOrigin(0.5, 0.5);
@@ -2201,7 +2396,10 @@ class Jeu2 extends Phaser.Scene {
                     this.plague01.setOrigin(1, 0.5);
                     this.plague01.setOffset(40, 20);
                 }
+
                 this.enemyDeathSound.play();
+                this.plague01.body.enable = false;
+
                 this.time.delayedCall(200, () => {
                     this.plague01.setActive(false);
                     this.plague01.setVisible(false);
@@ -2212,6 +2410,36 @@ class Jeu2 extends Phaser.Scene {
                 });
             }
         }
+
+        if (this.plague02) {
+            if (this.plague02Life <= 0) {
+
+                if (!this.plague02.flipX) {
+                    this.plague02.anims.play("plague_death").setPosition(this.plague02.x - 25, this.plague02.y);
+                    this.plague02.setOrigin(0.5, 0.5);
+                    this.plague02.setOffset(10, 20);
+                } else if (this.plague02.flipX) {
+                    this.plague02.anims.play("plague_death").setPosition(this.plague02.x + 40, this.plague02.y);
+                    this.plague02.setPosition(this.plague02.x, this.plague02.y);
+                    this.plague02.setOrigin(1, 0.5);
+                    this.plague02.setOffset(40, 20);
+                }
+
+                this.enemyDeathSound.play();
+                this.plague02.body.enable = false;
+
+                this.time.delayedCall(200, () => {
+                    this.plague02.setActive(false);
+                    this.plague02.setVisible(false);
+                })
+                this.time.delayedCall(350, () => {
+                    this.plague02.destroy();
+                    this.plague02 = null;
+                });
+            }
+        }
+
+
     }
 
     handlePlayerIsHit(damage) {
@@ -2251,8 +2479,6 @@ class Jeu2 extends Phaser.Scene {
                     heart.destroy();
                     this.itemPickupSound.play();
                     this.handleHud();
-                } else {
-                    console.log("MAX HP.");
                 }
             });
         });
@@ -2353,6 +2579,27 @@ class Jeu2 extends Phaser.Scene {
                                 this.plant01isHit = true;
                             }
                             break;
+                        case this.plant02:
+                            if (this.plant02Life > 0) {
+                                this.plant02.play("plant_hit", true);
+                                this.plant02Life--;
+                                this.plant02isHit = true;
+                            }
+                            break;
+                        case this.plant03:
+                            if (this.plant03Life > 0) {
+                                this.plant03.play("plant_hit", true);
+                                this.plant03Life--;
+                                this.plant03isHit = true;
+                            }
+                            break;
+                        case this.plant04:
+                            if (this.plant04Life > 0) {
+                                this.plant04.play("plant_hit", true);
+                                this.plant04Life--;
+                                this.plant04isHit = true;
+                            }
+                            break;
                         case this.sorcerer01:
                             if (this.sorcerer01Life > 0) {
                                 this.sorcerer01.play("sorcerer_hit", true);
@@ -2367,25 +2614,18 @@ class Jeu2 extends Phaser.Scene {
                                 this.sorcerer02isHit = true;
                             }
                             break;
-                        case this.tank01:
-                            if (this.tank01Life > 0) {
-                                this.tank01Life--;
-                                this.tank01.play("tank_hit", true);
-                                this.tank01isHit = true;
-                            }
-                            break;
-                        case this.tank02:
-                            if (this.tank02Life > 0) {
-                                this.tank02Life--;
-                                this.tank02.play("tank_hit", true);
-                                this.tank02isHit = true;
-                            }
-                            break;
                         case this.plague01:
                             if (this.plague01Life > 0) {
                                 this.plague01Life--;
                                 this.plague01.play("plague_hit", true);
                                 this.plague01isHit = true;
+                            }
+                            break;
+                        case this.plague02:
+                            if (this.plague02Life > 0) {
+                                this.plague02Life--;
+                                this.plague02.play("plague_hit", true);
+                                this.plague02isHit = true;
                             }
                             break;
                     }
@@ -2407,24 +2647,30 @@ class Jeu2 extends Phaser.Scene {
         });
     }
 
-    /*handleParallax() {
+    handleParallax() {
         const cameraX = this.cameras.main.scrollX;
         this.backgroundParallax.forEach((layer, index) => {
             let speed;
             switch (index) {
                 case 0: // background_sky
+                    speed = -0.0005;
+                    break;
+                case 1: // background_sky_front01
+                    speed = -0.01;
+                    break;
+                case 2: // background_sky_front02
                     speed = -0.02;
                     break;
-                case 1: // background_sky_front
-                    speed = -0.03;
+                case 3: // background_behind01
+                    speed = -0.022;
                     break;
-                case 2: // background_behind04
-                    speed = -0.05;
+                case 4: // background_behind02
+                    speed = -0.025;
                     break;
             }
             layer.setX(cameraX * speed);
         });
-    } */
+    }
 
     handlePlayerMovement() {
         // Mouvement avec A et D (gauche-droite)

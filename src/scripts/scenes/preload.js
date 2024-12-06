@@ -174,6 +174,8 @@ class Preload extends Phaser.Scene {
 
         this.load.audio("daggerRecuperated", "./assets/audio/sfx/10_UI_Menu_SFX/dagger.mp3");
 
+        this.load.audio("playerdialogue", "./assets/audio/sfx/Player_dialogue.wav");
+
         // Preload menu chargement et font, lorsque loadé, start la scène `accueil`
 
         this.load.image("chargementMenu", "./assets/images/ui/chargementMenu.png");

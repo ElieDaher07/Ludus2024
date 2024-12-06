@@ -3,21 +3,21 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map_crystal.tmx",
+    "activeFile": "",
     "expandedProjectPaths": [
         "."
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 2,
+            "scaleInDock": 0.75,
             "scaleInEditor": 1
         },
         "map_crystal.tmx": {
-            "scale": 0.5,
-            "selectedLayer": 9,
+            "scale": 1.5,
+            "selectedLayer": 8,
             "viewCenter": {
-                "x": 566,
-                "y": 438
+                "x": 201.33333333333331,
+                "y": 308.6666666666667
             }
         },
         "map_crystal.tmx#background01": {
@@ -30,7 +30,8 @@
             "scaleInDock": 1
         },
         "map_crystal.tmx#main_lev_build_1": {
-            "scaleInDock": 0.75
+            "scaleInDock": 0.75,
+            "scaleInEditor": 3
         },
         "map_crystal.tmx#main_lev_build_2": {
             "scaleInDock": 0.33
@@ -74,7 +75,6 @@
     "map.tileWidth": 16,
     "map.width": 80,
     "openFiles": [
-        "map_rocky.tmx",
         "map_crystal.tmx"
     ],
     "project": "ludus.tiled-project",

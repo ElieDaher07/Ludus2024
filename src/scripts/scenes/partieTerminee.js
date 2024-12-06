@@ -13,14 +13,19 @@ class PartieTerminee extends Phaser.Scene {
 
   create() {
 
-    // Cursor
+    const sauvegarde = JSON.parse(localStorage.getItem('sauvegardeJeu'));
 
+    if (sauvegarde) {
+      checkpoint = sauvegarde.checkpoint;
+      niveau = sauvegarde.niveau;
+      this.diamondCount = sauvegarde.nbDiamant;
+      this.playerLife = sauvegarde.nbVie;
+    }
+
+    // Cursor
 
     this.customCursor = this.add.image(0, 0, 'cursor').setScale(1).setDepth(1000).setVisible(false);
     this.customCursor.setOrigin(0);
-
-
-    this.diamondCount = 0;
 
     // Sons
 
@@ -120,7 +125,7 @@ class PartieTerminee extends Phaser.Scene {
         this.cameras.main.fade(1500, 0, 0, 0);
         this.time.delayedCall(1500, () => {
           this.gameoverSound.stop();
-          this.scene.start("jeu");
+          this.scene.start(niveau);
         });
       });
     });
